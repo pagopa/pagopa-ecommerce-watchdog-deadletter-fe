@@ -21,10 +21,7 @@ This application allows users to:
 * **View History:** See a complete history of all actions and observations associated with a transaction.
 
 
-
-https://github.com/user-attachments/assets/804e4191-2088-40ba-a771-f463c6a563c6
-
-
+https://github.com/user-attachments/assets/3ab2faa0-9c5f-46c7-8675-b88512b1937c
 
 ---
 
