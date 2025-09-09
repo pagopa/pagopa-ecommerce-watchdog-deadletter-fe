@@ -1,0 +1,3 @@
+{
+  "/deadletter-transactions/:deadletterTransactionId/actions": "/deadletter-transactions-actions?deadletterTransactionId=:deadletterTransactionId"
+}
