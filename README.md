@@ -20,6 +20,12 @@ This application allows users to:
 * **Add Actions/Observations:** Add notes and actions to a specific transaction to track analysis and decisions.
 * **View History:** See a complete history of all actions and observations associated with a transaction.
 
+
+
+https://github.com/user-attachments/assets/804e4191-2088-40ba-a771-f463c6a563c6
+
+
+
 ---
 
 ### Getting Started
