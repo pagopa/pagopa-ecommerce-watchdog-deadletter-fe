@@ -32,27 +32,28 @@ To run the application locally, you need to start both the frontend and a mock A
 **Prerequisites**
 
 * Node.js (LTS version recommended)
-* npm or yarn
+* yarn
 
 **Local Development Setup**
 
-1.  **Start the Mock API Server:** The frontend requires a running backend to fetch data. A mock API server is included for local development.
+1.  **Install packages:** Install the required packages.
     ```bash
-    npm run json-server
-    # or
-    yarn json-server
+    yarn install
+    ```
+
+2.  **Start the Mock API Server:** The frontend requires a running backend to fetch data. A mock API server is included for local development.
+    ```bash
+    yarn mock-server
     ```
     This will start the mock server on `http://localhost:4000`.
 
-2.  **Run the Development Server:**
+3.  **Run the Development Server:**
     Open a new terminal window and start the Next.js development server.
     ```bash
-    npm run dev
-    # or
     yarn dev
     ```
 
-3.  **Open in Browser:**
+4.  **Open in Browser:**
     The application will be available at `http://localhost:3000`.
     You need to include a mock user token in the URL to bypass the initial authentication (which is a basic auth placeholder for the PoC):
     `http://localhost:3000/#token=123`
