@@ -1,6 +1,6 @@
 import { JwtUser } from "@pagopa/mui-italia";
 
-export const useTokenFromHash = () => {
+export const useTokenFromHash = (): string | null => {
 
   if (typeof window !== "undefined") {
     const hash = window.location.hash;  
