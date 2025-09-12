@@ -1,6 +1,6 @@
 import { JwtUser } from "@pagopa/mui-italia";
 
-export const useTokenFromHash = (): string => {
+export const useTokenFromHash = (): string | null => {
 
   if (typeof window !== "undefined") {
     const hash = window.location.hash;  
@@ -9,7 +9,7 @@ export const useTokenFromHash = (): string => {
       return match[1];
   }
  
-  throw new Error("No window defined, token not readable");
+  return null;
 };
 
 export const fetchUserData = async (token: string): Promise<JwtUser | null> => {

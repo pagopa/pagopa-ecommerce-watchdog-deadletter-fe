@@ -38,7 +38,7 @@ export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
 
-  const token = useRef<string>("");
+  const token = useRef<string | null>();
 
   useEffect(()=>{ 
     if(!token.current)
