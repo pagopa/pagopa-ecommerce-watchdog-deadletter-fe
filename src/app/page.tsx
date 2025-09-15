@@ -28,14 +28,14 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData, useTokenFromHash } from "./utils/utils";
+import { Transaction } from "./types/DeadletterResponse";
 
 export default function Home() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [rows, setRows] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
-  const [azioniData, setAzioniData] = useState<{ [key: string]: string[] }>({});
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [actionsMap, setActionsMap] = useState<{ [key: string]: string[] }>({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
 
   const token = useTokenFromHash();
@@ -50,44 +50,41 @@ export default function Home() {
     }
   }, [token]);
 
-  const handleOpenDialog = (content: any) => {
+  const handleOpenDialog = (content: object) => {
     console.log("Apertura dialog con contenuto:", content);
     setDialogContent(content);
-    setDialogOpen(true);
+    setIsDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false);
+    setIsDialogOpen(false);
     setDialogContent({});
   };
 
 
   const handleLoadData = async (date: string) => {
     if (!date || !token) {
-      setRows([]);
+      setTransactions([]);
       return;
     }
     const data = await fetchDeadletterTransactions(token, date);
-    setRows(data.deadletterTransactions);
-
+    if(!data) return;
+    setTransactions(data.deadletterTransactions);
     const actionsMap: { [key: string]: string[] } = {};
     await Promise.all(
-      data.map(async (row: { id: string; }) => {
-        const actions = await fetchActionsByTransactionId(token, row.id);  
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        actionsMap[row.id] = actions.map((a: any) => {
-          const time = new Date(a.timestamp).toLocaleString();
-          return `${a.userId} - ${a.value} (${time})`;
+      data.deadletterTransactions.map(async (row) => {
+        const actions = await fetchActionsByTransactionId(token, row.transactionId);  
+        actionsMap[row.transactionId] = actions.map((action) => {
+          const time = new Date(action.timestamp).toLocaleString();
+          return `${action.userId} - ${action.value} (${time})`;
         });
       })
     );
-
-    setAzioniData(actionsMap);
-
+    setActionsMap(actionsMap);
   };
 
   const columns: GridColDef[] = [
-    { field: "insertionDate", headerName: "insertionDate", flex: 1 },
+    { field: "insertionDate", headerName: "insertionDate", flex: 1},
     // { field: "id", headerName: "id", width: 150 },
     { field: "transactionId", headerName: "transactionId", flex: 1, filterable: true },
     { field: "paymentToken", headerName: "paymentToken", flex: 1, filterable: true },
@@ -190,20 +187,20 @@ export default function Home() {
     sortable: false,
     renderCell: (params) => {
       const id = params.id as string;
-      const storico = azioniData[id] || [];
+      const transactionActions = actionsMap[id] || [];
 
       return (
         <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
           {/* Storico azioni */}
-          {storico.length > 0 && (
+          {transactionActions.length > 0 && (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-              {storico.map((azione, idx) => (
+              {transactionActions.map((action, idx) => (
                 <Chip
                   key={idx}
-                  label={azione}
+                  label={action}
                   size="small"
                   color={
-                    azione.toLowerCase().includes("ticket")
+                    action.toLowerCase().includes("ticket")
                       ? "primary"
                       : "success"
                   }
@@ -212,7 +209,7 @@ export default function Home() {
             </Box>
           )}
 
-          {storico.length > 0 && <Divider sx={{ mb: 1 }} />}
+          {transactionActions.length > 0 && <Divider sx={{ mb: 1 }} />}
           <Select
             size="small"
             value=""
@@ -222,7 +219,7 @@ export default function Home() {
             onChange={(e) => {
               if (!jwtUser) return; // evita errori se utente non caricato
               const nuovaAzione = `${jwtUser.name} ${jwtUser.surname} - ${e.target.value}`;
-              setAzioniData((prev) => ({
+              setActionsMap((prev) => ({
                 ...prev,
                 [id]: [...(prev[id] || []), nuovaAzione]
               }));
@@ -241,18 +238,19 @@ export default function Home() {
 
   ];
 
-  const aggregateBy = (field: keyof typeof rows[number]) => {
+  const aggregateBy = (field: keyof Transaction) => {
     return Object.entries(
-      rows.reduce((acc, row) => {
-        acc[row[field]] = (acc[row[field]] || 0) + 1;
+      transactions.reduce((acc, row) => {
+        const key = row[field] as string;
+        acc[key] = (acc[key] || 0) + 1;
         return acc;
       }, {} as Record<string, number>)
     ).map(([name, value]) => ({ name, value }));
   };
 
-  const ecommerceData = useMemo(() => aggregateBy("eCommerceStatus"), [rows]);
-  const npgData = useMemo(() => aggregateBy("gatewayAuthorizationStatus"), [rows]);
-  const paymentMethodName = useMemo(() => aggregateBy("paymentMethodName"), [rows]);
+  const ecommerceData = useMemo(() => aggregateBy("eCommerceStatus"), [transactions]);
+  const npgData = useMemo(() => aggregateBy("gatewayAuthorizationStatus"), [transactions]);
+  const paymentMethodName = useMemo(() => aggregateBy("paymentMethodName"), [transactions]);
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
   
@@ -309,7 +307,7 @@ export default function Home() {
           </Grid>
         </Paper>
 
-        {rows.length > 0 && (
+        {transactions.length > 0 && (
           <>
             <Grid container spacing={3} sx={{ mb: 3 }}>
               {[{ title: "Stato Ecommerce", data: ecommerceData },
@@ -342,7 +340,7 @@ export default function Home() {
 
             <Paper sx={{ height: "100%", width: "100%" }}>
               <DataGrid
-                rows={rows}
+                rows={transactions}
                 columns={columns}
                 getRowId={(row) => row.transactionId}
                 getRowHeight={() => "auto"}
@@ -363,8 +361,8 @@ export default function Home() {
             </Paper>
           </>
         )}
-        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-          <DialogTitle>Dettaglo</DialogTitle>
+        <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+          <DialogTitle>Dettaglio</DialogTitle>
           <DialogContent>
             <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
               {JSON.stringify(dialogContent, null, 2)}
