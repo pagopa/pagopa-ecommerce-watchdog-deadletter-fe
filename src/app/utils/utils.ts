@@ -2,7 +2,7 @@ import { JwtUser } from "@pagopa/mui-italia";
 import { DeadletterAction } from "../types/DeadletterAction";
 import { DeadletterResponse } from "../types/DeadletterResponse";
 
-export const useTokenFromHash = () => {
+export const useTokenFromHash = (): string | null => {
 
   if (typeof window !== "undefined") {
     const hash = window.location.hash;  

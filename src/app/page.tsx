@@ -3,7 +3,7 @@ import styles from "./page.module.css";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   TextField,
   Select,
@@ -38,13 +38,17 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
 
-  const token = useTokenFromHash();
+  const token = useRef<string | null>();
+
+  useEffect(()=>{ 
+    if(!token.current)
+      token.current = useTokenFromHash();
+  },[]);
 
   useEffect(() => {
-    if (token) {
-      fetchUserData(token).then(u => {
-          console.log("Dati utente ricevuti:", u);
-
+    if (token.current) {
+      fetchUserData(token.current).then(u => {
+        console.log("Dati utente ricevuti:", u);
         if (u) setJwtUser(u);
       });
     }
@@ -63,17 +67,17 @@ export default function Home() {
 
 
   const handleLoadData = async (date: string) => {
-    if (!date || !token) {
+    if (!date || !token.current) {
       setTransactions([]);
       return;
     }
-    const data = await fetchDeadletterTransactions(token, date);
+    const data = await fetchDeadletterTransactions(token.current, date);
     if(!data) return;
     setTransactions(data.deadletterTransactions);
     const actionsMap: { [key: string]: string[] } = {};
     await Promise.all(
       data.deadletterTransactions.map(async (row) => {
-        const actions = await fetchActionsByTransactionId(token, row.transactionId);  
+        const actions = await fetchActionsByTransactionId(token.current, row.transactionId);  
         actionsMap[row.transactionId] = actions.map((action) => {
           const time = new Date(action.timestamp).toLocaleString();
           return `${action.userId} - ${action.value} (${time})`;
