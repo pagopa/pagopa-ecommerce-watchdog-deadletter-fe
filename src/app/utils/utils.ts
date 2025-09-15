@@ -1,4 +1,6 @@
 import { JwtUser } from "@pagopa/mui-italia";
+import { DeadletterAction } from "../types/DeadletterAction";
+import { DeadletterResponse } from "../types/DeadletterResponse";
 
 export const useTokenFromHash = () => {
 
@@ -33,7 +35,7 @@ export const fetchUserData = async (token: string): Promise<JwtUser | null> => {
   }
 };
 
-export const fetchActionsByTransactionId = async (token: string, transactionId: string) => {
+export const fetchActionsByTransactionId = async (token: string, transactionId: string): Promise<DeadletterAction[]> => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/${transactionId}/actions`, {
       headers: { Authorization: `Bearer ${token}`,
@@ -47,7 +49,7 @@ export const fetchActionsByTransactionId = async (token: string, transactionId: 
   }
 };
 
-export const fetchDeadletterTransactions = async (token: string, date: string) => {
+export const fetchDeadletterTransactions = async (token: string, date: string): Promise<DeadletterResponse | null> => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions?date=${date}&pageNumber=0&pageSize=10`, {
       headers: {
@@ -60,6 +62,6 @@ export const fetchDeadletterTransactions = async (token: string, date: string) =
     return data;  
   } catch (e) {
     console.error(e);
-    return [];
+    return null;
   }
 };
