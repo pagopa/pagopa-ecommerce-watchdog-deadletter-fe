@@ -3,13 +3,12 @@ import styles from "./page.module.css";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   TextField,
   Select,
   MenuItem,
   Grid,
-  Typography,
   Box,
   Chip,
   Divider,
@@ -235,15 +234,6 @@ export default function Home() {
 
   ];
 
-  const aggregateBy = (field: keyof Transaction) => {
-    return Object.entries(
-      transactions.reduce((acc, row) => {
-        const key = row[field] as string;
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    ).map(([name, value]) => ({ name, value }));
-  };
 
   
   const pagoPALink : RootLinkType = {
