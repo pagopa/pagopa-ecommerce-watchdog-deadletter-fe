@@ -3,26 +3,18 @@ import { Logout } from "@mui/icons-material";
 import {
   Grid,
   TextField,
-  Typography
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip
-} from "recharts";
+import { useEffect, useRef, useState } from "react";
 import { TransactionsTable }  from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData, useTokenFromHash } from "./utils/utils";
+import ChartsStatistics from "./ChartsStatistics";
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -89,23 +81,9 @@ export default function Home() {
     setActionsMap(actionsMap);
   };
 
-  const aggregateBy = (field: keyof Transaction) => {
-    return Object.entries(
-      transactions.reduce((acc, row) => {
-        const key = row[field] as string;
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    ).map(([name, value]) => ({ name, value }));
-  };
 
-  const ecommerceData = useMemo(() => aggregateBy("eCommerceStatus"), [transactions]);
-  const npgData = useMemo(() => aggregateBy("gatewayAuthorizationStatus"), [transactions]);
-  const paymentMethodName = useMemo(() => aggregateBy("paymentMethodName"), [transactions]);
-
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
-  const pagoPALink: RootLinkType = {
+  
+  const pagoPALink : RootLinkType = {
     label: "PagoPA S.p.A.",
     href: "https://www.pagopa.it",
     ariaLabel: "",
@@ -160,35 +138,7 @@ export default function Home() {
 
         {transactions.length > 0 && (
           <>
-            <Grid container spacing={3} sx={{ mb: 3 }}>
-              {[{ title: "Stato Ecommerce", data: ecommerceData },
-              { title: "Stato NPG", data: npgData },
-              { title: "Distribuzione metodi di pagamento", data: paymentMethodName }].map((chart, idx) => (
-                <Grid item xs={12} md={4} key={idx}>
-                  <Paper sx={{ p: 2 }}>
-                    <Typography variant="h6" sx={{ mb: 1 }}>{chart.title}</Typography>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <PieChart>
-                        <Pie
-                          data={chart.data}
-                          dataKey="value"
-                          nameKey="name"
-                          outerRadius={80}
-                          label
-                        >
-                          {chart.data.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-
+            <ChartsStatistics transactions={transactions}/>
             <Paper sx={{ height: "100%", width: "100%" }}>
               <TransactionsTable transactions={transactions} actionsMap={actionsMap} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
             </Paper>
