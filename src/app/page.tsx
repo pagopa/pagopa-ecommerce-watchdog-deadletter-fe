@@ -15,20 +15,13 @@ import {
   Divider,
   Button
 } from "@mui/material";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from "recharts";
 import { Logout } from "@mui/icons-material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData, useTokenFromHash } from "./utils/utils";
 import { Transaction } from "./types/DeadletterResponse";
+import ChartsStatistics from "./ChartsStatistics";
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -252,11 +245,6 @@ export default function Home() {
     ).map(([name, value]) => ({ name, value }));
   };
 
-  const ecommerceData = useMemo(() => aggregateBy("eCommerceStatus"), [transactions]);
-  const npgData = useMemo(() => aggregateBy("gatewayAuthorizationStatus"), [transactions]);
-  const paymentMethodName = useMemo(() => aggregateBy("paymentMethodName"), [transactions]);
-
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
   
   const pagoPALink : RootLinkType = {
     label: "PagoPA S.p.A.",
@@ -313,35 +301,7 @@ export default function Home() {
 
         {transactions.length > 0 && (
           <>
-            <Grid container spacing={3} sx={{ mb: 3 }}>
-              {[{ title: "Stato Ecommerce", data: ecommerceData },
-                { title: "Stato NPG", data: npgData },
-                { title: "Distribuzione metodi di pagamento", data: paymentMethodName }].map((chart, idx) => (
-                <Grid item xs={12} md={4} key={idx}>
-                  <Paper sx={{ p: 2 }}>
-                    <Typography variant="h6" sx={{ mb: 1 }}>{chart.title}</Typography>
-                    <ResponsiveContainer width="100%" height={250}>
-                      <PieChart>
-                        <Pie
-                          data={chart.data}
-                          dataKey="value"
-                          nameKey="name"
-                          outerRadius={80}
-                          label
-                        >
-                          {chart.data.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-
+            <ChartsStatistics transactions={transactions}/>
             <Paper sx={{ height: "100%", width: "100%" }}>
               <DataGrid
                 rows={transactions}
