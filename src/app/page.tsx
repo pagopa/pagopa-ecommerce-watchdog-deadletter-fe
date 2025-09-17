@@ -1,25 +1,19 @@
 "use client";
-import styles from "./page.module.css";
-import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
-import { useState, useRef, useEffect } from "react";
-import {
-  TextField,
-  Select,
-  MenuItem,
-  Grid,
-  Box,
-  Chip,
-  Divider,
-  Button
-} from "@mui/material";
 import { Logout } from "@mui/icons-material";
+import {
+  Grid,
+  TextField,
+} from "@mui/material";
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData, useTokenFromHash } from "./utils/utils";
+import DialogTitle from "@mui/material/DialogTitle";
+import Paper from "@mui/material/Paper";
+import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
+import { useEffect, useRef, useState } from "react";
+import { TransactionsTable }  from "./TransactionsTable";
+import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
+import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData, useTokenFromHash } from "./utils/utils";
 import ChartsStatistics from "./ChartsStatistics";
 
 export default function Home() {
@@ -32,10 +26,10 @@ export default function Home() {
 
   const token = useRef<string | null>();
 
-  useEffect(()=>{ 
-    if(!token.current)
+  useEffect(() => {
+    if (!token.current)
       token.current = useTokenFromHash();
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (token.current) {
@@ -57,6 +51,14 @@ export default function Home() {
     setDialogContent({});
   };
 
+  const handleAddActionToTransaction = (value: string, id: string) => {
+    if (!jwtUser) return;
+    const nuovaAzione = `${jwtUser.name} ${jwtUser.surname} - ${value}`;
+    setActionsMap((prev) => ({
+      ...prev,
+      [id]: [...(prev[id] || []), nuovaAzione],
+    }));
+  }
 
   const handleLoadData = async (date: string) => {
     if (!date || !token.current) {
@@ -64,12 +66,12 @@ export default function Home() {
       return;
     }
     const data = await fetchDeadletterTransactions(token.current, date);
-    if(!data) return;
+    if (!data) return;
     setTransactions(data.deadletterTransactions);
     const actionsMap: { [key: string]: string[] } = {};
     await Promise.all(
       data.deadletterTransactions.map(async (row) => {
-        const actions = await fetchActionsByTransactionId(token.current, row.transactionId);  
+        const actions = await fetchActionsByTransactionId(token.current, row.transactionId);
         actionsMap[row.transactionId] = actions.map((action) => {
           const time = new Date(action.timestamp).toLocaleString();
           return `${action.userId} - ${action.value} (${time})`;
@@ -78,161 +80,6 @@ export default function Home() {
     );
     setActionsMap(actionsMap);
   };
-
-  const columns: GridColDef[] = [
-    { field: "insertionDate", headerName: "insertionDate", flex: 1},
-    // { field: "id", headerName: "id", width: 150 },
-    { field: "transactionId", headerName: "transactionId", flex: 1, filterable: true },
-    { field: "paymentToken", headerName: "paymentToken", flex: 1, filterable: true },
-    { field: "paymentEndToEndId", headerName: "paymentEndToEndId", flex: 0.5, filterable: true },
-    { field: "operationId", headerName: "operationId", flex: 0.5, filterable: true },
-    { field: "paymentMethodName", headerName: "methodName", flex: 0.6, filterable: true },
-    { field: "pspId", headerName: "pspId", flex: 0.5 },
-    { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7 },
-    { field: "gatewayAuthorizationStatus", headerName: "gatewayStatus", flex: 0.5 },
-    {
-      field: "nodoDetails",
-      headerName: "nodoDetails",
-      flex: 0.6,
-      renderCell: (params) => {
-        if (!params.value) {
-          return <span>N/A</span>;
-        }
-        return (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handleOpenDialog(params.value)}
-          >
-            View
-          </Button>
-        );
-      },
-    }, 
-    {
-      field: "npgDetails",
-      headerName: "npgDetails",
-      flex: 0.6,
-      renderCell: (params) => {
-        if (!params.value) {
-          return <span>N/A</span>;
-        }
-        return (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handleOpenDialog(params.value)}
-          >
-            View
-          </Button>
-        );
-      },
-    },
-    {
-      field: "eCommerceDetails",
-      headerName: "eCommerceDetails",
-      flex: 0.6,
-      renderCell: (params) => {
-        if (!params.value) {
-          return <span>N/A</span>;
-        }
-        return (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handleOpenDialog(params.value)}
-          >
-            View
-          </Button>
-        );
-      },
-  },
-    // {
-    //   field: "note",
-    //   headerName: "Note",
-    //   width: 250,
-    //   sortable: false,
-    //   renderCell: (params) => (
-    //     <TextField
-    //       variant="outlined"
-    //       size="small"
-    //       fullWidth
-    //       multiline
-    //       InputProps={{
-    //         sx: {
-    //           "& textarea": {
-    //             resize: "vertical",
-    //             overflow: "auto"
-    //           }
-    //         }
-    //       }}
-    //       value={noteData[params.id as string] || ""}
-    //       onChange={(e) =>
-    //         setNoteData({ ...noteData, [params.id as string]: e.target.value })
-    //       }
-    //       onKeyDown={(e) => {
-    //         if (e.key === " ") e.stopPropagation();
-    //       }}
-    //     />
-    //   )
-    // },
-   {
-    field: "azioni",
-    headerName: "Azioni",
-    flex: 1,
-    sortable: false,
-    renderCell: (params) => {
-      const id = params.id as string;
-      const transactionActions = actionsMap[id] || [];
-
-      return (
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-          {/* Storico azioni */}
-          {transactionActions.length > 0 && (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-              {transactionActions.map((action, idx) => (
-                <Chip
-                  key={idx}
-                  label={action}
-                  size="small"
-                  color={
-                    action.toLowerCase().includes("ticket")
-                      ? "primary"
-                      : "success"
-                  }
-                />
-              ))}
-            </Box>
-          )}
-
-          {transactionActions.length > 0 && <Divider sx={{ mb: 1 }} />}
-          <Select
-            size="small"
-            value=""
-            displayEmpty
-            fullWidth
-            sx={{ fontSize: "0.75rem" }}
-            onChange={(e) => {
-              if (!jwtUser) return; // evita errori se utente non caricato
-              const nuovaAzione = `${jwtUser.name} ${jwtUser.surname} - ${e.target.value}`;
-              setActionsMap((prev) => ({
-                ...prev,
-                [id]: [...(prev[id] || []), nuovaAzione]
-              }));
-            }}
-          >
-            <MenuItem value="">➕ Aggiungi azione</MenuItem>
-            <MenuItem value="Stornata">Stornata</MenuItem>
-            <MenuItem value="Ticket Nexi">Creato ticket Nexi</MenuItem>
-            <MenuItem value="Nessuna azione richiesta">Nessuna azione richiesta</MenuItem>
-            <MenuItem value="Da stornare">Da stornare</MenuItem>
-          </Select>
-        </Box>
-      );
-    }
-  }
-
-  ];
 
 
   
@@ -246,7 +93,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <HeaderAccount enableDropdown rootLink={pagoPALink} loggedUser={jwtUser ?? undefined}
-          onAssistanceClick={() => {
+        onAssistanceClick={() => {
           console.log("Clicked/Tapped on Assistance");
         }} onLogin={() => {
           console.log("User login");
@@ -256,7 +103,7 @@ export default function Home() {
           onClick: () => {
             console.log("User logged out");
           },
-          icon:  <Logout id="logout-button-icon" fontSize="small" />,
+          icon: <Logout id="logout-button-icon" fontSize="small" />,
         }]} />
       <HeaderProduct
         chipLabel="Beta"
@@ -293,25 +140,7 @@ export default function Home() {
           <>
             <ChartsStatistics transactions={transactions}/>
             <Paper sx={{ height: "100%", width: "100%" }}>
-              <DataGrid
-                rows={transactions}
-                columns={columns}
-                getRowId={(row) => row.transactionId}
-                getRowHeight={() => "auto"}
-                disableRowSelectionOnClick
-                sx={{
-                  fontSize: "0.85rem",
-                  border: 0,
-                  "& .MuiDataGrid-cell": {
-                    alignItems: "start",
-                    py: 1
-                  },
-                  "& .MuiInputBase-input": {
-                    fontSize: "0.75rem"
-                  }
-                }}
-                showToolbar
-              />
+              <TransactionsTable transactions={transactions} actionsMap={actionsMap} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
             </Paper>
           </>
         )}
