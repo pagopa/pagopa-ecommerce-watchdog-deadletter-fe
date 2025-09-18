@@ -111,6 +111,11 @@ export function TransactionsTable(
       headerName: "Azioni",
       flex: 1,
       sortable: false,
+      valueGetter: (_value, row) => {
+        const id = row.transactionId;
+        const value = props.actionsMap[id];
+        return value?.length > 0 ? value : null;
+      },
       renderCell: (params) => {
         const id = params.id as string;
         const transactionActions = props.actionsMap[id] || [];
