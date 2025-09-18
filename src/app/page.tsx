@@ -15,12 +15,13 @@ import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData, useTokenFromHash } from "./utils/utils";
 import ChartsStatistics from "./ChartsStatistics";
+import { DeadletterAction } from "./types/DeadletterAction";
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
-  const [actionsMap, setActionsMap] = useState<{ [key: string]: string[] }>({});
+  const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
 
@@ -52,12 +53,22 @@ export default function Home() {
   };
 
   const handleAddActionToTransaction = (value: string, id: string) => {
-    if (!jwtUser) return;
-    const nuovaAzione = `${jwtUser.name} ${jwtUser.surname} - ${value}`;
-    setActionsMap((prev) => ({
-      ...prev,
-      [id]: [...(prev[id] || []), nuovaAzione],
-    }));
+    if (!jwtUser || actionsMap.get(id)?.has(value)) return;
+
+    const newMap = new Map(actionsMap);
+    const newAction : DeadletterAction = {
+      value : value,
+      id :  "null",
+      timestamp : "",
+      userId : jwtUser.id,
+      deadletterTransactionId : id,
+    }
+    
+    if(!newMap.get(id))
+      newMap.set(id, new Map());
+    newMap.get(id)?.set(value,newAction);
+    console.log("new map: ", newMap);
+    setActionsMap(newMap);
   }
 
   const handleLoadData = async (date: string) => {
@@ -68,14 +79,15 @@ export default function Home() {
     const data = await fetchDeadletterTransactions(token.current, date);
     if (!data) return;
     setTransactions(data.deadletterTransactions);
-    const actionsMap: { [key: string]: string[] } = {};
+    const actionsMap: Map<string, Map<string, DeadletterAction>>= new Map();
     await Promise.all(
-      data.deadletterTransactions.map(async (row) => {
-        const actions = await fetchActionsByTransactionId(token.current, row.transactionId);
-        actionsMap[row.transactionId] = actions.map((action) => {
-          const time = new Date(action.timestamp).toLocaleString();
-          return `${action.userId} - ${action.value} (${time})`;
+      data.deadletterTransactions.map(async (transaction) => {
+        const actions = await fetchActionsByTransactionId(token.current,transaction.transactionId);
+        const singleActionMap : Map<string, DeadletterAction>  = new Map();
+        actions.forEach((act) => {
+          singleActionMap.set(act.value, act);
         });
+        actionsMap.set(transaction.transactionId,singleActionMap);
       })
     );
     setActionsMap(actionsMap);
