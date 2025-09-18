@@ -1,7 +1,7 @@
 export const useTokenFromHash = (): string | null => {
   if (typeof window !== "undefined") {
     const hash = window.location.hash;  
-    const match = hash.match(/#token=(.+)/);
+    const match = RegExp(/#token=(.+)/).exec(hash);
     if (match) 
       return match[1];
   }
