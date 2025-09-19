@@ -114,8 +114,12 @@ export function TransactionsTable(
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
-        const value = props.actionsMap[id];
-        return value?.length > 0 ? value : null;
+        const initialStringValue = "";
+        const value = props.actionsMap.get(id)?.values().toArray().reduce(
+          (accumulateString, currentValue) => accumulateString+" "+currentValue.value+" "+currentValue.timestamp+" "+currentValue.userId,
+          initialStringValue
+        );
+        return value && value.length > 10 ? value : null; 
       },
       renderCell: (params) => {
         const id = params.id as string;
