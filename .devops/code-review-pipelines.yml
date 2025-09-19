@@ -43,3 +43,13 @@ stages:
         - script: |
             yarn build
           displayName: 'Build'
+
+  - stage: Static_Analysis
+    condition: and(succeeded(), eq('${{parameters.STATIC_ANALISYS}}', true))
+    dependsOn: []
+    jobs:
+      - job: lint
+        steps:
+        - template: templates/node-job-setup/template.yaml@pagopaCommons
+        - script: yarn lint
+          displayName: 'Lint'
