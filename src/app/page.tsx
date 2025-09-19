@@ -72,11 +72,13 @@ export default function Home() {
     const actionsMap: { [key: string]: string[] } = {};
     await Promise.all(
       data.deadletterTransactions.map(async (row) => {
-        const actions = await fetchActionsByTransactionId(token.current, row.transactionId);
-        actionsMap[row.transactionId] = actions.map((action) => {
-          const time = new Date(action.timestamp).toLocaleString();
-          return `${action.userId} - ${action.value} (${time})`;
-        });
+        if(token.current){
+          const actions = await fetchActionsByTransactionId(token.current, row.transactionId);
+          actionsMap[row.transactionId] = actions.map((action) => {
+            const time = new Date(action.timestamp).toLocaleString();
+            return `${action.userId} - ${action.value} (${time})`;
+          });
+        }
       })
     );
     setActionsMap(actionsMap);
