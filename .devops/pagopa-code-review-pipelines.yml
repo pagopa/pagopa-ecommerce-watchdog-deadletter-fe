@@ -1,0 +1,45 @@
+parameters:
+  - name: 'BUILD'
+    displayName: 'Build'
+    type: boolean
+    default: true
+
+  - name: 'STATIC_ANALISYS'
+    displayName: 'Static analisys'
+    type: boolean
+    default: true
+
+  - name: 'UNIT_TESTS'
+    displayName: 'Unit tests'
+    type: boolean
+    default: true
+    
+variables:
+  NODE_VERSION: '22.13.1'
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-22.04'
+
+resources:
+  repositories:
+    - repository: pagopaCommons
+      type: github
+      name: pagopa/azure-pipeline-templates
+      ref: refs/tags/v19
+      endpoint: 'io-azure-devops-github-ro'
+
+stages:
+  - stage: Build
+    condition: and(succeeded(), eq('${{parameters.BUILD}}', true))
+    dependsOn: []
+    jobs:
+      - job: make_build
+        steps:
+        - template: templates/node-job-setup/template.yaml@pagopaCommons
+
+        - script: |
+            yarn build
+          displayName: 'Build'
