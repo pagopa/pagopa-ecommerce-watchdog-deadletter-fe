@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionsTable }  from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { useTokenFromHash } from "./utils/utils";
+import { getTokenFromHash } from "./utils/utils";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
 import { DeadletterAction } from "./types/DeadletterAction";
@@ -30,7 +30,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!token.current)
-      token.current = useTokenFromHash();
+      token.current = getTokenFromHash();
   }, []);
 
   useEffect(() => {
@@ -83,12 +83,14 @@ export default function Home() {
     const actionsMap: Map<string, Map<string, DeadletterAction>>= new Map();
     await Promise.all(
       data.deadletterTransactions.map(async (transaction) => {
-        const actions = await fetchActionsByTransactionId(token.current,transaction.transactionId);
-        const singleActionMap : Map<string, DeadletterAction>  = new Map();
-        actions.forEach((act) => {
-          singleActionMap.set(act.value, act);
-        });
-        actionsMap.set(transaction.transactionId,singleActionMap);
+        if(token.current){
+          const actions = await fetchActionsByTransactionId(token.current,transaction.transactionId);
+          const singleActionMap : Map<string, DeadletterAction>  = new Map();
+          actions.forEach((act) => {
+            singleActionMap.set(act.value, act);
+          });
+          actionsMap.set(transaction.transactionId,singleActionMap);
+        }
       })
     );
     setActionsMap(actionsMap);
