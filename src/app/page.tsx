@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionsTable }  from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { useTokenFromHash } from "./utils/utils";
+import { getTokenFromHash } from "./utils/utils";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
 
@@ -29,7 +29,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!token.current)
-      token.current = useTokenFromHash();
+      token.current = getTokenFromHash();
   }, []);
 
   useEffect(() => {
