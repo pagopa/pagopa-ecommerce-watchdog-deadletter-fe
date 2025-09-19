@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionsTable }  from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { useTokenFromHash } from "./utils/utils";
+import { getTokenFromHash } from "./utils/utils";
 import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
 
@@ -29,7 +29,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!token.current)
-      token.current = useTokenFromHash();
+      token.current = getTokenFromHash();
   }, []);
 
   useEffect(() => {
@@ -72,11 +72,13 @@ export default function Home() {
     const actionsMap: { [key: string]: string[] } = {};
     await Promise.all(
       data.deadletterTransactions.map(async (row) => {
-        const actions = await fetchActionsByTransactionId(token.current, row.transactionId);
-        actionsMap[row.transactionId] = actions.map((action) => {
-          const time = new Date(action.timestamp).toLocaleString();
-          return `${action.userId} - ${action.value} (${time})`;
-        });
+        if(token.current){
+          const actions = await fetchActionsByTransactionId(token.current, row.transactionId);
+          actionsMap[row.transactionId] = actions.map((action) => {
+            const time = new Date(action.timestamp).toLocaleString();
+            return `${action.userId} - ${action.value} (${time})`;
+          });
+        }
       })
     );
     setActionsMap(actionsMap);

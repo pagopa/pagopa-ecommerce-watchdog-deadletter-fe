@@ -1,4 +1,4 @@
-export const useTokenFromHash = (): string | null => {
+export const getTokenFromHash = (): string | null => {
   if (typeof window !== "undefined") {
     const hash = window.location.hash;  
     const match = RegExp(/#token=(.+)/).exec(hash);
