@@ -1,5 +1,5 @@
 import Paper from "@mui/material/Paper";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   Grid,
   Typography,
@@ -15,31 +15,33 @@ import {
 import { Transaction } from "./types/DeadletterResponse";
 
 
-export default function ChartsStatistics({transactions}: {transactions : Transaction[]}){
+export default function ChartsStatistics({transactions}: Readonly<{transactions : Transaction[]}>){
 
     const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-    const aggregateBy = (field: keyof Transaction) => {
-        return Object.entries(
-          transactions.reduce((acc, row) => {
-            const key = row[field] as string;
-            acc[key] = (acc[key] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>)
-        ).map(([name, value]) => ({ name, value }));
-    };
+    const aggregateBy = useCallback(
+    (field: keyof Transaction) => {
+      return Object.entries(
+        transactions.reduce((acc, row) => {
+          const key = row[field] as string;
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      ).map(([name, value]) => ({ name, value }));
+    },
+    [transactions]);
     
-    const ecommerceData = useMemo(() => aggregateBy("eCommerceStatus"), [transactions]);
-    const npgData = useMemo(() => aggregateBy("gatewayAuthorizationStatus"), [transactions]);
-    const paymentMethodName = useMemo(() => aggregateBy("paymentMethodName"), [transactions]);
+    const ecommerceData = useMemo(() => aggregateBy("eCommerceStatus"), [aggregateBy]);
+    const npgData = useMemo(() => aggregateBy("gatewayAuthorizationStatus"), [aggregateBy]);
+    const paymentMethodName = useMemo(() => aggregateBy("paymentMethodName"), [aggregateBy]);
 
 
     return(
             <Grid container spacing={3} sx={{ mb: 3 }}>
               {[{ title: "Stato Ecommerce", data: ecommerceData },
                 { title: "Stato NPG", data: npgData },
-                { title: "Distribuzione metodi di pagamento", data: paymentMethodName }].map((chart, idx) => (
-                <Grid item xs={12} md={4} key={idx}>
+                { title: "Distribuzione metodi di pagamento", data: paymentMethodName }].map((chart) => (
+                <Grid item xs={12} md={4} key={chart.title}>
                   <Paper sx={{ p: 2 }}>
                     <Typography variant="h6" sx={{ mb: 1 }}>{chart.title}</Typography>
                     <ResponsiveContainer width="100%" height={250}>
