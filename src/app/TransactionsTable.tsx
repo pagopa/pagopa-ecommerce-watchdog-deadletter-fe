@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { DeadletterAction } from "./types/DeadletterAction";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtiles";
 
+
 export function TransactionsTable(
   props: Readonly<{ 
     transactions: Transaction[]; 
