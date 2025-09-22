@@ -9,7 +9,8 @@
     "lint": "next lint",
     "mock-server": "json-server --watch api-mock/db.json --routes api-mock/routes.json --port 4000",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --passWithNoTests --config=jest.config.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
