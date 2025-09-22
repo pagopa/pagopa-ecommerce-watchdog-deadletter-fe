@@ -70,8 +70,8 @@ stages:
             organization: "pagopa"
             scannerMode: 'CLI'
             configMode: 'manual'
-            cliProjectKey: 'pagopa_pagopa-watchdog-deadletter-fe'
-            cliProjectName: 'pagopa-watchdog-deadletter-fe'
+            cliProjectKey: 'pagopa_pagopa-ecommerce-watchdog-deadletter-fe'
+            cliProjectName: 'pagopa-ecommerce-watchdog-deadletter-fe'
             cliSources: '.'
             extraProperties: |
               sonar.javascript.lcov.reportPaths=coverage/lcov.info
