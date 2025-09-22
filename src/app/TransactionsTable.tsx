@@ -1,11 +1,12 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
 import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DeadletterAction } from "./types/DeadletterAction";
 
 export function TransactionsTable(
   props: Readonly<{ 
     transactions: Transaction[]; 
-    actionsMap: { [key: string]: string[] };
+    actionsMap: Map<string, Map<string, DeadletterAction>>;
     handleOpenDialog: (content: object) => void; 
     handleAddActionToTransaction: (value:string, id:string) => void; }>
   ) {
@@ -113,12 +114,16 @@ export function TransactionsTable(
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
-        const value = props.actionsMap[id];
-        return value?.length > 0 ? value : null;
+        const initialStringValue = "";
+        const value = props.actionsMap.get(id)?.values().toArray().reduce(
+          (accumulateString, currentValue) => accumulateString+" "+currentValue.value+" "+currentValue.timestamp+" "+currentValue.userId,
+          initialStringValue
+        );
+        return value && value.length > 10 ? value : null; 
       },
       renderCell: (params) => {
         const id = params.id as string;
-        const transactionActions = props.actionsMap[id] || [];
+        const transactionActions = props.actionsMap.get(id)?.values().toArray() || [];
 
         return (
           <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -128,10 +133,10 @@ export function TransactionsTable(
                 {transactionActions.map((action, idx) => (
                   <Chip
                     key={idx}
-                    label={action}
+                    label={`${action.userId} - ${action.value} (${action.timestamp})`}
                     size="small"
                     color={
-                      action.toLowerCase().includes("ticket")
+                      action.value.toLowerCase().includes("ticket")
                         ? "primary"
                         : "success"
                     }
