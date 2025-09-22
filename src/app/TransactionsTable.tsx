@@ -2,6 +2,8 @@ import { Transaction } from "@/app/types/DeadletterResponse";
 import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { DeadletterAction } from "./types/DeadletterAction";
+import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtiles";
+
 
 export function TransactionsTable(
   props: Readonly<{ 
@@ -114,12 +116,8 @@ export function TransactionsTable(
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
-        const initialStringValue = "";
-        const value = props.actionsMap.get(id)?.values().toArray().reduce(
-          (accumulateString, currentValue) => accumulateString+" "+currentValue.value+" "+currentValue.timestamp+" "+currentValue.userId,
-          initialStringValue
-        );
-        return value && value.length > 10 ? value : null; 
+        const value = props.actionsMap.get(id)?.values().map(getDeadletterActionAsString).toArray();
+        return value && value.length > 0 ? value : null; 
       },
       renderCell: (params) => {
         const id = params.id as string;
@@ -133,7 +131,7 @@ export function TransactionsTable(
                 {transactionActions.map((action, idx) => (
                   <Chip
                     key={idx}
-                    label={`${action.userId} - ${action.value} (${action.timestamp})`}
+                    label={getDeadletterActionAsString(action)}
                     size="small"
                     color={
                       action.value.toLowerCase().includes("ticket")
