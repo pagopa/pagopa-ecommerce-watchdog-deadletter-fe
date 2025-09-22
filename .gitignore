@@ -20,6 +20,9 @@
 # production
 /build
 
+# test output
+test-report.xml
+
 # misc
 .DS_Store
 *.pem
