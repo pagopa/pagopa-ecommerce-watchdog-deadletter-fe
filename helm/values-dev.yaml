@@ -69,7 +69,6 @@ microservice-chart:
     NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST: ""
     NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST: ""
   envSecret:
-    
   nodeSelector: {}
   tolerations: []
   affinity:
@@ -82,7 +81,7 @@ microservice-chart:
                 values:
                   - user
   secretProviderClass:
-    create: true
+    create: false
   keyvault:
     name: "pagopa-d-ecommerce-kv"
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
