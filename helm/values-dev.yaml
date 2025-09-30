@@ -10,7 +10,7 @@ microservice-chart:
     handlerType: httpGet
     httpGet:
       path: /index.html
-      port: 8080
+      port: 3000
     initialDelaySeconds: 10
     failureThreshold: 6
     periodSeconds: 10
@@ -18,7 +18,7 @@ microservice-chart:
     handlerType: httpGet
     httpGet:
       path: /index.html
-      port: 8080
+      port: 3000
     initialDelaySeconds: 10
     failureThreshold: 6
     periodSeconds: 10
@@ -28,12 +28,12 @@ microservice-chart:
     create: true
     type: ClusterIP
     ports:
-      - 8080
+      - 3000
   ingress:
     create: true
     host: "weudev.ecommerce.internal.dev.platform.pagopa.it"
     path: /pagopa-ecommerce-watchdog-deadletter-fe/(.*)
-    servicePort: 8080
+    servicePort: 3000
   serviceAccount:
     name: "ecommerce-workload-identity"
   podAnnotations: {}
