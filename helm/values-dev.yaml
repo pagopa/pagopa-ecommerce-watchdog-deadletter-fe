@@ -12,12 +12,12 @@ microservice-chart:
     create: true
     type: ClusterIP
     ports:
-      - 3000
+      - 80
   ingress:
     create: true
     host: "weudev.ecommerce.internal.dev.platform.pagopa.it"
     path: /pagopa-ecommerce-watchdog-deadletter-fe/(.*)
-    servicePort: 3000
+    servicePort: 80
   serviceAccount:
     name: "ecommerce-workload-identity"
   podAnnotations: {}
