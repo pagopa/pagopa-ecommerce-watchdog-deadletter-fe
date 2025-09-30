@@ -42,7 +42,7 @@ microservice-chart:
       type: RuntimeDefault
   securityContext:
     readOnlyRootFilesystem: false
-    allowPrivilegeEscalation: false
+    allowPrivilegeEscalation: true
     capabilities:
       drop:
         - all
