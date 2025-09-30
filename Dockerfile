@@ -10,12 +10,13 @@ RUN yarn build
 FROM nginx:stable-alpine AS production
 COPY --from=build /app/out /usr/share/nginx/html
 USER root
+RUN sed -i 's/listen\s\+80;/listen 8080;/g' /etc/nginx/conf.d/default.conf
 RUN mkdir -p /var/cache/nginx && \
     chown -R nginx:nginx /var/cache/nginx && \
     mkdir -p /var/run && \
     chown -R nginx:nginx /var/run
 USER nginx
-EXPOSE 80
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
 
 
