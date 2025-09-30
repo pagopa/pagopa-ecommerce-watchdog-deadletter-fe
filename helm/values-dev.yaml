@@ -46,6 +46,11 @@ microservice-chart:
     capabilities:
       drop:
         - all
+  tmpVolumeMount:
+    create: true
+    mounts:
+      - name: nginx
+        mountPath: /var/cache/nginx
   resources:
     requests:
       memory: "128Mi"
