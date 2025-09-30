@@ -6,6 +6,22 @@ microservice-chart:
     repository: pagopadcommonacr.azurecr.io/pagopaecommercewatchdogdeadletterfe
     tag: "latest"
     pullPolicy: Always
+  livenessProbe:
+    handlerType: httpGet
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 10
+    failureThreshold: 6
+    periodSeconds: 10
+  readinessProbe:
+    handlerType: httpGet
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 10
+    failureThreshold: 6
+    periodSeconds: 10
   deployment:
     create: true
   service:
@@ -52,6 +68,7 @@ microservice-chart:
   envConfig:
     NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST: ""
     NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST: ""
+  envSecret:
     
   nodeSelector: {}
   tolerations: []
