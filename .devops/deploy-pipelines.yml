@@ -65,6 +65,7 @@ stages:
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
               DOCKER_IMAGE_TAG: $(Build.SourceVersion)${{ variables.DOCKER_FILE_VERSION_SUFFIX }}
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
+              DOCKER_BUILD_ARGS: --env-file .env.dev
 
   - stage: 'Deploy_for_DEV'
     displayName: 'Deploy DEV'
