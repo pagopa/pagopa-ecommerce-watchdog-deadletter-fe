@@ -1,5 +1,5 @@
 # Build Stage
-FROM node:22-alpine AS build
+FROM node:22.13.1-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da AS build
 WORKDIR /app
 
 ARG NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST
@@ -14,7 +14,7 @@ COPY . .
 RUN yarn build
 
 # Production Stage
-FROM node:22-alpine AS production
+FROM node:22.13.1-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da AS production
 WORKDIR /app
 
 ENV NODE_ENV=production
