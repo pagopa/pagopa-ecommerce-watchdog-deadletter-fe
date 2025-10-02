@@ -10,13 +10,14 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
 import { useEffect, useRef, useState } from "react";
-import { TransactionsTable }  from "./TransactionsTable";
+import { TransactionsTable } from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { getTokenFromHash } from "./utils/utils";
-import { fetchActionsByTransactionId, fetchDeadletterTransactions, fetchUserData } from "./utils/api/client";
+import { fetchActionsByTransactionId, fetchDeadletterTransactions } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
 import { DeadletterAction } from "./types/DeadletterAction";
+import LoginDialog from "./LoginDialog";
+
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -25,22 +26,40 @@ export default function Home() {
   const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
 
   const token = useRef<string | null>();
 
   useEffect(() => {
-    if (!token.current)
-      token.current = getTokenFromHash();
+    console.log("set the token ...");
+    token.current = localStorage.getItem("authToken");
+
+    if (!token.current) {
+      setIsLoginDialogOpen(true);
+    } else if (!jwtUser) {
+        console.log("!jwtUser ...");
+        let jwtUserLoc: string | null = localStorage.getItem('jwtUser');
+        if (jwtUserLoc) {
+          const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
+          setJwtUser(jwtCurr);
+          setIsLoginDialogOpen(false);
+          console.log("jwtUser ...");
+        } else {
+          // LOGOUT ?
+          console.log("Errore");
+          setJwtUser(null);
+          setIsLoginDialogOpen(true);
+        }
+
+    } else {
+      setIsLoginDialogOpen(false);
+    }
   }, []);
 
   useEffect(() => {
-    if (token.current) {
-      fetchUserData(token.current).then(u => {
-        console.log("Dati utente ricevuti:", u);
-        if (u) setJwtUser(u);
-      });
-    }
-  }, [token]);
+    token.current = localStorage.getItem("authToken");
+  }, [jwtUser]);
+
 
   const handleOpenDialog = (content: object) => {
     console.log("Apertura dialog con contenuto:", content);
@@ -57,39 +76,40 @@ export default function Home() {
     if (!jwtUser || actionsMap.get(id)?.has(value)) return;
 
     const newMap = new Map(actionsMap);
-    const newAction : DeadletterAction = {
-      value : value,
-      id :  "null",
-      timestamp : "",
-      userId : jwtUser.id,
-      deadletterTransactionId : id,
+    const newAction: DeadletterAction = {
+      value: value,
+      id: "null",
+      timestamp: "",
+      userId: jwtUser.id,
+      deadletterTransactionId: id,
     }
-    
-    if(!newMap.get(id))
+
+    if (!newMap.get(id))
       newMap.set(id, new Map());
-    newMap.get(id)?.set(value,newAction);
+    newMap.get(id)?.set(value, newAction);
     console.log("new map: ", newMap);
     setActionsMap(newMap);
   }
 
   const handleLoadData = async (date: string) => {
     if (!date || !token.current) {
+      console.log();
       setTransactions([]);
       return;
     }
     const data = await fetchDeadletterTransactions(token.current, date);
     if (!data) return;
     setTransactions(data.deadletterTransactions);
-    const actionsMap: Map<string, Map<string, DeadletterAction>>= new Map();
+    const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
     await Promise.all(
       data.deadletterTransactions.map(async (transaction) => {
-        if(token.current){
-          const actions = await fetchActionsByTransactionId(token.current,transaction.transactionId);
-          const singleActionMap : Map<string, DeadletterAction>  = new Map();
+        if (token.current) {
+          const actions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
+          const singleActionMap: Map<string, DeadletterAction> = new Map();
           actions.forEach((act) => {
             singleActionMap.set(act.value, act);
           });
-          actionsMap.set(transaction.transactionId,singleActionMap);
+          actionsMap.set(transaction.transactionId, singleActionMap);
         }
       })
     );
@@ -97,8 +117,8 @@ export default function Home() {
   };
 
 
-  
-  const pagoPALink : RootLinkType = {
+
+  const pagoPALink: RootLinkType = {
     label: "PagoPA S.p.A.",
     href: "https://www.pagopa.it",
     ariaLabel: "",
@@ -112,11 +132,17 @@ export default function Home() {
           console.log("Clicked/Tapped on Assistance");
         }} onLogin={() => {
           console.log("User login");
+          setIsLoginDialogOpen(true);
         }} userActions={[{
           id: "logout",
           label: "Esci",
           onClick: () => {
             console.log("User logged out");
+            setJwtUser(null);
+            setTransactions([]);
+            window.location.href = '/';
+            // Delite the local store
+            localStorage.clear();
           },
           icon: <Logout id="logout-button-icon" fontSize="small" />,
         }]} />
@@ -153,7 +179,7 @@ export default function Home() {
 
         {transactions.length > 0 && (
           <>
-            <ChartsStatistics transactions={transactions}/>
+            <ChartsStatistics transactions={transactions} />
             <Paper sx={{ height: "100%", width: "100%" }}>
               <TransactionsTable transactions={transactions} actionsMap={actionsMap} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
             </Paper>
@@ -167,6 +193,7 @@ export default function Home() {
             </pre>
           </DialogContent>
         </Dialog>
+        {isLoginDialogOpen && <LoginDialog isLoginDialogOpen={isLoginDialogOpen} setIsLoginDialogOpen={setIsLoginDialogOpen} setJwtUser={setJwtUser} />}
       </main>
     </div>
   );
