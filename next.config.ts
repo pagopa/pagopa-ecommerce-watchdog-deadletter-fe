@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  output: 'export',
+  output: 'standalone',
+  assetPrefix: '/pagopa-ecommerce-watchdog-deadletter-fe',
 };
 
 export default nextConfig;
