@@ -11,7 +11,7 @@ microservice-chart:
     httpGet:
       path: /
       port: 3000
-    initialDelaySeconds: 10
+    initialDelaySeconds: 5
     failureThreshold: 6
     periodSeconds: 10
   readinessProbe:
@@ -19,7 +19,7 @@ microservice-chart:
     httpGet:
       path: /
       port: 3000
-    initialDelaySeconds: 10
+    initialDelaySeconds: 5
     failureThreshold: 6
     periodSeconds: 10
   deployment:
