@@ -4,7 +4,6 @@ import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authenti
 import { JwtUser } from "@pagopa/mui-italia";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
-    console.log(JSON.stringify(user));
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST}/authenticate`, {
       method: "POST",
       headers: {
