@@ -77,7 +77,7 @@ export default function LoginDialog(props:
                     // Save token in the local store
                     localStorage.setItem('authToken', token);
                     const jwtUser: JwtUser = {
-                        username: username,
+                        id: username,
                     }
                     props.setJwtUser(jwtUser);
                     props.setIsLoginDialogOpen(false);
