@@ -61,7 +61,7 @@ export default function LoginDialog(props:
             setErrorPassword(false);
 
         setLoginLoading(true);
-        let authenticationCredential: AuthenticationCredential = {
+        const authenticationCredential: AuthenticationCredential = {
             username: username,
             password: password
         };

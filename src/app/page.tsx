@@ -38,7 +38,7 @@ export default function Home() {
       setIsLoginDialogOpen(true);
     } else if (!jwtUser) {
         console.log("!jwtUser ...");
-        let jwtUserLoc: string | null = localStorage.getItem('jwtUser');
+        const jwtUserLoc: string | null = localStorage.getItem('jwtUser');
         if (jwtUserLoc) {
           const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
           setJwtUser(jwtCurr);
