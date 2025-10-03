@@ -4,21 +4,22 @@ import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authenti
 import { JwtUser } from "@pagopa/mui-italia";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
-  try {
+  
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST}/authenticate`, {
       method: "POST",
       body: JSON.stringify(user),
     });
+
+    if(res.status === 400) throw new Error("Malformed request");
+
+    if(res.status === 401) throw new Error("Unauthorized. The credential are invalid");
+
     if (!res.ok) throw new Error("Failed to fetch user");
     
     const data : AuthenticationOk = await res.json() as AuthenticationOk;
     
     return data;
 
-  } catch (e) {
-    console.error(e);
-    return null;
-  }
 };
 
 export const fetchUserData = async (token: string): Promise<JwtUser | null> => {

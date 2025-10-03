@@ -1,4 +1,4 @@
-import { SetStateAction, useState} from "react";
+import { SetStateAction, useState } from "react";
 import FilledInput from '@mui/material/FilledInput';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -8,24 +8,30 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { IconButton, Button, Grid, TextField } from "@mui/material";
+import { IconButton, Grid, TextField, Alert, FormHelperText } from "@mui/material";
 import { fetchAuthentication } from "./utils/api/client";
 import { AuthenticationCredential, AuthenticationOk } from "./types/Authentication";
 import { getTokenFromUrl } from "./utils/utils";
 import { JwtUser } from "@pagopa/mui-italia";
+import { LoadingButton } from "@mui/lab";
 
 
 
 
-export default function LoginDialog(props: 
-    Readonly<{ 
-        isLoginDialogOpen: boolean, 
-        setIsLoginDialogOpen: React.Dispatch<SetStateAction<boolean>>, 
-        setJwtUser: React.Dispatch<SetStateAction<JwtUser | null>>, }>) {
+export default function LoginDialog(props:
+    Readonly<{
+        isLoginDialogOpen: boolean,
+        setIsLoginDialogOpen: React.Dispatch<SetStateAction<boolean>>,
+        setJwtUser: React.Dispatch<SetStateAction<JwtUser | null>>,
+    }>) {
 
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState<string>("");
+    const [errorUsername, setErrorUsername] = useState<boolean>(false);
     const [password, setPassword] = useState<string>("");
+    const [errorPassword, setErrorPassword] = useState<boolean>(false);
+    const [loginLoading, setLoginLoading] = useState<boolean>(false);
+    const [errorLogin, setErrorLogin] = useState<string | null | undefined>();
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -39,6 +45,22 @@ export default function LoginDialog(props:
 
     const handleLogin = async () => {
         console.log("handle login!");
+
+        if (username.length === 0) {
+            setErrorUsername(true);
+            return;
+        }
+        else
+            setErrorUsername(false);
+
+        if (password.length === 0) {
+            setErrorPassword(true);
+            return;
+        }
+        else
+            setErrorPassword(false);
+
+        setLoginLoading(true);
         let authenticationCredential: AuthenticationCredential = {
             username: username,
             password: password
@@ -47,9 +69,9 @@ export default function LoginDialog(props:
         try {
             // do the login call ...
             const autResult: AuthenticationOk | null = await fetchAuthentication(authenticationCredential);
+            setLoginLoading(false);
             if (autResult) {
-                const token: string | null= getTokenFromUrl(autResult.urlRedirect);
-                console.log("token: ", token);
+                const token: string | null = getTokenFromUrl(autResult.urlRedirect);
 
                 if (token) {
                     // Save token in the local store
@@ -69,13 +91,18 @@ export default function LoginDialog(props:
                 }
 
             }
-        } catch (e) {
-            console.error(e);
+
+        } catch (error) {
+            setLoginLoading(false);
+            if (error instanceof Error)
+                setErrorLogin(error.message);
         }
     }
 
     const handleCloseDialog = () => {
         props.setIsLoginDialogOpen(false);
+        setErrorLogin(null);
+        setLoginLoading(false);
     };
 
 
@@ -92,6 +119,8 @@ export default function LoginDialog(props:
                             onChange={(event) => {
                                 setUsername(event.target.value);
                             }}
+                            error={errorUsername}
+                            helperText={errorUsername ? "Incorrect entry." : ""}
                         />
                     </Grid>
                     <Grid item xs={6} md={2}>
@@ -118,13 +147,24 @@ export default function LoginDialog(props:
                                         </IconButton>
                                     </InputAdornment>
                                 }
+                                error={errorPassword}
                             />
+                            {errorPassword && (
+                                <FormHelperText>
+                                    Password is required or not valid.
+                                </FormHelperText>
+                            )}
                         </FormControl>
                     </Grid>
+                    {errorLogin &&
+                        <Grid item xs={6} md={2}>
+                            <Alert severity="error">{errorLogin}</Alert>
+                        </Grid>
+                    }
                     <Grid item xs={6} md={2}>
-                        <Button variant="outlined" onClick={handleLogin}>
+                        <LoadingButton variant="outlined" onClick={handleLogin} loading={loginLoading}>
                             Login
-                        </Button>
+                        </LoadingButton>
                     </Grid>
                 </Grid>
             </DialogContent>
