@@ -32,7 +32,7 @@ export const fetchUserData = async (token: string): Promise<JwtUser | null> => {
     if (!res.ok) throw new Error("Failed to fetch user");
     const data = await res.json();
     return {
-      id: data.id,
+      username: data.id,
       name: data.name,
       surname: data.surname,
       email: data.email

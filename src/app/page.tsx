@@ -80,7 +80,7 @@ export default function Home() {
       value: value,
       id: "null",
       timestamp: "",
-      userId: jwtUser.id,
+      userId: jwtUser.username,
       deadletterTransactionId: id,
     }
 
