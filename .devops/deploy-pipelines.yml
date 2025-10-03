@@ -65,7 +65,7 @@ stages:
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
               DOCKER_IMAGE_TAG: $(Build.SourceVersion)${{ variables.DOCKER_FILE_VERSION_SUFFIX }}
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
-              DOCKER_BUILD_ARGS: --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST=https://weudev.ecommerce.internal.dev.platform.pagopa.it/pagopa-ecommerce-watchdog-deadletter-service --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST=https://weudev.ecommerce.internal.dev.platform.pagopa.it/pagopa-ecommerce-watchdog-deadletter-service
+              DOCKER_BUILD_ARGS: --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST=https://weudev.ecommerce.internal.dev.platform.pagopa.it/pagopa-ecommerce-watchdog-deadletter-service --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST=https://weudev.ecommerce.internal.dev.platform.pagopa.it/pagopa-ecommerce-watchdog-deadletter-service --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH=/pagopa-ecommerce-watchdog-deadletter-fe/
 
   - stage: 'Deploy_for_DEV'
     displayName: 'Deploy DEV'

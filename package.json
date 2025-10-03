@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "mock-server": "json-server --watch api-mock/db.json --routes api-mock/routes.json --port 4000",
+    "mock-server": "json-server --watch api-mock/db.json --middlewares api-mock/middleware.js --routes api-mock/routes.json --port 4000",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --passWithNoTests --config=jest.config.ts"
