@@ -31,25 +31,21 @@ export default function Home() {
   const token = useRef<string | null>();
 
   useEffect(() => {
-    console.log("set the token ...");
     token.current = localStorage.getItem("authToken");
 
     if (!token.current) {
       setIsLoginDialogOpen(true);
     } else if (!jwtUser) {
-        console.log("!jwtUser ...");
-        const jwtUserLoc: string | null = localStorage.getItem('jwtUser');
-        if (jwtUserLoc) {
-          const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
-          setJwtUser(jwtCurr);
-          setIsLoginDialogOpen(false);
-          console.log("jwtUser ...");
-        } else {
-          // LOGOUT ?
-          console.log("Errore");
-          setJwtUser(null);
-          setIsLoginDialogOpen(true);
-        }
+      const jwtUserLoc: string | null = localStorage.getItem('jwtUser');
+      if (jwtUserLoc) {
+        const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
+        setJwtUser(jwtCurr);
+        setIsLoginDialogOpen(false);
+      } else {
+        // LOGOUT
+        setJwtUser(null);
+        setIsLoginDialogOpen(true);
+      }
 
     } else {
       setIsLoginDialogOpen(false);
@@ -62,7 +58,6 @@ export default function Home() {
 
 
   const handleOpenDialog = (content: object) => {
-    console.log("Apertura dialog con contenuto:", content);
     setDialogContent(content);
     setIsDialogOpen(true);
   };
@@ -93,7 +88,6 @@ export default function Home() {
 
   const handleLoadData = async (date: string) => {
     if (!date || !token.current) {
-      console.log();
       setTransactions([]);
       return;
     }
@@ -116,7 +110,13 @@ export default function Home() {
     setActionsMap(actionsMap);
   };
 
-
+  const handleLogout = () => {
+    setJwtUser(null);
+    setTransactions([]);
+    window.location.href = process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/";
+    // Delete the local store
+    localStorage.clear();
+  }
 
   const pagoPALink: RootLinkType = {
     label: "PagoPA S.p.A.",
@@ -136,14 +136,7 @@ export default function Home() {
         }} userActions={[{
           id: "logout",
           label: "Esci",
-          onClick: () => {
-            console.log("User logged out");
-            setJwtUser(null);
-            setTransactions([]);
-            window.location.href = '/';
-            // Delite the local store
-            localStorage.clear();
-          },
+          onClick: handleLogout,
           icon: <Logout id="logout-button-icon" fontSize="small" />,
         }]} />
       <HeaderProduct
