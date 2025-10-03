@@ -44,7 +44,6 @@ export default function LoginDialog(props:
     };
 
     const handleLogin = async () => {
-        console.log("handle login!");
 
         if (username.length === 0) {
             setErrorUsername(true);
