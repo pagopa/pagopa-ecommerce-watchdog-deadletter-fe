@@ -67,10 +67,10 @@ export default function LoginDialog(props:
 
         try {
             // do the login call ...
-            const autResult: AuthenticationOk | null = await fetchAuthentication(authenticationCredential);
+            const authResult: AuthenticationOk | null = await fetchAuthentication(authenticationCredential);
             setLoginLoading(false);
-            if (autResult) {
-                const token: string | null = getTokenFromUrl(autResult.urlRedirect);
+            if (authResult) {
+                const token: string | null = getTokenFromUrl(authResult.urlRedirect);
 
                 if (token) {
                     // Save token in the local store
@@ -82,7 +82,7 @@ export default function LoginDialog(props:
                     props.setIsLoginDialogOpen(false);
                     // Save the user in the localstore
                     localStorage.setItem('jwtUser', JSON.stringify(jwtUser))
-                    window.location.href = autResult.urlRedirect;
+                    window.location.href = authResult.urlRedirect;
                 } else {
                     // Generate a error message
                     console.error("No token acquired...");
