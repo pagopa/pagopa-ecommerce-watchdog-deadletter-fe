@@ -14,6 +14,7 @@ import { AuthenticationCredential, AuthenticationOk } from "./types/Authenticati
 import { getTokenFromUrl } from "./utils/utils";
 import { JwtUser } from "@pagopa/mui-italia";
 import { LoadingButton } from "@mui/lab";
+import { decodeJwt } from "jose";
 
 
 
@@ -73,15 +74,15 @@ export default function LoginDialog(props:
                 const token: string | null = getTokenFromUrl(authResult.urlRedirect);
 
                 if (token) {
-                    // Save token in the local store
-                    localStorage.setItem('authToken', token);
-                    const jwtUser: JwtUser = {
-                        id: username,
-                    }
+                    // Save token in the sessionStore
+                    sessionStorage.setItem('authToken', token);
+                    // Decode the token
+                    const jwtUser = decodeJwt<JwtUser>(token);
+                    console.log("DEBUG TOKEN DEC: ", jwtUser);
                     props.setJwtUser(jwtUser);
                     props.setIsLoginDialogOpen(false);
-                    // Save the user in the localstore
-                    localStorage.setItem('jwtUser', JSON.stringify(jwtUser))
+                    // Save the user in the sessionStore
+                    sessionStorage.setItem('jwtUser', JSON.stringify(jwtUser))
                     window.location.href = authResult.urlRedirect;
                 } else {
                     // Generate a error message

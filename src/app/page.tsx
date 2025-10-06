@@ -31,12 +31,12 @@ export default function Home() {
   const token = useRef<string | null>();
 
   useEffect(() => {
-    token.current = localStorage.getItem("authToken");
+    token.current = sessionStorage.getItem("authToken");
 
     if (!token.current) {
       setIsLoginDialogOpen(true);
     } else if (!jwtUser) {
-      const jwtUserLoc: string | null = localStorage.getItem('jwtUser');
+      const jwtUserLoc: string | null = sessionStorage.getItem('jwtUser');
       if (jwtUserLoc) {
         const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
         setJwtUser(jwtCurr);
@@ -53,7 +53,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    token.current = localStorage.getItem("authToken");
+    token.current = sessionStorage.getItem("authToken");
   }, [jwtUser]);
 
 
@@ -115,7 +115,7 @@ export default function Home() {
     setTransactions([]);
     window.location.href = process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/";
     // Delete the local store
-    localStorage.clear();
+    sessionStorage.clear();
   }
 
   const pagoPALink: RootLinkType = {
