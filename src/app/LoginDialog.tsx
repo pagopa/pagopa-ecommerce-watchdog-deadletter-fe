@@ -75,14 +75,14 @@ export default function LoginDialog(props:
 
                 if (token) {
                     // Save token in the sessionStore
-                    localStorage.setItem('authToken', token);
+                    sessionStorage.setItem('authToken', token);
                     // Decode the token
                     const jwtUser = decodeJwt<JwtUser>(token);
                     console.log("DEBUG TOKEN DEC: ", jwtUser);
                     props.setJwtUser(jwtUser);
                     props.setIsLoginDialogOpen(false);
                     // Save the user in the sessionStore
-                    localStorage.setItem('jwtUser', JSON.stringify(jwtUser))
+                    sessionStorage.setItem('jwtUser', JSON.stringify(jwtUser))
                     window.location.href = authResult.urlRedirect;
                 } else {
                     // Generate a error message
