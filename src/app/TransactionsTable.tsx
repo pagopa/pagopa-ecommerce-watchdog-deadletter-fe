@@ -153,12 +153,12 @@ export function TransactionsTable(
               onChange={(e) => props.handleAddActionToTransaction(e.target.value, id)}
             >
               <MenuItem value="">➕ Aggiungi azione</MenuItem>
-              <MenuItem value="Stornata">Stornata</MenuItem>
-              <MenuItem value="Ticket Nexi">Creato ticket Nexi</MenuItem>
-              <MenuItem value="Nessuna azione richiesta">
-                Nessuna azione richiesta
-              </MenuItem>
+              <MenuItem value="Nessuna azione richiesta">Nessuna azione richiesta</MenuItem>
+              <MenuItem value="Presa in carico">Presa in carico</MenuItem>
               <MenuItem value="Da stornare">Da stornare</MenuItem>
+              <MenuItem value="Stornata">Stornata</MenuItem>
+              <MenuItem value="In attesa Nexi">In attesa Nexi</MenuItem>
+              <MenuItem value="In attesa PSP">In attesa PSP</MenuItem>
             </Select>
           </Box>
         );
