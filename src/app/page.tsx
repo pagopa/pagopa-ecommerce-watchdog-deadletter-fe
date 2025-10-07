@@ -74,7 +74,7 @@ export default function Home() {
     const newAction: DeadletterAction = {
       value: value,
       id: "null",
-      timestamp: "",
+      timestamp: new Date().toISOString().split('T')[0],
       userId: jwtUser.name + " " + jwtUser.surname,
       deadletterTransactionId: id,
     }
