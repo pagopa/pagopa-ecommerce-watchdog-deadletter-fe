@@ -17,6 +17,8 @@ import { fetchActionsByTransactionId, fetchDeadletterTransactions } from "./util
 import ChartsStatistics from "./ChartsStatistics";
 import { DeadletterAction } from "./types/DeadletterAction";
 import LoginDialog from "./LoginDialog";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 
 export default function Home() {
@@ -27,6 +29,7 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
+  const [loadingData, setLoadingData] = useState<boolean>(false);
 
   const token = useRef<string | null>();
 
@@ -91,8 +94,12 @@ export default function Home() {
       setTransactions([]);
       return;
     }
+    setLoadingData(true);
     const data = await fetchDeadletterTransactions(token.current, date);
-    if (!data) return;
+    if (!data) {
+      setLoadingData(false);
+      return;
+    }
     setTransactions(data.deadletterTransactions);
     const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
     await Promise.all(
@@ -106,7 +113,7 @@ export default function Home() {
           actionsMap.set(transaction.transactionId, singleActionMap);
         }
       })
-    );
+    ).finally(() => { setLoadingData(false); });
     setActionsMap(actionsMap);
   };
 
@@ -170,7 +177,7 @@ export default function Home() {
           </Grid>
         </Paper>
 
-        {transactions.length > 0 && (
+        {transactions.length > 0 && !loadingData && (
           <>
             <ChartsStatistics transactions={transactions} />
             <Paper sx={{ height: "100%", width: "100%" }}>
@@ -178,6 +185,11 @@ export default function Home() {
             </Paper>
           </>
         )}
+        {loadingData &&
+          (<Box display='flex' alignItems="center" justifyContent="center" minHeight="50vh">
+            <CircularProgress />
+          </Box>)
+          }
         <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
           <DialogTitle>Dettaglio</DialogTitle>
           <DialogContent>
