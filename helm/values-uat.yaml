@@ -1,0 +1,87 @@
+microservice-chart:
+  namespace: "ecommerce"
+  nameOverride: ""
+  fullnameOverride: "pagopa-ecommerce-watchdog-deadletter-fe"
+  image:
+    repository: pagopadcommonacr.azurecr.io/pagopaecommercewatchdogdeadletterfe
+    tag: "latest"
+    pullPolicy: Always
+  livenessProbe:
+    handlerType: httpGet
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 5
+    failureThreshold: 6
+    periodSeconds: 10
+  readinessProbe:
+    handlerType: httpGet
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 5
+    failureThreshold: 6
+    periodSeconds: 10
+  deployment:
+    create: true
+  service:
+    create: true
+    type: ClusterIP
+    ports:
+      - 3000
+  ingress:
+    create: true
+    host: "weuuat.ecommerce.internal.uat.platform.pagopa.it"
+    path: /pagopa-ecommerce-watchdog-deadletter-fe/(.*)
+    servicePort: 3000
+  serviceAccount:
+    name: "ecommerce-workload-identity"
+  podAnnotations: {}
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - all
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "100m"
+  autoscaling:
+    enable: false
+    minReplica: 1
+    maxReplica: 1
+    pollingInterval: 10 # seconds
+    cooldownPeriod: 50 # seconds
+    triggers:
+      - type: cpu
+        metadata:
+          # Required
+          type: Utilization # Allowed types are 'Utilization' or 'AverageValue'
+          value: "75"
+  envConfig:
+  envSecret:
+  nodeSelector: {}
+  tolerations: []
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node_type
+                operator: In
+                values:
+                  - user
+  secretProviderClass:
+    create: false
+  keyvault:
+    name: "pagopa-d-ecommerce-kv"
+    tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
+  azure:
+    workloadIdentityClientId: "1be61b58-24e2-49c8-b401-89ebd004bf2e"
