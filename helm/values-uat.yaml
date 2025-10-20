@@ -81,7 +81,7 @@ microservice-chart:
   secretProviderClass:
     create: false
   keyvault:
-    name: "pagopa-d-ecommerce-kv"
+    name: "pagopa-u-ecommerce-kv"
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
   azure:
-    workloadIdentityClientId: "1be61b58-24e2-49c8-b401-89ebd004bf2e"
+    workloadIdentityClientId: "449c5b65-f368-487a-881a-b03676420c53"
