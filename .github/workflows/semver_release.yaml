@@ -36,14 +36,6 @@ jobs:
     outputs:
       app_version: ${{ steps.semver.outputs.version }}
     steps:
-      - name: Make Release
-        id: release
-        uses: pagopa/github-actions-template/node-release@473d7a78d28e15cab46dcaf766087e60604d6a40 # v1.13.3
-        with:
-          semver: ${{ needs.semver_labels.outputs.semver_app }}
-          github_token: ${{ secrets.BOT_GITHUB_TOKEN }}
-          skip_ci: false
-          prerelease: false
       - name: Checkout release branch 
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
