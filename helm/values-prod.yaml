@@ -4,7 +4,7 @@ microservice-chart:
   fullnameOverride: "pagopa-ecommerce-watchdog-deadletter-fe"
   image:
     repository: pagopapcommonacr.azurecr.io/pagopaecommercewatchdogdeadletterfe
-    tag: "latest"
+    tag: "0.2.0"
     pullPolicy: Always
   livenessProbe:
     handlerType: httpGet
@@ -85,3 +85,5 @@ microservice-chart:
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
   azure:
     workloadIdentityClientId: "d5614882-90dd-47a1-aad1-cdf295201469"
+  canaryDelivery:
+    create: false
