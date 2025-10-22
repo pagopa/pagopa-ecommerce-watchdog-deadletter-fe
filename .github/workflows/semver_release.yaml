@@ -106,3 +106,4 @@ jobs:
           generateReleaseNotes: true
           prerelease: false
           draft: false
+
