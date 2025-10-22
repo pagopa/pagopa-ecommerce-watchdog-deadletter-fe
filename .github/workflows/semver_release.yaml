@@ -44,3 +44,78 @@ jobs:
           github_token: ${{ secrets.BOT_GITHUB_TOKEN }}
           skip_ci: false
           prerelease: false
+          
+
+      - name: Checkout release branch 
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+        with:
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}  
+      # setup git author
+      - name: Setup git author
+        run: |
+          git config --global user.email "${{ secrets.BOT_GIT_MAIL }}" && git config --global user.name "${{ secrets.BOT_GIT_USER }}"
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610
+        with:
+          node-version: '22'
+
+      - name: Set branch
+        run: |
+          echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
+        if: ${{ github.ref_name != 'main' }}
+        shell: bash
+
+      - id: get_version
+        name: Get Version
+        run: |
+          PACKAGE_FILE="package.json"
+          if [[ -f "$PACKAGE_FILE" ]]; then
+            echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Bump Package Version
+        id: bump
+        uses: pagopa/github-actions-template/bump-semver@main
+        with:
+          semver: ${{ needs.semver_labels.outputs.semver_app  }}
+          current_version: ${{ env.version }}
+
+      - id: semver
+        name: New Version
+        run: |   
+          echo "new_version=${{ steps.bump.outputs.new_version }}${{env.BRANCH}}" >> $GITHUB_OUTPUT
+        shell: bash
+
+
+      - name: Helm Bump
+        if: ${{ needs.semver_labels.outputs.semver_app != 'ignore-for-release' }}
+        uses: pagopa/github-actions-template/helm-bump@main
+        with:
+          version: ${{ steps.semver.outputs.new_version }}
+          beta: false
+
+      - name: Push New Version
+        if: ${{ needs.semver_labels.outputs.semver_app != 'ignore-for-release' }}
+        shell: bash
+        run: |
+          contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' package.json)"
+          echo -E "${contents}" > package.json
+    
+          git add .
+          git commit -m "Bump to version ${{ steps.semver.outputs.new_version }} [skip ci]" || exit 0
+          git push origin ${{ github.ref_name}}
+
+      - name: Create Release
+        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 #v1.16.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+        with:
+          commit: ${{ (needs.semver_labels.outputs.semver_app != 'ignore-for-release' && github.ref_name) || '' }}
+          tag: ${{ steps.semver.outputs.new_version }}
+          name: Release ${{ steps.semver.outputs.new_version }}
+          makeLatest: true
+          generateReleaseNotes: true
+          prerelease: false
+          draft: false
