@@ -91,7 +91,6 @@ jobs:
         run: |
           contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' package.json)"
           echo -E "${contents}" > package.json
-    
           git add .
           git commit -m "Bump to version ${{ steps.semver.outputs.new_version }} [skip ci]" || exit 0
           git push origin ${{ github.ref_name}}
