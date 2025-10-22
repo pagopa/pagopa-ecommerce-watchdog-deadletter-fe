@@ -34,7 +34,7 @@ jobs:
     needs: semver_labels
     environment: prod
     outputs:
-      app_version: ${{ steps.semver.outputs.version }}
+      app_version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout release branch 
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
@@ -75,14 +75,14 @@ jobs:
         run: |
           for i in helm/values-*.yaml; do
             [ -f "$i" ] || break
-            yq -i ".microservice-chart.image.tag = \"${{steps.semver.outputs.version}}\"" "$i"
+            yq -i ".microservice-chart.image.tag = \"${{steps.get_version.outputs.version}}\"" "$i"
             git add "$i"
           done
       - name: Update Chart App Version
         run: |
           CHART_FILE="helm/Chart.yaml" 
             if [[ -f "$CHART_FILE" ]]; then
-              yq -i ".appVersion = \"${{steps.semver.outputs.version}}\"" "$CHART_FILE"
+              yq -i ".appVersion = \"${{steps.get_version.outputs.version}}\"" "$CHART_FILE"
               git add "$CHART_FILE"
           fi
       - name: Install semver globally
