@@ -8,6 +8,8 @@ permissions:
   contents: write
   pull-requests: write
 
+  
+
 jobs:
   semver_labels:
     name: Read semver labels from merged PR
