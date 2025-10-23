@@ -34,7 +34,7 @@ jobs:
     needs: semver_labels
     environment: prod
     outputs:
-      app_version: ${{ steps.get_version.outputs.version }}
+      app_version: ${{ steps.semver.outputs.version }}
     steps:
       - name: Checkout release branch 
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
