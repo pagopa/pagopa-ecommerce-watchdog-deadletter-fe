@@ -3,7 +3,7 @@ microservice-chart:
   nameOverride: ""
   fullnameOverride: "pagopa-ecommerce-watchdog-deadletter-fe"
   image:
-    repository: pagopadcommonacr.azurecr.io/pagopaecommercewatchdogdeadletterfe
+    repository: pagopaucommonacr.azurecr.io/pagopaecommercewatchdogdeadletterfe
     tag: "0.5.5"
     pullPolicy: Always
   livenessProbe:
@@ -31,7 +31,7 @@ microservice-chart:
       - 3000
   ingress:
     create: true
-    host: "weudev.ecommerce.internal.dev.platform.pagopa.it"
+    host: "weuuat.ecommerce.internal.uat.platform.pagopa.it"
     path: /pagopa-ecommerce-watchdog-deadletter-fe/(.*)
     servicePort: 3000
   serviceAccount:
@@ -81,9 +81,9 @@ microservice-chart:
   secretProviderClass:
     create: false
   keyvault:
-    name: "pagopa-d-ecommerce-kv"
+    name: "pagopa-u-ecommerce-kv"
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
   azure:
-    workloadIdentityClientId: "1be61b58-24e2-49c8-b401-89ebd004bf2e"
+    workloadIdentityClientId: "449c5b65-f368-487a-881a-b03676420c53"
   canaryDelivery:
     create: false

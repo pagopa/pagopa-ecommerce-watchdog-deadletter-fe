@@ -40,7 +40,7 @@ export const fetchActionsByTransactionId = async (token: string, transactionId: 
 
 export const fetchDeadletterTransactions = async (token: string, date: string): Promise<DeadletterResponse | null> => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions?date=${date}&pageNumber=0&pageSize=10`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions?date=${date}&pageNumber=0&pageSize=500`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
