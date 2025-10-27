@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionsTable } from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { fetchActionsByTransactionId, fetchDeadletterTransactions } from "./utils/api/client";
+import { fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
 import { DeadletterAction } from "./types/DeadletterAction";
 import LoginDialog from "./LoginDialog";
@@ -70,7 +70,7 @@ export default function Home() {
     setDialogContent({});
   };
 
-  const handleAddActionToTransaction = (value: string, id: string) => {
+  const handleAddActionToTransaction = async (value: string, id: string) => {
     if (!jwtUser || actionsMap.get(id)?.has(value)) return;
 
     const newMap = new Map(actionsMap);
@@ -80,6 +80,11 @@ export default function Home() {
       timestamp: new Date().toISOString().split('T')[0],
       userId: jwtUser.name + " " + jwtUser.surname,
       deadletterTransactionId: id,
+    }
+
+    if (token.current) {
+      const addResponse = await fetchAddActionToDeadletterTransaction(token.current, newAction);
+      if (!addResponse) return;
     }
 
     if (!newMap.get(id))
