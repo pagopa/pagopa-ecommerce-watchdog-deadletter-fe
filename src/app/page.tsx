@@ -70,7 +70,7 @@ export default function Home() {
     setDialogContent({});
   };
 
-  const handleAddActionToTransaction = async (value: string, id: string) => {
+  const handleAddActionToTransaction = (value: string, id: string) => {
     if (!jwtUser || actionsMap.get(id)?.has(value)) return;
 
     const newMap = new Map(actionsMap);
@@ -83,15 +83,15 @@ export default function Home() {
     }
 
     if (token.current) {
-      const addResponse = await fetchAddActionToDeadletterTransaction(token.current, newAction);
-      if (!addResponse) return;
+      fetchAddActionToDeadletterTransaction(token.current, newAction).then((res) => {
+        if(!res) return;
+        if (!newMap.get(id))
+          newMap.set(id, new Map());
+        newMap.get(id)?.set(value, newAction);
+        console.log("new map: ", newMap);
+        setActionsMap(newMap);
+      });
     }
-
-    if (!newMap.get(id))
-      newMap.set(id, new Map());
-    newMap.get(id)?.set(value, newAction);
-    console.log("new map: ", newMap);
-    setActionsMap(newMap);
   }
 
   const handleLoadData = async (date: string) => {
