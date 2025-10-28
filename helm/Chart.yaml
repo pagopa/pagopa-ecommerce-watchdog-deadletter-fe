@@ -1,6 +1,6 @@
 apiVersion: v2
 type: application
-version: 1.3.1
+version: 1.3.2
 appVersion: "0.5.5"
 name: pagopa-ecommerce-watchdog-deadletter-fe
 description: Rect Typescript frontend application designed to support deadletter monitoring for the eCommerce transactions process.
