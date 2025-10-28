@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionsTable } from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { fetchActionsByTransactionId, fetchDeadletterTransactions } from "./utils/api/client";
+import { fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
 import { DeadletterAction } from "./types/DeadletterAction";
 import LoginDialog from "./LoginDialog";
@@ -77,16 +77,21 @@ export default function Home() {
     const newAction: DeadletterAction = {
       value: value,
       id: "null",
-      timestamp: new Date().toISOString().split('T')[0],
-      userId: jwtUser.name + " " + jwtUser.surname,
+      timestamp: new Date().toISOString(),
+      userId: jwtUser.id,
       deadletterTransactionId: id,
     }
 
-    if (!newMap.get(id))
-      newMap.set(id, new Map());
-    newMap.get(id)?.set(value, newAction);
-    console.log("new map: ", newMap);
-    setActionsMap(newMap);
+    if (token.current) {
+      fetchAddActionToDeadletterTransaction(token.current, newAction).then((res) => {
+        if(!res) return;
+        if (!newMap.get(id))
+          newMap.set(id, new Map());
+        newMap.get(id)?.set(value, newAction);
+        console.log("new map: ", newMap);
+        setActionsMap(newMap);
+      });
+    }
   }
 
   const handleLoadData = async (date: string) => {

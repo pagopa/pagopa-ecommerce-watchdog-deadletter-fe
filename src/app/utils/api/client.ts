@@ -53,3 +53,22 @@ export const fetchDeadletterTransactions = async (token: string, date: string): 
     return null;
   }
 };
+
+export const fetchAddActionToDeadletterTransaction = async (token: string, action: DeadletterAction): Promise<Response | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/${action.deadletterTransactionId}/actions`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({"value": action.value }),
+    });
+
+    if (!res.ok) throw new Error(`Failed to add action to deadletter transaction with id: ${action.deadletterTransactionId}`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};

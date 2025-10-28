@@ -2,7 +2,7 @@ import { Transaction } from "@/app/types/DeadletterResponse";
 import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { DeadletterAction } from "./types/DeadletterAction";
-import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtiles";
+import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 
 
 export function TransactionsTable(
