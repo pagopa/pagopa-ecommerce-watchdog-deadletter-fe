@@ -31,7 +31,7 @@ microservice-chart:
       - 3000
   ingress:
     create: true
-    host: "weuprod.checkout.internal.platform.pagopa.it"
+    host: "weuprod.ecommerce.internal.platform.pagopa.it"
     path: /pagopa-ecommerce-watchdog-deadletter-fe/(.*)
     servicePort: 3000
   serviceAccount:
