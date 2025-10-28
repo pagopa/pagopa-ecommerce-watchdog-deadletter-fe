@@ -14,7 +14,6 @@ export function TransactionsTable(
   ) {
   const columns: GridColDef[] = [
     { field: "insertionDate", headerName: "insertionDate", flex: 1 },
-    // { field: "id", headerName: "id", width: 150 },
     {
       field: "transactionId",
       headerName: "transactionId",
