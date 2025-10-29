@@ -1,1170 +1,1172 @@
 {
-  "users": 
-    {
-      "id": "123",
-      "name": "Operatore",
-      "surname": "Mario Rossi",
-      "email": "mario.rossi@example.com"
-    }
-  ,
-  "deadletter-transactions": 
-    {
-        "deadletterTransactions": [
-            {
-                "transactionId": "b202ea99a53643c4bb1d73114a06ea21",
-                "insertionDate": "2025-07-02T17:22:29.689947547Z",
-                "paymentToken": "6535d0c28c67448f9936bad26aeb9743",
-                "paymentMethodName": "GOOGLEPAY",
-                "pspId": "CIPBITMM",
-                "eCommerceStatus": "REFUND_ERROR",
-                "gatewayAuthorizationStatus": "null",
-                "paymentEndToEndId": null,
-                "operationId": "321055056922651839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionRefundRetriedEvent\",\"id\":\"905cdbc7-9453-4e06-925b-2467993a2461\",\"transactionId\":\"b202ea99a53643c4bb1d73114a06ea21\",\"creationDate\":\"2025-07-02T16:52:27.305363346Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"transactionGatewayAuthorizationData\":null},\"eventCode\":\"TRANSACTION_REFUND_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-daae65aed7ca0fac9534bf0703f07cec-a53a60611d28fdc8-01\",\"tracestate\":null,\"baggage\":null}}",
-                    "timestamp": "2025-07-02T17:22:29.689947547Z",
-                    "transactionInfo": {
-                        "transactionId": "b202ea99a53643c4bb1d73114a06ea21",
-                        "authorizationRequestId": "E1751472447254teSA",
-                        "eCommerceStatus": "REFUND_ERROR",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "6535d0c28c67448f9936bad26aeb9743"
-                        ],
-                        "pspId": "CIPBITMM",
-                        "paymentMethodName": "GOOGLEPAY",
-                        "grandTotal": 12100,
-                        "rrn": null,
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "PENDING",
-                            "operationId": "321055056922651839",
-                            "correlationId": "292eeba9-1c39-4bb4-a6fe-2c2d351dfd14",
-                            "paymentEndToEndId": null,
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T16:07:24.467271641Z",
-                        "status": "Cancellato",
-                        "statusDetails": null,
-                        "eventStatus": "REFUND_ERROR",
-                        "amount": 12000,
-                        "fee": 100,
-                        "grandTotal": 12100,
-                        "rrn": null,
-                        "authorizationCode": null,
-                        "authorizationOperationId": null,
-                        "refundOperationId": null,
-                        "paymentMethodName": "GOOGLEPAY",
-                        "brand": "GOOGLEPAY",
-                        "authorizationRequestId": "E1751472447254teSA",
-                        "paymentGateway": "NPG",
-                        "correlationId": "292eeba9-1c39-4bb4-a6fe-2c2d351dfd14",
-                        "gatewayAuthorizationStatus": null,
-                        "gatewayErrorCode": null
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "b202ea99a53643c4bb1d73114a06ea21",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302018888888888887",
-                                "amount": 12000,
-                                "paymentToken": "6535d0c28c67448f9936bad26aeb9743",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "CIPBITMM",
-                        "businessName": "NX PAYMENTS S.P.A.",
-                        "idChannel": "13212880150_17"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": null,
-                                "rrn": null
-                            },
-                            "operationAmount": "12100",
-                            "operationCurrency": "EUR",
-                            "operationId": "321055056922651839",
-                            "operationResult": "CANCELED",
-                            "operationTime": "2025-07-02 18:07:27.611",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751472447254teSA",
-                            "paymentCircuit": "GOOGLEPAY",
-                            "paymentEndToEndId": null,
-                            "paymentMethod": "APM"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
-                "insertionDate": "2025-07-02T17:33:15.633702275Z",
-                "paymentToken": "cde7b3ba3d0548cc983d6fd9c79fb641",
-                "paymentMethodName": "GOOGLEPAY",
-                "pspId": "CIPBITMM",
-                "eCommerceStatus": "REFUND_ERROR",
-                "gatewayAuthorizationStatus": "null",
-                "paymentEndToEndId": null,
-                "operationId": "496313910637251839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionRefundRetriedEvent\",\"id\":\"1ac6e2da-9293-4380-8de2-b26bc83ab82c\",\"transactionId\":\"ca2d9476cdbe4535a693606b8c3bb9d6\",\"creationDate\":\"2025-07-02T17:03:13.114738363Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"transactionGatewayAuthorizationData\":null},\"eventCode\":\"TRANSACTION_REFUND_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-1c90fc292e996760eb4e7e48807c30b4-da073a5f371af2e7-01\",\"tracestate\":null,\"baggage\":null}}",
-                    "timestamp": "2025-07-02T17:33:15.633702275Z",
-                    "transactionInfo": {
-                        "transactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
-                        "authorizationRequestId": "E1751473092968ofcB",
-                        "eCommerceStatus": "REFUND_ERROR",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "cde7b3ba3d0548cc983d6fd9c79fb641"
-                        ],
-                        "pspId": "CIPBITMM",
-                        "paymentMethodName": "GOOGLEPAY",
-                        "grandTotal": 12100,
-                        "rrn": null,
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "PENDING",
-                            "operationId": "496313910637251839",
-                            "correlationId": "7bda91d2-a1e1-45ac-b57b-03d0d1d1a061",
-                            "paymentEndToEndId": null,
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "ma@ma.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T16:18:08.77395669Z",
-                        "status": "Cancellato",
-                        "statusDetails": null,
-                        "eventStatus": "REFUND_ERROR",
-                        "amount": 12000,
-                        "fee": 100,
-                        "grandTotal": 12100,
-                        "rrn": null,
-                        "authorizationCode": null,
-                        "authorizationOperationId": null,
-                        "refundOperationId": null,
-                        "paymentMethodName": "GOOGLEPAY",
-                        "brand": "GOOGLEPAY",
-                        "authorizationRequestId": "E1751473092968ofcB",
-                        "paymentGateway": "NPG",
-                        "correlationId": "7bda91d2-a1e1-45ac-b57b-03d0d1d1a061",
-                        "gatewayAuthorizationStatus": null,
-                        "gatewayErrorCode": null
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "ca2d9476cdbe4535a693606b8c3bb9d6",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302017474747474700",
-                                "amount": 12000,
-                                "paymentToken": "cde7b3ba3d0548cc983d6fd9c79fb641",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "CIPBITMM",
-                        "businessName": "NX PAYMENTS S.P.A.",
-                        "idChannel": "13212880150_17"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": null,
-                                "rrn": null
-                            },
-                            "operationAmount": "12100",
-                            "operationCurrency": "EUR",
-                            "operationId": "496313910637251839",
-                            "operationResult": "CANCELED",
-                            "operationTime": "2025-07-02 18:18:27.801",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751473092968ofcB",
-                            "paymentCircuit": "MC",
-                            "paymentEndToEndId": null,
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "6438d77a7fa3448da8baffe420acae77",
-                "insertionDate": "2025-07-02T19:21:39.282238363Z",
-                "paymentToken": "db33acb0acaf4688b48ffd9e7273dbcf",
-                "paymentMethodName": "GOOGLEPAY",
-                "pspId": "CIPBITMM",
-                "eCommerceStatus": "EXPIRED",
-                "gatewayAuthorizationStatus": "THREEDS_FAILED",
-                "paymentEndToEndId": null,
-                "operationId": "505464747110451839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"8e94c5ff-3903-46bf-9337-2d22535ba558\",\"transactionId\":\"6438d77a7fa3448da8baffe420acae77\",\"creationDate\":\"2025-07-02T19:20:07.443044958Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-0000000000000000cf349d7a243791cf-c10b6a27f1568106-01\",\"tracestate\":\"in=cf349d7a243791cf;75dfdd4d8c784ea7\",\"baggage\":null}}",
-                    "timestamp": "2025-07-02T19:21:39.282238363Z",
-                    "transactionInfo": {
-                        "transactionId": "6438d77a7fa3448da8baffe420acae77",
-                        "authorizationRequestId": "E1751483893304D87Z",
-                        "eCommerceStatus": "CLOSURE_ERROR",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "db33acb0acaf4688b48ffd9e7273dbcf"
-                        ],
-                        "pspId": "CIPBITMM",
-                        "paymentMethodName": "GOOGLEPAY",
-                        "grandTotal": 12100,
-                        "rrn": "",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "THREEDS_FAILED",
-                            "operationId": "505464747110451839",
-                            "correlationId": "e0dcd13c-92ce-4c70-9b7f-a627280ba8b9",
-                            "paymentEndToEndId": null,
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T19:18:08.876387547Z",
-                        "status": "Rifiutato",
-                        "statusDetails": null,
-                        "eventStatus": "EXPIRED",
-                        "amount": 12000,
-                        "fee": 100,
-                        "grandTotal": 12100,
-                        "rrn": "",
-                        "authorizationCode": "",
-                        "authorizationOperationId": "505464747110451839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "GOOGLEPAY",
-                        "brand": "GOOGLEPAY",
-                        "authorizationRequestId": "E1751483893304D87Z",
-                        "paymentGateway": "NPG",
-                        "correlationId": "e0dcd13c-92ce-4c70-9b7f-a627280ba8b9",
-                        "gatewayAuthorizationStatus": "THREEDS_FAILED",
-                        "gatewayErrorCode": null
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "6438d77a7fa3448da8baffe420acae77",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302011111111111484",
-                                "amount": 12000,
-                                "paymentToken": "db33acb0acaf4688b48ffd9e7273dbcf",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "CIPBITMM",
-                        "businessName": "NX PAYMENTS S.P.A.",
-                        "idChannel": "13212880150_17"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": "",
-                                "rrn": ""
-                            },
-                            "operationAmount": "12100",
-                            "operationCurrency": "EUR",
-                            "operationId": "505464747110451839",
-                            "operationResult": "THREEDS_FAILED",
-                            "operationTime": "2025-07-02 21:18:35.077",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751483893304D87Z",
-                            "paymentCircuit": "MC",
-                            "paymentEndToEndId": null,
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
-                "insertionDate": "2025-07-02T17:00:56.582184915Z",
-                "paymentToken": "5fd0bd0a52064e09b107ed998cc4d4e6",
-                "paymentMethodName": "CARDS",
-                "pspId": "UNCRITMM",
-                "eCommerceStatus": "NOTIFIED_OK",
-                "gatewayAuthorizationStatus": "EXECUTED",
-                "paymentEndToEndId": "796382442287151839",
-                "operationId": "796382442287151839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"b1a51ee6-3fb5-475f-9abf-f8f51cd16c07\",\"transactionId\":\"6460dc3e61ba4ed6bfea2c4468b2862c\",\"creationDate\":\"2025-07-02T15:54:37.657023598Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"dd42eedf-3981-43b8-8e36-cfe2154b8edb\"},\"paymentNotices\":[{\"paymentToken\":\"5fd0bd0a52064e09b107ed998cc4d4e6\",\"rptId\":\"77777777777302011111111111491\",\"description\":\"TARI/TEFA 2021\",\"amount\":12000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":10000,\"transferCategory\":\"0101101IM\"},{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":2000,\"transferCategory\":\"0201102IM\"}],\"companyName\":\"company PA\",\"creditorReferenceId\":\"02011111111111491\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT\",\"idCart\":null,\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751471654755JSOj\",\"correlationId\":\"476c24c2-5bb8-4dd4-9a2e-464f663dfae2\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-915c312dbe3779395fec99c55af3ec0b-d5296feb1c5af05f-01\",\"tracestate\":null,\"baggage\":null}}",
-                    "timestamp": "2025-07-02T17:00:56.582184915Z",
-                    "transactionInfo": {
-                        "transactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
-                        "authorizationRequestId": "E1751471654755JSOj",
-                        "eCommerceStatus": "EXPIRED",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "5fd0bd0a52064e09b107ed998cc4d4e6"
-                        ],
-                        "pspId": "UNCRITMM",
-                        "paymentMethodName": "CARDS",
-                        "grandTotal": 12120,
-                        "rrn": "251839055937",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "EXECUTED",
-                            "operationId": "796382442287151839",
-                            "correlationId": "476c24c2-5bb8-4dd4-9a2e-464f663dfae2",
-                            "paymentEndToEndId": "796382442287151839",
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T15:54:37.657023598Z",
-                        "status": "Confermato",
-                        "statusDetails": null,
-                        "eventStatus": "NOTIFIED_OK",
-                        "amount": 12000,
-                        "fee": 120,
-                        "grandTotal": 12120,
-                        "rrn": "251839055937",
-                        "authorizationCode": "103256",
-                        "authorizationOperationId": "796382442287151839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "CARDS",
-                        "brand": "MC",
-                        "authorizationRequestId": "E1751471654755JSOj",
-                        "paymentGateway": "NPG",
-                        "correlationId": "476c24c2-5bb8-4dd4-9a2e-464f663dfae2",
-                        "gatewayAuthorizationStatus": "EXECUTED",
-                        "gatewayErrorCode": "000"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "6460dc3e61ba4ed6bfea2c4468b2862c",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302011111111111491",
-                                "amount": 12000,
-                                "paymentToken": "5fd0bd0a52064e09b107ed998cc4d4e6",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "UNCRITMM",
-                        "businessName": "UN spa",
-                        "idChannel": "00348170101_01"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": "103256",
-                                "rrn": "251839055937"
-                            },
-                            "operationAmount": "12120",
-                            "operationCurrency": "EUR",
-                            "operationId": "796382442287151839",
-                            "operationResult": "EXECUTED",
-                            "operationTime": "2025-07-02 17:55:55.043",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751471654755JSOj",
-                            "paymentCircuit": "MC",
-                            "paymentEndToEndId": "796382442287151839",
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "aabe94d6f8b34482a323045704ce522b",
-                "insertionDate": "2025-07-02T16:13:04.684822564Z",
-                "paymentToken": "538b3598499a49b39d378ddd65a8c0f6",
-                "paymentMethodName": "CARDS",
-                "pspId": "UNCRITMM",
-                "eCommerceStatus": "NOTIFIED_OK",
-                "gatewayAuthorizationStatus": "EXECUTED",
-                "paymentEndToEndId": "327670870088451839",
-                "operationId": "327670870088451839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"fb7b8309-09f8-4fea-8813-34941ad85fb6\",\"transactionId\":\"aabe94d6f8b34482a323045704ce522b\",\"creationDate\":\"2025-07-02T15:07:37.360810911Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"dd42eedf-3981-43b8-8e36-cfe2154b8edb\"},\"paymentNotices\":[{\"paymentToken\":\"538b3598499a49b39d378ddd65a8c0f6\",\"rptId\":\"77777777777302011111111111489\",\"description\":\"TARI/TEFA 2021\",\"amount\":12000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":10000,\"transferCategory\":\"0101101IM\"},{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":2000,\"transferCategory\":\"0201102IM\"}],\"companyName\":\"company PA\",\"creditorReferenceId\":\"02011111111111489\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT\",\"idCart\":null,\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751468828179G44P\",\"correlationId\":\"131e5fac-4ab8-4a28-aba8-d68821c03df4\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-270ad65065a43e82ca7da9a372b44cce-72a681cde759c536-01\",\"tracestate\":null,\"baggage\":null}}",
-                    "timestamp": "2025-07-02T16:13:04.684822564Z",
-                    "transactionInfo": {
-                        "transactionId": "aabe94d6f8b34482a323045704ce522b",
-                        "authorizationRequestId": "E1751468828179G44P",
-                        "eCommerceStatus": "EXPIRED",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "538b3598499a49b39d378ddd65a8c0f6"
-                        ],
-                        "pspId": "UNCRITMM",
-                        "paymentMethodName": "CARDS",
-                        "grandTotal": 12120,
-                        "rrn": "251839055935",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "EXECUTED",
-                            "operationId": "327670870088451839",
-                            "correlationId": "131e5fac-4ab8-4a28-aba8-d68821c03df4",
-                            "paymentEndToEndId": "327670870088451839",
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T15:07:37.360810911Z",
-                        "status": "Confermato",
-                        "statusDetails": null,
-                        "eventStatus": "NOTIFIED_OK",
-                        "amount": 12000,
-                        "fee": 120,
-                        "grandTotal": 12120,
-                        "rrn": "251839055935",
-                        "authorizationCode": "767233",
-                        "authorizationOperationId": "327670870088451839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "CARDS",
-                        "brand": "MC",
-                        "authorizationRequestId": "E1751468828179G44P",
-                        "paymentGateway": "NPG",
-                        "correlationId": "131e5fac-4ab8-4a28-aba8-d68821c03df4",
-                        "gatewayAuthorizationStatus": "EXECUTED",
-                        "gatewayErrorCode": "000"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "aabe94d6f8b34482a323045704ce522b",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302011111111111489",
-                                "amount": 12000,
-                                "paymentToken": "538b3598499a49b39d378ddd65a8c0f6",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "UNCRITMM",
-                        "businessName": "UN spa",
-                        "idChannel": "00348170101_01"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": "767233",
-                                "rrn": "251839055935"
-                            },
-                            "operationAmount": "12120",
-                            "operationCurrency": "EUR",
-                            "operationId": "327670870088451839",
-                            "operationResult": "EXECUTED",
-                            "operationTime": "2025-07-02 17:08:01.670",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751468828179G44P",
-                            "paymentCircuit": "MC",
-                            "paymentEndToEndId": "327670870088451839",
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "3364013ba65944faba4d5fbbaa94f038",
-                "insertionDate": "2025-07-02T16:23:25.804728716Z",
-                "paymentToken": "9aa781257b30403da845db0610882354",
-                "paymentMethodName": "GOOGLEPAY",
-                "pspId": "CIPBITMM",
-                "eCommerceStatus": "EXPIRED",
-                "gatewayAuthorizationStatus": "DECLINED",
-                "paymentEndToEndId": null,
-                "operationId": "380364596587851839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"111701be-361e-4de5-88b4-815d12465350\",\"transactionId\":\"3364013ba65944faba4d5fbbaa94f038\",\"creationDate\":\"2025-07-02T16:21:54.902632292Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-000000000000000033c90893137ad40d-5aa06a8b7dfeee7f-01\",\"tracestate\":\"in=33c90893137ad40d;363a4bc32b74e321\",\"baggage\":null}}",
-                    "timestamp": "2025-07-02T16:23:25.804728716Z",
-                    "transactionInfo": {
-                        "transactionId": "3364013ba65944faba4d5fbbaa94f038",
-                        "authorizationRequestId": "E1751473201271UamP",
-                        "eCommerceStatus": "CLOSURE_ERROR",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "9aa781257b30403da845db0610882354"
-                        ],
-                        "pspId": "CIPBITMM",
-                        "paymentMethodName": "GOOGLEPAY",
-                        "grandTotal": 12100,
-                        "rrn": "518311895356",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "DECLINED",
-                            "operationId": "380364596587851839",
-                            "correlationId": "bcd2f532-3a26-46f7-9fdf-2ae38398a58c",
-                            "paymentEndToEndId": null,
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "ma@ma.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T16:19:56.431443776Z",
-                        "status": "Rifiutato",
-                        "statusDetails": null,
-                        "eventStatus": "EXPIRED",
-                        "amount": 12000,
-                        "fee": 100,
-                        "grandTotal": 12100,
-                        "rrn": "518311895356",
-                        "authorizationCode": null,
-                        "authorizationOperationId": "380364596587851839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "GOOGLEPAY",
-                        "brand": "GOOGLEPAY",
-                        "authorizationRequestId": "E1751473201271UamP",
-                        "paymentGateway": "NPG",
-                        "correlationId": "bcd2f532-3a26-46f7-9fdf-2ae38398a58c",
-                        "gatewayAuthorizationStatus": "DECLINED",
-                        "gatewayErrorCode": "904"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "3364013ba65944faba4d5fbbaa94f038",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302011111111111120",
-                                "amount": 12000,
-                                "paymentToken": "9aa781257b30403da845db0610882354",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "CIPBITMM",
-                        "businessName": "NX PAYMENTS S.P.A.",
-                        "idChannel": "13212880150_17"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": null,
-                                "rrn": "518311895356"
-                            },
-                            "operationAmount": "0",
-                            "operationCurrency": "EUR",
-                            "operationId": "380364596587851839",
-                            "operationResult": "DECLINED",
-                            "operationTime": "2025-07-02 18:20:23.243",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751473201271UamP",
-                            "paymentCircuit": "GOOGLE_PAY",
-                            "paymentEndToEndId": null,
-                            "paymentMethod": "APM"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "5fe5a5a5833540c3b971872d4e92fd75",
-                "insertionDate": "2025-07-02T15:52:07.315878486Z",
-                "paymentToken": "e9a0b030918249249c6dfbc2cac010ca",
-                "paymentMethodName": "CARDS",
-                "pspId": "UNCRITMM",
-                "eCommerceStatus": "NOTIFIED_OK",
-                "gatewayAuthorizationStatus": "EXECUTED",
-                "paymentEndToEndId": "137655313198651839",
-                "operationId": "137655313198651839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"f9aabda4-c8eb-4316-bbcf-5f1a105e4ab4\",\"transactionId\":\"5fe5a5a5833540c3b971872d4e92fd75\",\"creationDate\":\"2025-07-02T14:46:16.455042536Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"84509f32-3298-472c-965b-734a8e89d70b\"},\"paymentNotices\":[{\"paymentToken\":\"e9a0b030918249249c6dfbc2cac010ca\",\"rptId\":\"77777777777300000000001066364\",\"description\":\"Oneri istruttori/spese di registrazione VAS, TEST\",\"amount\":5000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":5000,\"transferCategory\":\"0301118SP\"}],\"companyName\":\"Regione Puglia\",\"creditorReferenceId\":\"00000000001066364\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT_CART\",\"idCart\":\"IDS-27a5f744-61b2-4a68-9f89-e40325744c22\",\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751467535301uw-I\",\"correlationId\":\"2fcab325-b0e2-47ee-8ba4-6d5e976da6c8\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-e47044c83abccfc361666b0b0bcca034-b812abaa9136bf3a-01\",\"tracestate\":null,\"baggage\":null}}",
-                    "timestamp": "2025-07-02T15:52:07.315878486Z",
-                    "transactionInfo": {
-                        "transactionId": "5fe5a5a5833540c3b971872d4e92fd75",
-                        "authorizationRequestId": "E1751467535301uw-I",
-                        "eCommerceStatus": "EXPIRED",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "e9a0b030918249249c6dfbc2cac010ca"
-                        ],
-                        "pspId": "UNCRITMM",
-                        "paymentMethodName": "CARDS",
-                        "grandTotal": 5095,
-                        "rrn": "251839055918",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "EXECUTED",
-                            "operationId": "137655313198651839",
-                            "correlationId": "2fcab325-b0e2-47ee-8ba4-6d5e976da6c8",
-                            "paymentEndToEndId": "137655313198651839",
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T14:46:16.455042536Z",
-                        "status": "Confermato",
-                        "statusDetails": null,
-                        "eventStatus": "NOTIFIED_OK",
-                        "amount": 5000,
-                        "fee": 95,
-                        "grandTotal": 5095,
-                        "rrn": "251839055918",
-                        "authorizationCode": "150789",
-                        "authorizationOperationId": "137655313198651839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "CARDS",
-                        "brand": "MC",
-                        "authorizationRequestId": "E1751467535301uw-I",
-                        "paymentGateway": "NPG",
-                        "correlationId": "2fcab325-b0e2-47ee-8ba4-6d5e976da6c8",
-                        "gatewayAuthorizationStatus": "EXECUTED",
-                        "gatewayErrorCode": "000"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT_CART",
-                        "idTransaction": "5fe5a5a5833540c3b971872d4e92fd75",
-                        "details": [
-                            {
-                                "subject": "Oneri istruttori/spese di registrazione VAS, TEST",
-                                "iuv": null,
-                                "rptId": "77777777777300000000001066364",
-                                "amount": 5000,
-                                "paymentToken": "e9a0b030918249249c6dfbc2cac010ca",
-                                "creditorInstitution": "Regione test",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "UNCRITMM",
-                        "businessName": "UN spa",
-                        "idChannel": "00348170101_01"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": "150789",
-                                "rrn": "251839055918"
-                            },
-                            "operationAmount": "5095",
-                            "operationCurrency": "EUR",
-                            "operationId": "137655313198651839",
-                            "operationResult": "EXECUTED",
-                            "operationTime": "2025-07-02 16:47:04.306",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751467535301uw-I",
-                            "paymentCircuit": "MC",
-                            "paymentEndToEndId": "137655313198651839",
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "f632a432acfd4adb978f89453a5390b8",
-                "insertionDate": "2025-07-02T16:07:36.190063219Z",
-                "paymentToken": "e19acab5ab5b4e59984f9b07641b32a6",
-                "paymentMethodName": "GOOGLEPAY",
-                "pspId": "CIPBITMM",
-                "eCommerceStatus": "EXPIRED",
-                "gatewayAuthorizationStatus": "DECLINED",
-                "paymentEndToEndId": null,
-                "operationId": "673084329718451839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"220023a0-43fe-440b-8620-907b5ae6c42f\",\"transactionId\":\"f632a432acfd4adb978f89453a5390b8\",\"creationDate\":\"2025-07-02T16:06:05.286711855Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-00000000000000008c567395d60cef77-92e37b7f4c2135d8-01\",\"tracestate\":\"in=8c567395d60cef77;0cbf691b895124a9\",\"baggage\":null}}",
-                    "timestamp": "2025-07-02T16:07:36.190063219Z",
-                    "transactionInfo": {
-                        "transactionId": "f632a432acfd4adb978f89453a5390b8",
-                        "authorizationRequestId": "E1751472234696o7yv",
-                        "eCommerceStatus": "CLOSURE_ERROR",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "e19acab5ab5b4e59984f9b07641b32a6"
-                        ],
-                        "pspId": "CIPBITMM",
-                        "paymentMethodName": "GOOGLEPAY",
-                        "grandTotal": 12100,
-                        "rrn": "518311895320",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "DECLINED",
-                            "operationId": "673084329718451839",
-                            "correlationId": "668a5f29-f96b-4b85-b42f-c4112d65b8fc",
-                            "paymentEndToEndId": null,
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T16:01:31.025745261Z",
-                        "status": "Rifiutato",
-                        "statusDetails": null,
-                        "eventStatus": "EXPIRED",
-                        "amount": 12000,
-                        "fee": 100,
-                        "grandTotal": 12100,
-                        "rrn": "518311895320",
-                        "authorizationCode": null,
-                        "authorizationOperationId": "673084329718451839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "GOOGLEPAY",
-                        "brand": "GOOGLEPAY",
-                        "authorizationRequestId": "E1751472234696o7yv",
-                        "paymentGateway": "NPG",
-                        "correlationId": "668a5f29-f96b-4b85-b42f-c4112d65b8fc",
-                        "gatewayAuthorizationStatus": "DECLINED",
-                        "gatewayErrorCode": "904"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "f632a432acfd4adb978f89453a5390b8",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302011111111111492",
-                                "amount": 12000,
-                                "paymentToken": "e19acab5ab5b4e59984f9b07641b32a6",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "CIPBITMM",
-                        "businessName": "NX PAYMENTS S.P.A.",
-                        "idChannel": "13212880150_17"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": null,
-                                "rrn": "518311895320"
-                            },
-                            "operationAmount": "0",
-                            "operationCurrency": "EUR",
-                            "operationId": "673084329718451839",
-                            "operationResult": "DECLINED",
-                            "operationTime": "2025-07-02 18:04:33.186",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751472234696o7yv",
-                            "paymentCircuit": "GOOGLE_PAY",
-                            "paymentEndToEndId": null,
-                            "paymentMethod": "APM"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "429a7b69689c4e6197f4d4fd412ae355",
-                "insertionDate": "2025-07-02T16:17:17.897798317Z",
-                "paymentToken": "2330a6e6748b441887bff9cc5579661b",
-                "paymentMethodName": "GOOGLEPAY",
-                "pspId": "CIPBITMM",
-                "eCommerceStatus": "EXPIRED",
-                "gatewayAuthorizationStatus": "DECLINED",
-                "paymentEndToEndId": null,
-                "operationId": "533935788069251839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"125f0f7f-36c8-498d-83f0-5a42c8789578\",\"transactionId\":\"429a7b69689c4e6197f4d4fd412ae355\",\"creationDate\":\"2025-07-02T16:15:47.001255386Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-0000000000000000239720c5e018c23b-c035bf48c9c67f7a-01\",\"tracestate\":\"in=239720c5e018c23b;aef72f672a4213b1\",\"baggage\":null}}",
-                    "timestamp": "2025-07-02T16:17:17.897798317Z",
-                    "transactionInfo": {
-                        "transactionId": "429a7b69689c4e6197f4d4fd412ae355",
-                        "authorizationRequestId": "E1751472776298hZFO",
-                        "eCommerceStatus": "CLOSURE_ERROR",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "2330a6e6748b441887bff9cc5579661b"
-                        ],
-                        "pspId": "CIPBITMM",
-                        "paymentMethodName": "GOOGLEPAY",
-                        "grandTotal": 12100,
-                        "rrn": "518311895334",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "DECLINED",
-                            "operationId": "533935788069251839",
-                            "correlationId": "e8695c15-d5b6-458f-ad0d-ecd9ff62ae9d",
-                            "paymentEndToEndId": null,
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T16:12:53.869200417Z",
-                        "status": "Rifiutato",
-                        "statusDetails": null,
-                        "eventStatus": "EXPIRED",
-                        "amount": 12000,
-                        "fee": 100,
-                        "grandTotal": 12100,
-                        "rrn": "518311895334",
-                        "authorizationCode": null,
-                        "authorizationOperationId": "533935788069251839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "GOOGLEPAY",
-                        "brand": "GOOGLEPAY",
-                        "authorizationRequestId": "E1751472776298hZFO",
-                        "paymentGateway": "NPG",
-                        "correlationId": "e8695c15-d5b6-458f-ad0d-ecd9ff62ae9d",
-                        "gatewayAuthorizationStatus": "DECLINED",
-                        "gatewayErrorCode": "111"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "429a7b69689c4e6197f4d4fd412ae355",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302019999999999922",
-                                "amount": 12000,
-                                "paymentToken": "2330a6e6748b441887bff9cc5579661b",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "CIPBITMM",
-                        "businessName": "NX PAYMENTS S.P.A.",
-                        "idChannel": "13212880150_17"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": null,
-                                "rrn": "518311895334"
-                            },
-                            "operationAmount": "12100",
-                            "operationCurrency": "EUR",
-                            "operationId": "533935788069251839",
-                            "operationResult": "DECLINED",
-                            "operationTime": "2025-07-02 18:14:14.624",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751472776298hZFO",
-                            "paymentCircuit": "MC",
-                            "paymentEndToEndId": null,
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
-            },
-            {
-                "transactionId": "505db4c0c7be4f4582868fd0780359f4",
-                "insertionDate": "2025-07-02T16:53:08.537435644Z",
-                "paymentToken": "6a9f3de24ede4f2f8a0177b49b74ca3d",
-                "paymentMethodName": "CARDS",
-                "pspId": "UNCRITMM",
-                "eCommerceStatus": "NOTIFIED_OK",
-                "gatewayAuthorizationStatus": "EXECUTED",
-                "paymentEndToEndId": "113147082357551839",
-                "operationId": "113147082357551839",
-                "deadletterTransactionDetails": {
-                    "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
-                    "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"5e1628cb-d053-4254-9b85-56a84c14cd18\",\"transactionId\":\"505db4c0c7be4f4582868fd0780359f4\",\"creationDate\":\"2025-07-02T15:47:25.391751245Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"dd42eedf-3981-43b8-8e36-cfe2154b8edb\"},\"paymentNotices\":[{\"paymentToken\":\"6a9f3de24ede4f2f8a0177b49b74ca3d\",\"rptId\":\"77777777777302011111111111490\",\"description\":\"TARI/TEFA 2021\",\"amount\":12000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":10000,\"transferCategory\":\"0101101IM\"},{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":2000,\"transferCategory\":\"0201102IM\"}],\"companyName\":\"company PA\",\"creditorReferenceId\":\"02011111111111490\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT\",\"idCart\":null,\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751471219206bfxL\",\"correlationId\":\"d6adc54d-e979-4979-bddf-2ad1d384d57e\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-d54ca1a36c5f421146eca78394e66553-bf6a4fb1bd6d2427-01\",\"tracestate\":null,\"baggage\":null}}",
-                    "timestamp": "2025-07-02T16:53:08.537435644Z",
-                    "transactionInfo": {
-                        "transactionId": "505db4c0c7be4f4582868fd0780359f4",
-                        "authorizationRequestId": "E1751471219206bfxL",
-                        "eCommerceStatus": "EXPIRED",
-                        "paymentGateway": "NPG",
-                        "paymentTokens": [
-                            "6a9f3de24ede4f2f8a0177b49b74ca3d"
-                        ],
-                        "pspId": "UNCRITMM",
-                        "paymentMethodName": "CARDS",
-                        "grandTotal": 12120,
-                        "rrn": "251839055936",
-                        "details": {
-                            "type": "NPG",
-                            "operationResult": "EXECUTED",
-                            "operationId": "113147082357551839",
-                            "correlationId": "d6adc54d-e979-4979-bddf-2ad1d384d57e",
-                            "paymentEndToEndId": "113147082357551839",
-                            "outcome": null
-                        }
-                    }
-                },
-                "eCommerceDetails": {
-                    "userInfo": {
-                        "userFiscalCode": null,
-                        "notificationEmail": "test@test.it",
-                        "surname": null,
-                        "name": null,
-                        "username": null,
-                        "authenticationType": "GUEST"
-                    },
-                    "transactionInfo": {
-                        "creationDate": "2025-07-02T15:47:25.391751245Z",
-                        "status": "Confermato",
-                        "statusDetails": null,
-                        "eventStatus": "NOTIFIED_OK",
-                        "amount": 12000,
-                        "fee": 120,
-                        "grandTotal": 12120,
-                        "rrn": "251839055936",
-                        "authorizationCode": "944565",
-                        "authorizationOperationId": "113147082357551839",
-                        "refundOperationId": null,
-                        "paymentMethodName": "CARDS",
-                        "brand": "VISA",
-                        "authorizationRequestId": "E1751471219206bfxL",
-                        "paymentGateway": "NPG",
-                        "correlationId": "d6adc54d-e979-4979-bddf-2ad1d384d57e",
-                        "gatewayAuthorizationStatus": "EXECUTED",
-                        "gatewayErrorCode": "000"
-                    },
-                    "paymentInfo": {
-                        "origin": "CHECKOUT",
-                        "idTransaction": "505db4c0c7be4f4582868fd0780359f4",
-                        "details": [
-                            {
-                                "subject": "TARI/TEFA 2021",
-                                "iuv": null,
-                                "rptId": "77777777777302011111111111490",
-                                "amount": 12000,
-                                "paymentToken": "6a9f3de24ede4f2f8a0177b49b74ca3d",
-                                "creditorInstitution": "company PA",
-                                "paFiscalCode": "77777777777"
-                            }
-                        ]
-                    },
-                    "pspInfo": {
-                        "pspId": "UNCRITMM",
-                        "businessName": "UN spa",
-                        "idChannel": "00348170101_01"
-                    },
-                    "product": "ECOMMERCE"
-                },
-                "nodoDetails": {
-                    "dateFrom": "2025-07-02",
-                    "dateTo": "2025-07-02",
-                    "data": []
-                },
-                "npgDetails": {
-                    "operations": [
-                        {
-                            "additionalData": {
-                                "authorizationCode": "944565",
-                                "rrn": "251839055936"
-                            },
-                            "operationAmount": "12120",
-                            "operationCurrency": "EUR",
-                            "operationId": "113147082357551839",
-                            "operationResult": "EXECUTED",
-                            "operationTime": "2025-07-02 17:48:05.513",
-                            "operationType": "AUTHORIZATION",
-                            "orderId": "E1751471219206bfxL",
-                            "paymentCircuit": "VISA",
-                            "paymentEndToEndId": "113147082357551839",
-                            "paymentMethod": "CARD"
-                        }
-                    ]
-                }
+  "deadletter-transactions": {
+    "deadletterTransactions": [
+      {
+        "transactionId": "b202ea99a53643c4bb1d73114a06ea21",
+        "insertionDate": "2025-07-02T17:22:29.689947547Z",
+        "paymentToken": "6535d0c28c67448f9936bad26aeb9743",
+        "paymentMethodName": "GOOGLEPAY",
+        "pspId": "CIPBITMM",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "null",
+        "paymentEndToEndId": null,
+        "operationId": "321055056922651839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionRefundRetriedEvent\",\"id\":\"905cdbc7-9453-4e06-925b-2467993a2461\",\"transactionId\":\"b202ea99a53643c4bb1d73114a06ea21\",\"creationDate\":\"2025-07-02T16:52:27.305363346Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"transactionGatewayAuthorizationData\":null},\"eventCode\":\"TRANSACTION_REFUND_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-daae65aed7ca0fac9534bf0703f07cec-a53a60611d28fdc8-01\",\"tracestate\":null,\"baggage\":null}}",
+          "timestamp": "2025-07-02T17:22:29.689947547Z",
+          "transactionInfo": {
+            "transactionId": "b202ea99a53643c4bb1d73114a06ea21",
+            "authorizationRequestId": "E1751472447254teSA",
+            "eCommerceStatus": "REFUND_ERROR",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["6535d0c28c67448f9936bad26aeb9743"],
+            "pspId": "CIPBITMM",
+            "paymentMethodName": "GOOGLEPAY",
+            "grandTotal": 12100,
+            "rrn": null,
+            "details": {
+              "type": "NPG",
+              "operationResult": "PENDING",
+              "operationId": "321055056922651839",
+              "correlationId": "292eeba9-1c39-4bb4-a6fe-2c2d351dfd14",
+              "paymentEndToEndId": null,
+              "outcome": null
             }
-        ],
-        "page": {
-            "current": 0,
-            "total": 3,
-            "results": 10
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T16:07:24.467271641Z",
+            "status": "Cancellato",
+            "statusDetails": null,
+            "eventStatus": "REFUND_ERROR",
+            "amount": 12000,
+            "fee": 100,
+            "grandTotal": 12100,
+            "rrn": null,
+            "authorizationCode": null,
+            "authorizationOperationId": null,
+            "refundOperationId": null,
+            "paymentMethodName": "GOOGLEPAY",
+            "brand": "GOOGLEPAY",
+            "authorizationRequestId": "E1751472447254teSA",
+            "paymentGateway": "NPG",
+            "correlationId": "292eeba9-1c39-4bb4-a6fe-2c2d351dfd14",
+            "gatewayAuthorizationStatus": null,
+            "gatewayErrorCode": null
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "b202ea99a53643c4bb1d73114a06ea21",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302018888888888887",
+                "amount": 12000,
+                "paymentToken": "6535d0c28c67448f9936bad26aeb9743",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "CIPBITMM",
+            "businessName": "NX PAYMENTS S.P.A.",
+            "idChannel": "13212880150_17"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": null,
+                "rrn": null
+              },
+              "operationAmount": "12100",
+              "operationCurrency": "EUR",
+              "operationId": "321055056922651839",
+              "operationResult": "CANCELED",
+              "operationTime": "2025-07-02 18:07:27.611",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751472447254teSA",
+              "paymentCircuit": "GOOGLEPAY",
+              "paymentEndToEndId": null,
+              "paymentMethod": "APM"
+            }
+          ]
         }
+      },
+      {
+        "transactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
+        "insertionDate": "2025-07-02T17:33:15.633702275Z",
+        "paymentToken": "cde7b3ba3d0548cc983d6fd9c79fb641",
+        "paymentMethodName": "GOOGLEPAY",
+        "pspId": "CIPBITMM",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "null",
+        "paymentEndToEndId": null,
+        "operationId": "496313910637251839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionRefundRetriedEvent\",\"id\":\"1ac6e2da-9293-4380-8de2-b26bc83ab82c\",\"transactionId\":\"ca2d9476cdbe4535a693606b8c3bb9d6\",\"creationDate\":\"2025-07-02T17:03:13.114738363Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"transactionGatewayAuthorizationData\":null},\"eventCode\":\"TRANSACTION_REFUND_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-1c90fc292e996760eb4e7e48807c30b4-da073a5f371af2e7-01\",\"tracestate\":null,\"baggage\":null}}",
+          "timestamp": "2025-07-02T17:33:15.633702275Z",
+          "transactionInfo": {
+            "transactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
+            "authorizationRequestId": "E1751473092968ofcB",
+            "eCommerceStatus": "REFUND_ERROR",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["cde7b3ba3d0548cc983d6fd9c79fb641"],
+            "pspId": "CIPBITMM",
+            "paymentMethodName": "GOOGLEPAY",
+            "grandTotal": 12100,
+            "rrn": null,
+            "details": {
+              "type": "NPG",
+              "operationResult": "PENDING",
+              "operationId": "496313910637251839",
+              "correlationId": "7bda91d2-a1e1-45ac-b57b-03d0d1d1a061",
+              "paymentEndToEndId": null,
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "ma@ma.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T16:18:08.77395669Z",
+            "status": "Cancellato",
+            "statusDetails": null,
+            "eventStatus": "REFUND_ERROR",
+            "amount": 12000,
+            "fee": 100,
+            "grandTotal": 12100,
+            "rrn": null,
+            "authorizationCode": null,
+            "authorizationOperationId": null,
+            "refundOperationId": null,
+            "paymentMethodName": "GOOGLEPAY",
+            "brand": "GOOGLEPAY",
+            "authorizationRequestId": "E1751473092968ofcB",
+            "paymentGateway": "NPG",
+            "correlationId": "7bda91d2-a1e1-45ac-b57b-03d0d1d1a061",
+            "gatewayAuthorizationStatus": null,
+            "gatewayErrorCode": null
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "ca2d9476cdbe4535a693606b8c3bb9d6",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302017474747474700",
+                "amount": 12000,
+                "paymentToken": "cde7b3ba3d0548cc983d6fd9c79fb641",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "CIPBITMM",
+            "businessName": "NX PAYMENTS S.P.A.",
+            "idChannel": "13212880150_17"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": null,
+                "rrn": null
+              },
+              "operationAmount": "12100",
+              "operationCurrency": "EUR",
+              "operationId": "496313910637251839",
+              "operationResult": "CANCELED",
+              "operationTime": "2025-07-02 18:18:27.801",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751473092968ofcB",
+              "paymentCircuit": "MC",
+              "paymentEndToEndId": null,
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "6438d77a7fa3448da8baffe420acae77",
+        "insertionDate": "2025-07-02T19:21:39.282238363Z",
+        "paymentToken": "db33acb0acaf4688b48ffd9e7273dbcf",
+        "paymentMethodName": "GOOGLEPAY",
+        "pspId": "CIPBITMM",
+        "eCommerceStatus": "EXPIRED",
+        "gatewayAuthorizationStatus": "THREEDS_FAILED",
+        "paymentEndToEndId": null,
+        "operationId": "505464747110451839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"8e94c5ff-3903-46bf-9337-2d22535ba558\",\"transactionId\":\"6438d77a7fa3448da8baffe420acae77\",\"creationDate\":\"2025-07-02T19:20:07.443044958Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-0000000000000000cf349d7a243791cf-c10b6a27f1568106-01\",\"tracestate\":\"in=cf349d7a243791cf;75dfdd4d8c784ea7\",\"baggage\":null}}",
+          "timestamp": "2025-07-02T19:21:39.282238363Z",
+          "transactionInfo": {
+            "transactionId": "6438d77a7fa3448da8baffe420acae77",
+            "authorizationRequestId": "E1751483893304D87Z",
+            "eCommerceStatus": "CLOSURE_ERROR",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["db33acb0acaf4688b48ffd9e7273dbcf"],
+            "pspId": "CIPBITMM",
+            "paymentMethodName": "GOOGLEPAY",
+            "grandTotal": 12100,
+            "rrn": "",
+            "details": {
+              "type": "NPG",
+              "operationResult": "THREEDS_FAILED",
+              "operationId": "505464747110451839",
+              "correlationId": "e0dcd13c-92ce-4c70-9b7f-a627280ba8b9",
+              "paymentEndToEndId": null,
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T19:18:08.876387547Z",
+            "status": "Rifiutato",
+            "statusDetails": null,
+            "eventStatus": "EXPIRED",
+            "amount": 12000,
+            "fee": 100,
+            "grandTotal": 12100,
+            "rrn": "",
+            "authorizationCode": "",
+            "authorizationOperationId": "505464747110451839",
+            "refundOperationId": null,
+            "paymentMethodName": "GOOGLEPAY",
+            "brand": "GOOGLEPAY",
+            "authorizationRequestId": "E1751483893304D87Z",
+            "paymentGateway": "NPG",
+            "correlationId": "e0dcd13c-92ce-4c70-9b7f-a627280ba8b9",
+            "gatewayAuthorizationStatus": "THREEDS_FAILED",
+            "gatewayErrorCode": null
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "6438d77a7fa3448da8baffe420acae77",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302011111111111484",
+                "amount": 12000,
+                "paymentToken": "db33acb0acaf4688b48ffd9e7273dbcf",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "CIPBITMM",
+            "businessName": "NX PAYMENTS S.P.A.",
+            "idChannel": "13212880150_17"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": "",
+                "rrn": ""
+              },
+              "operationAmount": "12100",
+              "operationCurrency": "EUR",
+              "operationId": "505464747110451839",
+              "operationResult": "THREEDS_FAILED",
+              "operationTime": "2025-07-02 21:18:35.077",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751483893304D87Z",
+              "paymentCircuit": "MC",
+              "paymentEndToEndId": null,
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
+        "insertionDate": "2025-07-02T17:00:56.582184915Z",
+        "paymentToken": "5fd0bd0a52064e09b107ed998cc4d4e6",
+        "paymentMethodName": "CARDS",
+        "pspId": "UNCRITMM",
+        "eCommerceStatus": "NOTIFIED_OK",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentEndToEndId": "796382442287151839",
+        "operationId": "796382442287151839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"b1a51ee6-3fb5-475f-9abf-f8f51cd16c07\",\"transactionId\":\"6460dc3e61ba4ed6bfea2c4468b2862c\",\"creationDate\":\"2025-07-02T15:54:37.657023598Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"dd42eedf-3981-43b8-8e36-cfe2154b8edb\"},\"paymentNotices\":[{\"paymentToken\":\"5fd0bd0a52064e09b107ed998cc4d4e6\",\"rptId\":\"77777777777302011111111111491\",\"description\":\"TARI/TEFA 2021\",\"amount\":12000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":10000,\"transferCategory\":\"0101101IM\"},{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":2000,\"transferCategory\":\"0201102IM\"}],\"companyName\":\"company PA\",\"creditorReferenceId\":\"02011111111111491\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT\",\"idCart\":null,\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751471654755JSOj\",\"correlationId\":\"476c24c2-5bb8-4dd4-9a2e-464f663dfae2\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-915c312dbe3779395fec99c55af3ec0b-d5296feb1c5af05f-01\",\"tracestate\":null,\"baggage\":null}}",
+          "timestamp": "2025-07-02T17:00:56.582184915Z",
+          "transactionInfo": {
+            "transactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
+            "authorizationRequestId": "E1751471654755JSOj",
+            "eCommerceStatus": "EXPIRED",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["5fd0bd0a52064e09b107ed998cc4d4e6"],
+            "pspId": "UNCRITMM",
+            "paymentMethodName": "CARDS",
+            "grandTotal": 12120,
+            "rrn": "251839055937",
+            "details": {
+              "type": "NPG",
+              "operationResult": "EXECUTED",
+              "operationId": "796382442287151839",
+              "correlationId": "476c24c2-5bb8-4dd4-9a2e-464f663dfae2",
+              "paymentEndToEndId": "796382442287151839",
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T15:54:37.657023598Z",
+            "status": "Confermato",
+            "statusDetails": null,
+            "eventStatus": "NOTIFIED_OK",
+            "amount": 12000,
+            "fee": 120,
+            "grandTotal": 12120,
+            "rrn": "251839055937",
+            "authorizationCode": "103256",
+            "authorizationOperationId": "796382442287151839",
+            "refundOperationId": null,
+            "paymentMethodName": "CARDS",
+            "brand": "MC",
+            "authorizationRequestId": "E1751471654755JSOj",
+            "paymentGateway": "NPG",
+            "correlationId": "476c24c2-5bb8-4dd4-9a2e-464f663dfae2",
+            "gatewayAuthorizationStatus": "EXECUTED",
+            "gatewayErrorCode": "000"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "6460dc3e61ba4ed6bfea2c4468b2862c",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302011111111111491",
+                "amount": 12000,
+                "paymentToken": "5fd0bd0a52064e09b107ed998cc4d4e6",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "UNCRITMM",
+            "businessName": "UN spa",
+            "idChannel": "00348170101_01"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": "103256",
+                "rrn": "251839055937"
+              },
+              "operationAmount": "12120",
+              "operationCurrency": "EUR",
+              "operationId": "796382442287151839",
+              "operationResult": "EXECUTED",
+              "operationTime": "2025-07-02 17:55:55.043",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751471654755JSOj",
+              "paymentCircuit": "MC",
+              "paymentEndToEndId": "796382442287151839",
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "aabe94d6f8b34482a323045704ce522b",
+        "insertionDate": "2025-07-02T16:13:04.684822564Z",
+        "paymentToken": "538b3598499a49b39d378ddd65a8c0f6",
+        "paymentMethodName": "CARDS",
+        "pspId": "UNCRITMM",
+        "eCommerceStatus": "NOTIFIED_OK",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentEndToEndId": "327670870088451839",
+        "operationId": "327670870088451839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"fb7b8309-09f8-4fea-8813-34941ad85fb6\",\"transactionId\":\"aabe94d6f8b34482a323045704ce522b\",\"creationDate\":\"2025-07-02T15:07:37.360810911Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"dd42eedf-3981-43b8-8e36-cfe2154b8edb\"},\"paymentNotices\":[{\"paymentToken\":\"538b3598499a49b39d378ddd65a8c0f6\",\"rptId\":\"77777777777302011111111111489\",\"description\":\"TARI/TEFA 2021\",\"amount\":12000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":10000,\"transferCategory\":\"0101101IM\"},{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":2000,\"transferCategory\":\"0201102IM\"}],\"companyName\":\"company PA\",\"creditorReferenceId\":\"02011111111111489\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT\",\"idCart\":null,\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751468828179G44P\",\"correlationId\":\"131e5fac-4ab8-4a28-aba8-d68821c03df4\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-270ad65065a43e82ca7da9a372b44cce-72a681cde759c536-01\",\"tracestate\":null,\"baggage\":null}}",
+          "timestamp": "2025-07-02T16:13:04.684822564Z",
+          "transactionInfo": {
+            "transactionId": "aabe94d6f8b34482a323045704ce522b",
+            "authorizationRequestId": "E1751468828179G44P",
+            "eCommerceStatus": "EXPIRED",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["538b3598499a49b39d378ddd65a8c0f6"],
+            "pspId": "UNCRITMM",
+            "paymentMethodName": "CARDS",
+            "grandTotal": 12120,
+            "rrn": "251839055935",
+            "details": {
+              "type": "NPG",
+              "operationResult": "EXECUTED",
+              "operationId": "327670870088451839",
+              "correlationId": "131e5fac-4ab8-4a28-aba8-d68821c03df4",
+              "paymentEndToEndId": "327670870088451839",
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T15:07:37.360810911Z",
+            "status": "Confermato",
+            "statusDetails": null,
+            "eventStatus": "NOTIFIED_OK",
+            "amount": 12000,
+            "fee": 120,
+            "grandTotal": 12120,
+            "rrn": "251839055935",
+            "authorizationCode": "767233",
+            "authorizationOperationId": "327670870088451839",
+            "refundOperationId": null,
+            "paymentMethodName": "CARDS",
+            "brand": "MC",
+            "authorizationRequestId": "E1751468828179G44P",
+            "paymentGateway": "NPG",
+            "correlationId": "131e5fac-4ab8-4a28-aba8-d68821c03df4",
+            "gatewayAuthorizationStatus": "EXECUTED",
+            "gatewayErrorCode": "000"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "aabe94d6f8b34482a323045704ce522b",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302011111111111489",
+                "amount": 12000,
+                "paymentToken": "538b3598499a49b39d378ddd65a8c0f6",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "UNCRITMM",
+            "businessName": "UN spa",
+            "idChannel": "00348170101_01"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": "767233",
+                "rrn": "251839055935"
+              },
+              "operationAmount": "12120",
+              "operationCurrency": "EUR",
+              "operationId": "327670870088451839",
+              "operationResult": "EXECUTED",
+              "operationTime": "2025-07-02 17:08:01.670",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751468828179G44P",
+              "paymentCircuit": "MC",
+              "paymentEndToEndId": "327670870088451839",
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "3364013ba65944faba4d5fbbaa94f038",
+        "insertionDate": "2025-07-02T16:23:25.804728716Z",
+        "paymentToken": "9aa781257b30403da845db0610882354",
+        "paymentMethodName": "GOOGLEPAY",
+        "pspId": "CIPBITMM",
+        "eCommerceStatus": "EXPIRED",
+        "gatewayAuthorizationStatus": "DECLINED",
+        "paymentEndToEndId": null,
+        "operationId": "380364596587851839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"111701be-361e-4de5-88b4-815d12465350\",\"transactionId\":\"3364013ba65944faba4d5fbbaa94f038\",\"creationDate\":\"2025-07-02T16:21:54.902632292Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-000000000000000033c90893137ad40d-5aa06a8b7dfeee7f-01\",\"tracestate\":\"in=33c90893137ad40d;363a4bc32b74e321\",\"baggage\":null}}",
+          "timestamp": "2025-07-02T16:23:25.804728716Z",
+          "transactionInfo": {
+            "transactionId": "3364013ba65944faba4d5fbbaa94f038",
+            "authorizationRequestId": "E1751473201271UamP",
+            "eCommerceStatus": "CLOSURE_ERROR",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["9aa781257b30403da845db0610882354"],
+            "pspId": "CIPBITMM",
+            "paymentMethodName": "GOOGLEPAY",
+            "grandTotal": 12100,
+            "rrn": "518311895356",
+            "details": {
+              "type": "NPG",
+              "operationResult": "DECLINED",
+              "operationId": "380364596587851839",
+              "correlationId": "bcd2f532-3a26-46f7-9fdf-2ae38398a58c",
+              "paymentEndToEndId": null,
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "ma@ma.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T16:19:56.431443776Z",
+            "status": "Rifiutato",
+            "statusDetails": null,
+            "eventStatus": "EXPIRED",
+            "amount": 12000,
+            "fee": 100,
+            "grandTotal": 12100,
+            "rrn": "518311895356",
+            "authorizationCode": null,
+            "authorizationOperationId": "380364596587851839",
+            "refundOperationId": null,
+            "paymentMethodName": "GOOGLEPAY",
+            "brand": "GOOGLEPAY",
+            "authorizationRequestId": "E1751473201271UamP",
+            "paymentGateway": "NPG",
+            "correlationId": "bcd2f532-3a26-46f7-9fdf-2ae38398a58c",
+            "gatewayAuthorizationStatus": "DECLINED",
+            "gatewayErrorCode": "904"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "3364013ba65944faba4d5fbbaa94f038",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302011111111111120",
+                "amount": 12000,
+                "paymentToken": "9aa781257b30403da845db0610882354",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "CIPBITMM",
+            "businessName": "NX PAYMENTS S.P.A.",
+            "idChannel": "13212880150_17"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": null,
+                "rrn": "518311895356"
+              },
+              "operationAmount": "0",
+              "operationCurrency": "EUR",
+              "operationId": "380364596587851839",
+              "operationResult": "DECLINED",
+              "operationTime": "2025-07-02 18:20:23.243",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751473201271UamP",
+              "paymentCircuit": "GOOGLE_PAY",
+              "paymentEndToEndId": null,
+              "paymentMethod": "APM"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "5fe5a5a5833540c3b971872d4e92fd75",
+        "insertionDate": "2025-07-02T15:52:07.315878486Z",
+        "paymentToken": "e9a0b030918249249c6dfbc2cac010ca",
+        "paymentMethodName": "CARDS",
+        "pspId": "UNCRITMM",
+        "eCommerceStatus": "NOTIFIED_OK",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentEndToEndId": "137655313198651839",
+        "operationId": "137655313198651839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"f9aabda4-c8eb-4316-bbcf-5f1a105e4ab4\",\"transactionId\":\"5fe5a5a5833540c3b971872d4e92fd75\",\"creationDate\":\"2025-07-02T14:46:16.455042536Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"84509f32-3298-472c-965b-734a8e89d70b\"},\"paymentNotices\":[{\"paymentToken\":\"e9a0b030918249249c6dfbc2cac010ca\",\"rptId\":\"77777777777300000000001066364\",\"description\":\"Oneri istruttori/spese di registrazione VAS, TEST\",\"amount\":5000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":5000,\"transferCategory\":\"0301118SP\"}],\"companyName\":\"Regione Puglia\",\"creditorReferenceId\":\"00000000001066364\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT_CART\",\"idCart\":\"IDS-27a5f744-61b2-4a68-9f89-e40325744c22\",\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751467535301uw-I\",\"correlationId\":\"2fcab325-b0e2-47ee-8ba4-6d5e976da6c8\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-e47044c83abccfc361666b0b0bcca034-b812abaa9136bf3a-01\",\"tracestate\":null,\"baggage\":null}}",
+          "timestamp": "2025-07-02T15:52:07.315878486Z",
+          "transactionInfo": {
+            "transactionId": "5fe5a5a5833540c3b971872d4e92fd75",
+            "authorizationRequestId": "E1751467535301uw-I",
+            "eCommerceStatus": "EXPIRED",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["e9a0b030918249249c6dfbc2cac010ca"],
+            "pspId": "UNCRITMM",
+            "paymentMethodName": "CARDS",
+            "grandTotal": 5095,
+            "rrn": "251839055918",
+            "details": {
+              "type": "NPG",
+              "operationResult": "EXECUTED",
+              "operationId": "137655313198651839",
+              "correlationId": "2fcab325-b0e2-47ee-8ba4-6d5e976da6c8",
+              "paymentEndToEndId": "137655313198651839",
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T14:46:16.455042536Z",
+            "status": "Confermato",
+            "statusDetails": null,
+            "eventStatus": "NOTIFIED_OK",
+            "amount": 5000,
+            "fee": 95,
+            "grandTotal": 5095,
+            "rrn": "251839055918",
+            "authorizationCode": "150789",
+            "authorizationOperationId": "137655313198651839",
+            "refundOperationId": null,
+            "paymentMethodName": "CARDS",
+            "brand": "MC",
+            "authorizationRequestId": "E1751467535301uw-I",
+            "paymentGateway": "NPG",
+            "correlationId": "2fcab325-b0e2-47ee-8ba4-6d5e976da6c8",
+            "gatewayAuthorizationStatus": "EXECUTED",
+            "gatewayErrorCode": "000"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT_CART",
+            "idTransaction": "5fe5a5a5833540c3b971872d4e92fd75",
+            "details": [
+              {
+                "subject": "Oneri istruttori/spese di registrazione VAS, TEST",
+                "iuv": null,
+                "rptId": "77777777777300000000001066364",
+                "amount": 5000,
+                "paymentToken": "e9a0b030918249249c6dfbc2cac010ca",
+                "creditorInstitution": "Regione test",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "UNCRITMM",
+            "businessName": "UN spa",
+            "idChannel": "00348170101_01"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": "150789",
+                "rrn": "251839055918"
+              },
+              "operationAmount": "5095",
+              "operationCurrency": "EUR",
+              "operationId": "137655313198651839",
+              "operationResult": "EXECUTED",
+              "operationTime": "2025-07-02 16:47:04.306",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751467535301uw-I",
+              "paymentCircuit": "MC",
+              "paymentEndToEndId": "137655313198651839",
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "f632a432acfd4adb978f89453a5390b8",
+        "insertionDate": "2025-07-02T16:07:36.190063219Z",
+        "paymentToken": "e19acab5ab5b4e59984f9b07641b32a6",
+        "paymentMethodName": "GOOGLEPAY",
+        "pspId": "CIPBITMM",
+        "eCommerceStatus": "EXPIRED",
+        "gatewayAuthorizationStatus": "DECLINED",
+        "paymentEndToEndId": null,
+        "operationId": "673084329718451839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"220023a0-43fe-440b-8620-907b5ae6c42f\",\"transactionId\":\"f632a432acfd4adb978f89453a5390b8\",\"creationDate\":\"2025-07-02T16:06:05.286711855Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-00000000000000008c567395d60cef77-92e37b7f4c2135d8-01\",\"tracestate\":\"in=8c567395d60cef77;0cbf691b895124a9\",\"baggage\":null}}",
+          "timestamp": "2025-07-02T16:07:36.190063219Z",
+          "transactionInfo": {
+            "transactionId": "f632a432acfd4adb978f89453a5390b8",
+            "authorizationRequestId": "E1751472234696o7yv",
+            "eCommerceStatus": "CLOSURE_ERROR",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["e19acab5ab5b4e59984f9b07641b32a6"],
+            "pspId": "CIPBITMM",
+            "paymentMethodName": "GOOGLEPAY",
+            "grandTotal": 12100,
+            "rrn": "518311895320",
+            "details": {
+              "type": "NPG",
+              "operationResult": "DECLINED",
+              "operationId": "673084329718451839",
+              "correlationId": "668a5f29-f96b-4b85-b42f-c4112d65b8fc",
+              "paymentEndToEndId": null,
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T16:01:31.025745261Z",
+            "status": "Rifiutato",
+            "statusDetails": null,
+            "eventStatus": "EXPIRED",
+            "amount": 12000,
+            "fee": 100,
+            "grandTotal": 12100,
+            "rrn": "518311895320",
+            "authorizationCode": null,
+            "authorizationOperationId": "673084329718451839",
+            "refundOperationId": null,
+            "paymentMethodName": "GOOGLEPAY",
+            "brand": "GOOGLEPAY",
+            "authorizationRequestId": "E1751472234696o7yv",
+            "paymentGateway": "NPG",
+            "correlationId": "668a5f29-f96b-4b85-b42f-c4112d65b8fc",
+            "gatewayAuthorizationStatus": "DECLINED",
+            "gatewayErrorCode": "904"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "f632a432acfd4adb978f89453a5390b8",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302011111111111492",
+                "amount": 12000,
+                "paymentToken": "e19acab5ab5b4e59984f9b07641b32a6",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "CIPBITMM",
+            "businessName": "NX PAYMENTS S.P.A.",
+            "idChannel": "13212880150_17"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": null,
+                "rrn": "518311895320"
+              },
+              "operationAmount": "0",
+              "operationCurrency": "EUR",
+              "operationId": "673084329718451839",
+              "operationResult": "DECLINED",
+              "operationTime": "2025-07-02 18:04:33.186",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751472234696o7yv",
+              "paymentCircuit": "GOOGLE_PAY",
+              "paymentEndToEndId": null,
+              "paymentMethod": "APM"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "429a7b69689c4e6197f4d4fd412ae355",
+        "insertionDate": "2025-07-02T16:17:17.897798317Z",
+        "paymentToken": "2330a6e6748b441887bff9cc5579661b",
+        "paymentMethodName": "GOOGLEPAY",
+        "pspId": "CIPBITMM",
+        "eCommerceStatus": "EXPIRED",
+        "gatewayAuthorizationStatus": "DECLINED",
+        "paymentEndToEndId": null,
+        "operationId": "533935788069251839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionClosureRetriedEvent\",\"id\":\"125f0f7f-36c8-498d-83f0-5a42c8789578\",\"transactionId\":\"429a7b69689c4e6197f4d4fd412ae355\",\"creationDate\":\"2025-07-02T16:15:47.001255386Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"closureErrorData\":{\"httpErrorCode\":null,\"errorDescription\":null,\"errorType\":\"COMMUNICATION_ERROR\"}},\"eventCode\":\"TRANSACTION_CLOSURE_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-0000000000000000239720c5e018c23b-c035bf48c9c67f7a-01\",\"tracestate\":\"in=239720c5e018c23b;aef72f672a4213b1\",\"baggage\":null}}",
+          "timestamp": "2025-07-02T16:17:17.897798317Z",
+          "transactionInfo": {
+            "transactionId": "429a7b69689c4e6197f4d4fd412ae355",
+            "authorizationRequestId": "E1751472776298hZFO",
+            "eCommerceStatus": "CLOSURE_ERROR",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["2330a6e6748b441887bff9cc5579661b"],
+            "pspId": "CIPBITMM",
+            "paymentMethodName": "GOOGLEPAY",
+            "grandTotal": 12100,
+            "rrn": "518311895334",
+            "details": {
+              "type": "NPG",
+              "operationResult": "DECLINED",
+              "operationId": "533935788069251839",
+              "correlationId": "e8695c15-d5b6-458f-ad0d-ecd9ff62ae9d",
+              "paymentEndToEndId": null,
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T16:12:53.869200417Z",
+            "status": "Rifiutato",
+            "statusDetails": null,
+            "eventStatus": "EXPIRED",
+            "amount": 12000,
+            "fee": 100,
+            "grandTotal": 12100,
+            "rrn": "518311895334",
+            "authorizationCode": null,
+            "authorizationOperationId": "533935788069251839",
+            "refundOperationId": null,
+            "paymentMethodName": "GOOGLEPAY",
+            "brand": "GOOGLEPAY",
+            "authorizationRequestId": "E1751472776298hZFO",
+            "paymentGateway": "NPG",
+            "correlationId": "e8695c15-d5b6-458f-ad0d-ecd9ff62ae9d",
+            "gatewayAuthorizationStatus": "DECLINED",
+            "gatewayErrorCode": "111"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "429a7b69689c4e6197f4d4fd412ae355",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302019999999999922",
+                "amount": 12000,
+                "paymentToken": "2330a6e6748b441887bff9cc5579661b",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "CIPBITMM",
+            "businessName": "NX PAYMENTS S.P.A.",
+            "idChannel": "13212880150_17"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": null,
+                "rrn": "518311895334"
+              },
+              "operationAmount": "12100",
+              "operationCurrency": "EUR",
+              "operationId": "533935788069251839",
+              "operationResult": "DECLINED",
+              "operationTime": "2025-07-02 18:14:14.624",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751472776298hZFO",
+              "paymentCircuit": "MC",
+              "paymentEndToEndId": null,
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      },
+      {
+        "transactionId": "505db4c0c7be4f4582868fd0780359f4",
+        "insertionDate": "2025-07-02T16:53:08.537435644Z",
+        "paymentToken": "6a9f3de24ede4f2f8a0177b49b74ca3d",
+        "paymentMethodName": "CARDS",
+        "pspId": "UNCRITMM",
+        "eCommerceStatus": "NOTIFIED_OK",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentEndToEndId": "113147082357551839",
+        "operationId": "113147082357551839",
+        "deadletterTransactionDetails": {
+          "queueName": "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
+          "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionActivatedEvent\",\"id\":\"5e1628cb-d053-4254-9b85-56a84c14cd18\",\"transactionId\":\"505db4c0c7be4f4582868fd0780359f4\",\"creationDate\":\"2025-07-02T15:47:25.391751245Z[Etc/UTC]\",\"data\":{\"email\":{\"data\":\"dd42eedf-3981-43b8-8e36-cfe2154b8edb\"},\"paymentNotices\":[{\"paymentToken\":\"6a9f3de24ede4f2f8a0177b49b74ca3d\",\"rptId\":\"77777777777302011111111111490\",\"description\":\"TARI/TEFA 2021\",\"amount\":12000,\"paymentContextCode\":null,\"transferList\":[{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":10000,\"transferCategory\":\"0101101IM\"},{\"paFiscalCode\":\"77777777777\",\"digitalStamp\":false,\"transferAmount\":2000,\"transferCategory\":\"0201102IM\"}],\"companyName\":\"company PA\",\"creditorReferenceId\":\"02011111111111490\",\"allCCP\":false}],\"faultCode\":null,\"faultCodeString\":null,\"clientId\":\"CHECKOUT\",\"idCart\":null,\"paymentTokenValiditySeconds\":900,\"transactionGatewayActivationData\":{\"type\":\"NPG\",\"orderId\":\"E1751471219206bfxL\",\"correlationId\":\"d6adc54d-e979-4979-bddf-2ad1d384d57e\"},\"userId\":null},\"eventCode\":\"TRANSACTION_ACTIVATED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-d54ca1a36c5f421146eca78394e66553-bf6a4fb1bd6d2427-01\",\"tracestate\":null,\"baggage\":null}}",
+          "timestamp": "2025-07-02T16:53:08.537435644Z",
+          "transactionInfo": {
+            "transactionId": "505db4c0c7be4f4582868fd0780359f4",
+            "authorizationRequestId": "E1751471219206bfxL",
+            "eCommerceStatus": "EXPIRED",
+            "paymentGateway": "NPG",
+            "paymentTokens": ["6a9f3de24ede4f2f8a0177b49b74ca3d"],
+            "pspId": "UNCRITMM",
+            "paymentMethodName": "CARDS",
+            "grandTotal": 12120,
+            "rrn": "251839055936",
+            "details": {
+              "type": "NPG",
+              "operationResult": "EXECUTED",
+              "operationId": "113147082357551839",
+              "correlationId": "d6adc54d-e979-4979-bddf-2ad1d384d57e",
+              "paymentEndToEndId": "113147082357551839",
+              "outcome": null
+            }
+          }
+        },
+        "eCommerceDetails": {
+          "userInfo": {
+            "userFiscalCode": null,
+            "notificationEmail": "test@test.it",
+            "surname": null,
+            "name": null,
+            "username": null,
+            "authenticationType": "GUEST"
+          },
+          "transactionInfo": {
+            "creationDate": "2025-07-02T15:47:25.391751245Z",
+            "status": "Confermato",
+            "statusDetails": null,
+            "eventStatus": "NOTIFIED_OK",
+            "amount": 12000,
+            "fee": 120,
+            "grandTotal": 12120,
+            "rrn": "251839055936",
+            "authorizationCode": "944565",
+            "authorizationOperationId": "113147082357551839",
+            "refundOperationId": null,
+            "paymentMethodName": "CARDS",
+            "brand": "VISA",
+            "authorizationRequestId": "E1751471219206bfxL",
+            "paymentGateway": "NPG",
+            "correlationId": "d6adc54d-e979-4979-bddf-2ad1d384d57e",
+            "gatewayAuthorizationStatus": "EXECUTED",
+            "gatewayErrorCode": "000"
+          },
+          "paymentInfo": {
+            "origin": "CHECKOUT",
+            "idTransaction": "505db4c0c7be4f4582868fd0780359f4",
+            "details": [
+              {
+                "subject": "TARI/TEFA 2021",
+                "iuv": null,
+                "rptId": "77777777777302011111111111490",
+                "amount": 12000,
+                "paymentToken": "6a9f3de24ede4f2f8a0177b49b74ca3d",
+                "creditorInstitution": "company PA",
+                "paFiscalCode": "77777777777"
+              }
+            ]
+          },
+          "pspInfo": {
+            "pspId": "UNCRITMM",
+            "businessName": "UN spa",
+            "idChannel": "00348170101_01"
+          },
+          "product": "ECOMMERCE"
+        },
+        "nodoDetails": {
+          "dateFrom": "2025-07-02",
+          "dateTo": "2025-07-02",
+          "data": []
+        },
+        "npgDetails": {
+          "operations": [
+            {
+              "additionalData": {
+                "authorizationCode": "944565",
+                "rrn": "251839055936"
+              },
+              "operationAmount": "12120",
+              "operationCurrency": "EUR",
+              "operationId": "113147082357551839",
+              "operationResult": "EXECUTED",
+              "operationTime": "2025-07-02 17:48:05.513",
+              "operationType": "AUTHORIZATION",
+              "orderId": "E1751471219206bfxL",
+              "paymentCircuit": "VISA",
+              "paymentEndToEndId": "113147082357551839",
+              "paymentMethod": "CARD"
+            }
+          ]
+        }
+      }
+    ],
+    "page": {
+      "current": 0,
+      "total": 3,
+      "results": 10
     }
-  ,
+  },
   "deadletter-transactions-actions": [
     {
       "id": "e7cbf442-4f3f-4d91-bb6e-3c1fabc3a42e",
       "deadletterTransactionId": "b202ea99a53643c4bb1d73114a06ea21",
-      "userId": "123",
-      "value": "RETRY",
+      "userId": "luigi.verdi",
+      "action": {
+        "value": "Nessuna azione richiesta",
+        "type": "FINAL"
+      },
       "timestamp": "2025-08-10T08:20:00Z"
     },
     {
-      "id": "2",
+      "id": "f4f3d2b1-5c6e-4d2a-9f7e-8b9c6d5e4a3b",
       "deadletterTransactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
-      "userId": "123",
-      "value": "RETRY",
+      "userId": "luigi.verdi",
+      "action": {
+        "value": "Presa in carico",
+        "type": "NOT_FINAL"
+      },
       "timestamp": "2025-08-10T10:35:00Z"
     }
   ],
-  "authenticate":{
-    "urlRedirect":"http://localhost:3000/#token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkIiwibmFtZSI6Ik1hcmlvIiwic3VybmFtZSI6IlJvc3NpIiwiZW1haWwiOiJtYXJpby5yb3NzaUBtb2NrLmNvbSIsImlhdCI6MTc1OTc1Mjg3NCwiZXhwIjoxNzU5OTMxOTMzLCJhdWQiOiJ3YXRjaGRvZyIsImlzcyI6IndhdGNoZG9nLWRlYWRsZXR0ZXItc2VydmljZSJ9.PXQlFZYtWo5eb_XuhEvJC3x4vmjtVYKHb01FZ2QIVFw"
-  }
+  "authenticate": {
+    "urlRedirect": "http://localhost:3000/#token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1hcmlvLnJvc3NpIiwibmFtZSI6Ik1hcmlvIiwic3VybmFtZSI6IlJvc3NpIiwiZW1haWwiOiJtYXJpby5yb3NzaUBtb2NrLmNvbSIsImlhdCI6MTc1OTc1Mjg3NCwiZXhwIjoxNzU5OTMxOTMzLCJhdWQiOiJ3YXRjaGRvZyIsImlzcyI6IndhdGNoZG9nLWRlYWRsZXR0ZXItc2VydmljZSJ9.kRkBix0RQYeCHR_GlsL4lAt3cALLAzwYENsTB5gOaK8"
+  },
+  "actions": [
+    {
+      "value": "Nessuna azione richiesta",
+      "type": "FINAL"
+    },
+    {
+      "value": "Presa in carico",
+      "type": "NOT_FINAL"
+    },
+    {
+      "value": "Da stornare",
+      "type": "NOT_FINAL"
+    },
+    {
+      "value": "Stornata",
+      "type": "FINAL"
+    },
+    {
+      "value": "In attesa Nexi",
+      "type": "NOT_FINAL"
+    },
+    {
+      "value": "In attesa PSP",
+      "type": "NOT_FINAL"
+    }
+  ]
 }
