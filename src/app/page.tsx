@@ -192,7 +192,7 @@ export default function Home() {
 
         {transactions.length > 0 && !loadingData && (
           <>
-            <ChartsStatistics transactions={transactions} />
+            <ChartsStatistics transactions={transactions} actionsMap={actionsMap} />
             <Paper sx={{ height: "100%", width: "100%" }}>
               <TransactionsTable transactions={transactions} actionsMap={actionsMap} actions={actions} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
             </Paper>
