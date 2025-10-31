@@ -45,9 +45,6 @@ export default function Home() {
         const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
         setJwtUser(jwtCurr);
         setIsLoginDialogOpen(false);
-        fetchActions(token.current).then((data) => {
-          setActions(data);
-        });
       } else {
         // LOGOUT
         setJwtUser(null);
@@ -61,6 +58,11 @@ export default function Home() {
 
   useEffect(() => {
     token.current = sessionStorage.getItem("authToken");
+    if (token.current) {
+      fetchActions(token.current).then((fetchedActions) => {
+        setActions(fetchedActions);
+      });
+    }
   }, [jwtUser]);
 
 
