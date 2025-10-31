@@ -1,4 +1,4 @@
-import { DeadletterAction } from "@/app/types/DeadletterAction";
+import { ActionType, DeadletterAction } from "@/app/types/DeadletterAction";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authentication";
 
@@ -62,7 +62,7 @@ export const fetchAddActionToDeadletterTransaction = async (token: string, actio
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({"value": action.value }),
+      body: JSON.stringify({"value": action.action.value }),
     });
 
     if (!res.ok) throw new Error(`Failed to add action to deadletter transaction with id: ${action.deadletterTransactionId}`);
@@ -70,5 +70,20 @@ export const fetchAddActionToDeadletterTransaction = async (token: string, actio
   } catch (e) {
     console.error(e);
     return null;
+  }
+};
+
+export const fetchActions = async (token: string): Promise<ActionType[]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/actions`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch actions`);
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 };

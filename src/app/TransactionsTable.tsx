@@ -1,17 +1,18 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
 import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { DeadletterAction } from "./types/DeadletterAction";
+import { ActionType, DeadletterAction } from "./types/DeadletterAction";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 
-
 export function TransactionsTable(
-  props: Readonly<{ 
-    transactions: Transaction[]; 
+  props: Readonly<{
+    transactions: Transaction[];
     actionsMap: Map<string, Map<string, DeadletterAction>>;
-    handleOpenDialog: (content: object) => void; 
-    handleAddActionToTransaction: (value:string, id:string) => void; }>
-  ) {
+    actions: ActionType[];
+    handleOpenDialog: (content: object) => void;
+    handleAddActionToTransaction: (actionType: string, id: string) => void;
+  }>
+) {
   const columns: GridColDef[] = [
     { field: "insertionDate", headerName: "insertionDate", flex: 1 },
     {
@@ -115,27 +116,32 @@ export function TransactionsTable(
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
-        const value = props.actionsMap.get(id)?.values().map(getDeadletterActionAsString).toArray();
-        return value && value.length > 0 ? value : null; 
+        const value = props.actionsMap
+          .get(id)
+          ?.values()
+          .map(getDeadletterActionAsString)
+          .toArray();
+        return value && value.length > 0 ? value : null;
       },
       renderCell: (params) => {
         const id = params.id as string;
-        const transactionActions = props.actionsMap.get(id)?.values().toArray() || [];
+        const transactionActions =
+          props.actionsMap.get(id)?.values().toArray() || [];
 
         return (
           <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
             {/* Storico azioni */}
             {transactionActions.length > 0 && (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-                {transactionActions.map((action, idx) => (
+                {transactionActions.map((deadletterAction, idx) => (
                   <Chip
                     key={idx}
-                    label={getDeadletterActionAsString(action)}
+                    label={getDeadletterActionAsString(deadletterAction)}
                     size="small"
                     color={
-                      action.value.toLowerCase().includes("ticket")
-                        ? "primary"
-                        : "success"
+                      deadletterAction.action.type === "FINAL"
+                        ? "success"
+                        : "primary"
                     }
                   />
                 ))}
@@ -149,15 +155,14 @@ export function TransactionsTable(
               displayEmpty
               fullWidth
               sx={{ fontSize: "0.75rem" }}
-              onChange={(e) => props.handleAddActionToTransaction(e.target.value, id)}
+              onChange={(e) => props.handleAddActionToTransaction( e.target.value, id)}
             >
               <MenuItem value="">➕ Aggiungi azione</MenuItem>
-              <MenuItem value="Nessuna azione richiesta">Nessuna azione richiesta</MenuItem>
-              <MenuItem value="Presa in carico">Presa in carico</MenuItem>
-              <MenuItem value="Da stornare">Da stornare</MenuItem>
-              <MenuItem value="Stornata">Stornata</MenuItem>
-              <MenuItem value="In attesa Nexi">In attesa Nexi</MenuItem>
-              <MenuItem value="In attesa PSP">In attesa PSP</MenuItem>
+              {props.actions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.value}
+                </MenuItem>
+              ))}
             </Select>
           </Box>
         );
