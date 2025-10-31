@@ -240,7 +240,7 @@ stages:
               CONTAINER_REGISTRY_SERVICE_CONN: $(PROD_CONTAINER_REGISTRY_SERVICE_CONN)
               CONTAINER_REGISTRY_FQDN: $(PROD_CONTAINER_NAMESPACE)
               DOCKER_IMAGE_NAME: $(K8S_IMAGE_REPOSITORY_NAME)
-              DOCKER_IMAGE_TAG: $(Build.SourceVersion)
+              DOCKER_IMAGE_TAG: $(prod_version)
               FORCE_REPLACE_DOCKER_IMAGE: ${{ parameters.FORCE_REPLACE_DOCKER_IMAGE }}
               DOCKER_BUILD_ARGS: --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST=$(watchdog_service_api_host) --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST=$(watchdog_auth_api_host) --build-arg NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH=$(watchdog_base_path)
           - template: azure-templates/chart-current-version.yml
