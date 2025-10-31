@@ -13,9 +13,9 @@ import { useEffect, useRef, useState } from "react";
 import { TransactionsTable } from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from "./utils/api/client";
+import { fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from "./utils/api/client";
 import ChartsStatistics from "./ChartsStatistics";
-import { DeadletterAction } from "./types/DeadletterAction";
+import { ActionType, DeadletterAction } from "./types/DeadletterAction";
 import LoginDialog from "./LoginDialog";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -30,6 +30,7 @@ export default function Home() {
   const [dialogContent, setDialogContent] = useState({});
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [actions, setActions] = useState<ActionType[]>([]);
 
   const token = useRef<string | null>();
 
@@ -44,6 +45,9 @@ export default function Home() {
         const jwtCurr: JwtUser = JSON.parse(jwtUserLoc) as JwtUser;
         setJwtUser(jwtCurr);
         setIsLoginDialogOpen(false);
+        fetchActions(token.current).then((data) => {
+          setActions(data);
+        });
       } else {
         // LOGOUT
         setJwtUser(null);
@@ -70,16 +74,20 @@ export default function Home() {
     setDialogContent({});
   };
 
-  const handleAddActionToTransaction = (value: string, id: string) => {
-    if (!jwtUser || actionsMap.get(id)?.has(value)) return;
-
+  const handleAddActionToTransaction = (actionValue: string, id: string) => {
+    if (!jwtUser || actionsMap.get(id)?.has(actionValue)) return;
     const newMap = new Map(actionsMap);
+
+    //search the actionType with this value
+    const actionType = actions.find(action => action.value === actionValue);
+    if (!actionType) return;
+
     const newAction: DeadletterAction = {
-      value: value,
       id: "null",
       timestamp: new Date().toISOString(),
       userId: jwtUser.id,
       deadletterTransactionId: id,
+      action: actionType
     }
 
     if (token.current) {
@@ -87,7 +95,7 @@ export default function Home() {
         if(!res) return;
         if (!newMap.get(id))
           newMap.set(id, new Map());
-        newMap.get(id)?.set(value, newAction);
+        newMap.get(id)?.set(actionType.value, newAction);
         console.log("new map: ", newMap);
         setActionsMap(newMap);
       });
@@ -112,9 +120,9 @@ export default function Home() {
         if (token.current) {
           const actions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
           const singleActionMap: Map<string, DeadletterAction> = new Map();
-          actions.forEach((act) => {
-            singleActionMap.set(act.value, act);
-          });
+          for(const act of actions) {
+            singleActionMap.set(act.action.value, act);
+          }
           actionsMap.set(transaction.transactionId, singleActionMap);
         }
       })
@@ -125,7 +133,7 @@ export default function Home() {
   const handleLogout = () => {
     setJwtUser(null);
     setTransactions([]);
-    window.location.href = process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/";
+    globalThis.location.href = process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/";
     // Delete the local store
     sessionStorage.clear();
   }
@@ -184,9 +192,9 @@ export default function Home() {
 
         {transactions.length > 0 && !loadingData && (
           <>
-            <ChartsStatistics transactions={transactions} />
+            <ChartsStatistics transactions={transactions} actionsMap={actionsMap} />
             <Paper sx={{ height: "100%", width: "100%" }}>
-              <TransactionsTable transactions={transactions} actionsMap={actionsMap} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
+              <TransactionsTable transactions={transactions} actionsMap={actionsMap} actions={actions} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
             </Paper>
           </>
         )}

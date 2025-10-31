@@ -1,13 +1,13 @@
 import { DeadletterAction } from "@/app/types/DeadletterAction";
 
-export const getDeadletterActionAsString = (action: DeadletterAction): string => {
+export const getDeadletterActionAsString = (deadletterAction: DeadletterAction): string => {
   let date = "";
   let time = "";
-  const dateObj = new Date(action.timestamp);
+  const dateObj = new Date(deadletterAction.timestamp);
   if(dateObj) {
     date = dateObj.toLocaleDateString();
     time = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   }
 
-  return "[" + action.userId + " " + date + " " + time + "] " + action.value;
+  return "[" + deadletterAction.userId + " " + date + " " + time + "] " + deadletterAction.action.value;
 }
