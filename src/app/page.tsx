@@ -58,7 +58,7 @@ export default function Home() {
 
   useEffect(() => {
     token.current = sessionStorage.getItem("authToken");
-    if (token.current) {
+    if (token.current && jwtUser) {
       fetchActions(token.current).then((fetchedActions) => {
         setActions(fetchedActions);
       });
