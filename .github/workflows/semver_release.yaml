@@ -40,18 +40,22 @@ jobs:
         uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           token: ${{ secrets.BOT_GITHUB_TOKEN }}  
+      
       - name: Setup git author
         run: |
           git config --global user.email "${{ secrets.BOT_GIT_MAIL }}" && git config --global user.name "${{ secrets.BOT_GIT_USER }}"
+      
       - name: Setup Node.js 22
         uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610
         with:
           node-version: '22'
+      
       - name: Set branch
         run: |
           echo "BRANCH=-${{github.ref_name}}" >> $GITHUB_ENV
         if: ${{ github.ref_name != 'main' }}
         shell: bash
+      
       - id: get_version
         name: Get Version
         run: |
@@ -60,6 +64,7 @@ jobs:
             echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
           fi
         shell: bash
+      
       - name: Bump Package Version
         id: bump
         uses: pagopa/github-actions-template/bump-semver@main
@@ -71,6 +76,7 @@ jobs:
         run: |   
           echo "new_version=${{ steps.bump.outputs.new_version }}${{env.BRANCH}}" >> $GITHUB_OUTPUT
         shell: bash
+      
       - name: Update Helm Version Values
         run: |
           for i in helm/values-*.yaml; do
@@ -85,8 +91,10 @@ jobs:
               yq -i ".appVersion = \"${{steps.semver.outputs.new_version}}\"" "$CHART_FILE"
               git add "$CHART_FILE"
           fi
+      
       - name: Install semver globally
         run: yarn global add semver
+
       - name: Update Chart Version
         run: |
           RELEASE_CHART_SEMVER=$(echo ${{ needs.semver_labels.outputs.semver_chart }} |  cut -d'-' -f2 )
@@ -96,12 +104,18 @@ jobs:
             yq -i ".version = \"$(semver $CURRENT_CHART_VERSION -i $RELEASE_CHART_SEMVER )\"" "$CHART_FILE"
             git add "$CHART_FILE"
           fi
-        # push new version
-      - name: Push New Version
+      
+      # push new version
+      - name: Push New Version of the package.json
+        shell: bash
         run: |
-          git diff --cached
-          git commit -m "Bump version [skip ci]"
-          git push origin 'main'
+          contents="$(jq '.version = "${{ steps.semver.outputs.new_version }}"' package.json)"
+          echo -E "${contents}" > package.json
+    
+          git add .
+          git commit -m "Bump to version ${{ steps.semver.outputs.new_version }}" || exit 0
+          git push origin ${{ github.ref_name}}
+
   github_release:
     if: ${{needs.semver_labels.outputs.skip_release == 'False'}}
     name: Create a New Github Release
