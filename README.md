@@ -1,5 +1,8 @@
 # pagopa-ecommerce-watchdog-deadletter-fe
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pagopa_pagopa-ecommerce-watchdog-deadletter-fe&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pagopa_pagopa-ecommerce-watchdog-deadletter-fe)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pagopa_pagopa-ecommerce-watchdog-deadletter-fe&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pagopa_pagopa-ecommerce-watchdog-deadletter-fe)
+
 This is the repository for the **pagoPA eCommerce Watchdog Deadletter** frontend component.
 
 The project is a Next.js/react application designed to optimize the process of analyzing eCommerce transactions that end up in a "deadletter" state. 
