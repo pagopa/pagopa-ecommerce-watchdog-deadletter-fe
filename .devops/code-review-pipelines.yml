@@ -18,7 +18,10 @@ variables:
   NODE_VERSION: '22.13.1'
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
 
-trigger: none
+trigger:
+ branches:
+  include:
+    - main
 
 pool:
   vmImage: 'ubuntu-22.04'
