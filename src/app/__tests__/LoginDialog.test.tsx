@@ -103,7 +103,7 @@ describe('LoginDialog', () => {
 
   it('after login is done the dialog must be close and a JWT Token is received', async () => {
     renderComponent(true);
-    let urlRed: string = 'http://testresult.com?token=mockToken123';
+    const urlRed: string = 'http://testresult.com?token=mockToken123';
     // Mocks
     const authenticationResultMock: AuthenticationOk = { urlRedirect: urlRed }
     mockedFetchAuthentication.mockResolvedValue(authenticationResultMock);
@@ -160,7 +160,7 @@ describe('LoginDialog', () => {
     renderComponent(true);
 
     // Mocks
-    let error: Error = new Error("Failed to fetch user");
+    const error: Error = new Error("Failed to fetch user");
     mockedFetchAuthentication.mockRejectedValue(error);
 
     // Simulate a successfull login
