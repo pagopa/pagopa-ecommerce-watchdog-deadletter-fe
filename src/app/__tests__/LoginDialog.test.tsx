@@ -191,7 +191,7 @@ describe('LoginDialog', () => {
 
   });
 
-  it('chiama setIsLoginDialogOpen(false) quando l"utente preme "Escape"', async () => {
+  it('call setIsLoginDialogOpen(false) when "Escape" is pressed', async () => {
     renderComponent(true);
 
     const dialog = screen.getByRole('dialog');
