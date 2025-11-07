@@ -42,15 +42,8 @@ const mockSessionStorage = (() => {
     }),
   };
 })();
-/* Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
+Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
 
-// Mock of window.location
-Object.defineProperty(window, 'location', {
-  value: {
-    href: '',
-  },
-  writable: true,
-}); */
 
 
 describe('LoginDialog', () => {
@@ -68,8 +61,6 @@ describe('LoginDialog', () => {
         mockedDecodeJwt.mockReset();
 
         mockSessionStorage.clear();
-        // Reset the state of window.location
-        window.location.href = '';
     });
 
     // Component rendering function
@@ -112,9 +103,9 @@ describe('LoginDialog', () => {
 
     it('after login is done the dialog must be close and a JWT Token is received',async () => {
         renderComponent(true);
-        
+        let urlRed : string = 'http://testresult.com?token=mockToken123';
         // Mocks
-        const authenticationResultMock : AuthenticationOk = { urlRedirect:'http://testresult.com?token=mockToken123'}
+        const authenticationResultMock : AuthenticationOk = { urlRedirect: urlRed}
         mockedFetchAuthentication.mockResolvedValue(authenticationResultMock);
 
         const tokenMock : string = "mockToken123";
@@ -158,12 +149,61 @@ describe('LoginDialog', () => {
             expect(mockSetJwtUser).toHaveBeenCalledWith(mockUser);
             expect(mockSetIsLoginDialogOpen).toHaveBeenCalledWith(false);
 
-            // Check that the redirect is done
-            //expect(window.location.href).toBe(authenticationResultMock.urlRedirect);
-
         })
 
-    })
+        expect(mockSessionStorage.setItem).toHaveBeenCalledWith('authToken', tokenMock);
+        expect(mockSessionStorage.setItem).toHaveBeenCalledWith('jwtUser', JSON.stringify(mockUser));
+
+    });
+
+    it('during the login fetchAuthentication generate an exception',async () => {
+        renderComponent(true);
+
+        // Mocks
+        let error: Error = new Error("Failed to fetch user");
+        mockedFetchAuthentication.mockRejectedValue(error);
+        
+        // Simulate a successfull login
+        const usernameInput = screen.getByLabelText('Username');
+        const passwordInput = screen.getByLabelText('Password');
+        await userEvent.type(usernameInput, 'testuser');
+        await userEvent.type(passwordInput, 'password');
+
+        const loginButton = screen.getByRole('button',{name : "Login"});
+        await userEvent.click(loginButton);
+
+        await waitFor(() => {
+            // Check the api call
+            expect(mockedFetchAuthentication).toHaveBeenCalledWith({
+                username: 'testuser',
+                password: 'password',
+            });
+        });
+
+        expect(mockSetIsLoginDialogOpen).not.toHaveBeenCalled();
+        expect(mockSetJwtUser).not.toHaveBeenCalled();
+        expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
+
+        // Check the presence of the alert message
+        const alert = await screen.findByRole('alert');
+        expect(alert).toBeInTheDocument();
+        expect(alert).toHaveTextContent(error.message);
+        
+    });
+
+    it('chiama setIsLoginDialogOpen(false) quando l"utente preme "Escape"', async () => {
+      renderComponent(true);
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+
+      // Simulation of the escape key press by the user
+      fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' });
+
+      // check that the handleClose function is called
+      expect(mockSetIsLoginDialogOpen).toHaveBeenCalledTimes(1);
+      expect(mockSetIsLoginDialogOpen).toHaveBeenCalledWith(false);
+    });
 
 
 
