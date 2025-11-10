@@ -156,6 +156,47 @@ describe('LoginDialog', () => {
 
   });
 
+  it('during the login the JWT Token received is null', async () => {
+    renderComponent(true);
+    const urlRed: string = 'http://testresult.com?token=';
+    // Mocks
+    const authenticationResultMock: AuthenticationOk = { urlRedirect: urlRed }
+    mockedFetchAuthentication.mockResolvedValue(authenticationResultMock);
+
+    mockGetTokenFromUrl.mockReturnValue(null)
+
+
+    // Simulate a successfull login
+    const usernameInput = screen.getByLabelText('Username');
+    const passwordInput = screen.getByLabelText('Password');
+    await userEvent.type(usernameInput, 'testuser');
+    await userEvent.type(passwordInput, 'password');
+
+    const loginButton = screen.getByRole('button', { name: "Login" });
+    await userEvent.click(loginButton);
+
+    await waitFor(() => {
+      // Check the api call
+      expect(mockedFetchAuthentication).toHaveBeenCalledWith({
+        username: 'testuser',
+        password: 'password',
+      });
+    });
+
+    await waitFor(() => {
+      // Check that the token is parsed from the url
+      expect(mockGetTokenFromUrl).toHaveBeenCalledWith(authenticationResultMock.urlRedirect);
+      expect(mockedDecodeJwt).not.toHaveBeenCalled();
+
+      // Check props call for set the state of the JWTUser and close the dialog
+      expect(mockSetJwtUser).not.toHaveBeenCalled();
+      expect(mockSetIsLoginDialogOpen).not.toHaveBeenCalled();
+
+    })
+
+  });
+
+
   it('during the login fetchAuthentication generate an exception', async () => {
     renderComponent(true);
 
