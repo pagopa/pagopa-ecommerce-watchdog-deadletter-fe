@@ -83,8 +83,8 @@ export default function ChartsStatistics(
       {[
         { title: "Stato Ecommerce", data: ecommerceData },
         { title: "Stato NPG", data: npgData },
-        { title: "Distribuzione metodi di pagamento", data: paymentMethodName },
-        { title: "Distribuzione stato azioni", data: actionTypes },
+        { title: "Metodi di pagamento", data: paymentMethodName },
+        { title: "Stato azioni", data: actionTypes },
       ].map((chart) => (
         <Grid item xs={12} md={3} key={chart.title}>
           <Paper sx={{ p: 2 }}>
