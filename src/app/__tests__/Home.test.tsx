@@ -1,5 +1,5 @@
 import Home from "../page"
-import { render, screen, fireEvent, waitFor, logRoles } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, logRoles, within } from '@testing-library/react';
 import LoginDialog from "../LoginDialog";
 import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from '../utils/api/client';
 import React from "react";
@@ -10,6 +10,7 @@ import { AuthenticationOk } from '../types/Authentication';
 import { JwtUser } from "@pagopa/mui-italia";
 import { getTokenFromUrl } from "../utils/utils";
 import {deadletterResponse} from "./mock/DataMocks";
+import { Anybody } from "next/font/google";
 
 
 // Mocks
@@ -70,7 +71,6 @@ describe('Home', () => {
 
   beforeEach(() => {
     // Reset all the mock function
-    //jest.resetAllMocks();
     mockedFetchAuthentication.mockReset();
     mockedFetchActions.mockReset();
     mockedFetchActionsByTransactionId.mockReset();
@@ -98,7 +98,7 @@ describe('Home', () => {
     // Mock the presence of a token in the sessionStorage
     const tokenMock: string = "mockToken123";
     mockSessionStorage.setItem("authToken", tokenMock);
-    console.log("mockSessionStorage: ", mockSessionStorage.getItem("authToken"));
+
     const mockUser: JwtUser = {
       name: 'Mario',
       surname: 'Rossi',
@@ -213,8 +213,6 @@ describe('Home', () => {
 
     expect(datePicker).toHaveValue("2025-11-07");
 
-    //expect(await screen.findByTestId('mock-charts-statistics')).toBeInTheDocument();
-
     // wait until the graphs and the table are in the document
     expect(await screen.findByText("Stato Ecommerce")).toBeInTheDocument();
     expect(await screen.findByText("Stato NPG")).toBeInTheDocument();
@@ -228,6 +226,51 @@ describe('Home', () => {
 
   });
 
+  it('check that an action can be added ', async () => {
+    // Mock the presence of a token in the sessionStorage would be logged without login needed
+    const tokenMock: string = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    const mockUser: JwtUser = {
+      name: 'Mario',
+      surname: 'Rossi',
+      email: 'mario.rossi@example.com',
+      id: 'testId'
+    };
+    mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
+
+    // Mock the api
+    mockedFetchDeadletterTransactions.mockResolvedValue(deadletterResponse);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([{value:"testAction", type:"FINAL"}]);
+    mockedFetchAddActionToDeadletterTransaction.mockResolvedValue({response: "200"});
+
+    renderComponent();
+
+    // wait until the user is logged
+    expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
+
+    // check the presence of the date picker
+    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
+    expect(datePicker).toBeInTheDocument();
+
+    // click on the date picker and select a date
+    await userEvent.type(datePicker, "2025-11-07");
+
+    expect(datePicker).toHaveValue("2025-11-07");
+
+    // wait until the graphs and the table are in the document
+    const table = await screen.findByRole("grid");
+    expect(mockedFetchActions).toHaveBeenCalled();
+
+    // Add the action test to the transaction
+    const actionSelection = within(table).getByRole("combobox");
+    await userEvent.click(actionSelection);
+    const option = await screen.findByRole('option', { name: 'testAction' });
+    await userEvent.click(option);
+
+    expect(mockedFetchAddActionToDeadletterTransaction).toHaveBeenCalled();
+
+  });
 
   /* it('', () => {}); */
 
