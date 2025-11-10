@@ -1,16 +1,13 @@
 import Home from "../page"
-import { render, screen, fireEvent, waitFor, logRoles, within } from '@testing-library/react';
-import LoginDialog from "../LoginDialog";
+import { render, screen, within } from '@testing-library/react';
 import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from '../utils/api/client';
 import React from "react";
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
-import { AuthenticationOk } from '../types/Authentication';
 import { JwtUser } from "@pagopa/mui-italia";
 import { getTokenFromUrl } from "../utils/utils";
 import {deadletterResponse} from "./mock/DataMocks";
-import { Anybody } from "next/font/google";
 
 
 // Mocks
