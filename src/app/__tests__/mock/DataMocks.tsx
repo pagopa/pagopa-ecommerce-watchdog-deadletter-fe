@@ -120,4 +120,13 @@ export const deadletterResponse : DeadletterResponse = {
       "total": 3,
       "results": 10
     }
+};
+
+export const emptyDeadletterResponse : DeadletterResponse = {
+  deadletterTransactions:[],
+  page: {
+      current: 0,
+      total: 0,
+      results: 0
   }
+}

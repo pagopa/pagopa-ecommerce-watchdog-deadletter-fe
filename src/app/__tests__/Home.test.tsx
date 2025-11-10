@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { JwtUser } from "@pagopa/mui-italia";
 import { getTokenFromUrl } from "../utils/utils";
-import {deadletterResponse} from "./mock/DataMocks";
+import {deadletterResponse, emptyDeadletterResponse} from "./mock/DataMocks";
 
 
 // Mocks
@@ -119,7 +119,18 @@ describe('Home', () => {
 
   });
 
-  it('check that, after the login, if we select a date it will show a table', () => {});
+  it('check automatic logout when the jwtUser data are not present in the sessionStorage', async () => {
+    // Mock the presence of a token in the sessionStorage
+    const tokenMock: string = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+
+    mockedFetchActions.mockResolvedValue([]);
+
+    renderComponent();
+
+    expect(mockedFetchActions).not.toHaveBeenCalledWith(tokenMock);
+
+  })
 
   it('check that clicking the button with the text "Esci" it log out from the application', async () => {
     // Mock the presence of a token in the sessionStorage
@@ -222,6 +233,76 @@ describe('Home', () => {
     expect(mockedFetchActionsByTransactionId).toHaveBeenCalled();
 
   });
+  
+  it('check that if the selected date not has data, graphs and table are not showed',async () => {
+    // Mock the presence of a token in the sessionStorage would be logged without login needed
+    const tokenMock: string = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    const mockUser: JwtUser = {
+      name: 'Mario',
+      surname: 'Rossi',
+      email: 'mario.rossi@example.com',
+      id: 'testId'
+    };
+    mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
+
+    // Mock the api
+    mockedFetchDeadletterTransactions.mockResolvedValue(null);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([]);
+    
+    renderComponent();
+
+    // wait until the user is logged
+    expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
+
+    // check the presence of the date picker
+    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
+    expect(datePicker).toBeInTheDocument();
+
+    // click on the date picker and select a date
+    await userEvent.type(datePicker, "2025-11-07");
+
+    expect(datePicker).toHaveValue("2025-11-07");
+
+    // wait until the graphs and the table are in the document
+    expect(screen.queryByText("Stato Ecommerce")).not.toBeInTheDocument();
+    expect(screen.queryByText("Stato NPG")).not.toBeInTheDocument();
+    expect(screen.queryByText("Distribuzione metodi di pagamento")).not.toBeInTheDocument();
+    expect(screen.queryByText("Distribuzione stato azioni")).not.toBeInTheDocument();
+    expect(screen.queryByText("grid")).not.toBeInTheDocument();  
+  
+
+    expect(mockedFetchDeadletterTransactions).toHaveBeenCalled();
+    expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
+  });
+
+  it('check if not logged no table or charts is showed', async () => {
+    // Mock the api
+    mockedFetchDeadletterTransactions.mockResolvedValue(deadletterResponse);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([]);
+    
+    renderComponent();
+
+    // Check if the dialog and button components are visible and close it
+    expect(screen.getByRole('dialog', { name: "Login" })).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+
+    // check the presence of the date picker
+    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
+    expect(datePicker).toBeInTheDocument();
+    
+    // click on the date picker and select a date
+    await userEvent.type(datePicker, "2025-11-07");
+
+    expect(datePicker).toHaveValue("2025-11-07");
+
+    expect(mockedFetchDeadletterTransactions).not.toHaveBeenCalled();
+    expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
+
+  });
+
 
   it('check that an action can be added ', async () => {
     // Mock the presence of a token in the sessionStorage would be logged without login needed
