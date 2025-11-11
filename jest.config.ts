@@ -23,6 +23,9 @@ const config: Config = {
   testPathIgnorePatterns:[
     "/mock/"
   ]
+  globals: {
+    fetch: globalThis.fetch,
+  },
 };
 
 export default config;

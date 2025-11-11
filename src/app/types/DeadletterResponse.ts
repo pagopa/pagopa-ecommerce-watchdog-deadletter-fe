@@ -14,9 +14,9 @@ export interface Transaction {
   paymentEndToEndId: string | null;
   operationId: string;
   deadletterTransactionDetails: TransactionDetails;
-  eCommerceDetails: ECommerceDetails;
-  nodoDetails: NodoDetails;
-  npgDetails: NpgDetails;
+  eCommerceDetails: ECommerceDetails | null;
+  nodoDetails: NodoDetails | null;
+  npgDetails: NpgDetails | null;
 }
 
 interface Page {
