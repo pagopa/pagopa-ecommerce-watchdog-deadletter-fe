@@ -20,6 +20,9 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testResultsProcessor: "jest-sonar-reporter",
+  globals: {
+    fetch: globalThis.fetch,
+  },
 };
 
 export default config;

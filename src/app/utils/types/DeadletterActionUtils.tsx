@@ -4,7 +4,7 @@ export const getDeadletterActionAsString = (deadletterAction: DeadletterAction):
   let date = "";
   let time = "";
   const dateObj = new Date(deadletterAction.timestamp);
-  if(dateObj) {
+  if(!Number.isNaN(dateObj.getTime())) {
     date = dateObj.toLocaleDateString();
     time = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   }
