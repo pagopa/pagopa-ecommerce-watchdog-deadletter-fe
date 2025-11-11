@@ -22,10 +22,10 @@ const config: Config = {
   testResultsProcessor: "jest-sonar-reporter",
   testPathIgnorePatterns:[
     "/mock/"
-  ]
+  ],
   globals: {
     fetch: globalThis.fetch,
-  },
+  }
 };
 
 export default config;
