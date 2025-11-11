@@ -100,9 +100,9 @@ describe("ChartsStatistics", () => {
     expect(screen.getByText("Stato Ecommerce")).toBeInTheDocument();
     expect(screen.getByText("Stato NPG")).toBeInTheDocument();
     expect(
-      screen.getByText("Distribuzione metodi di pagamento")
+      screen.getByText("Metodi di pagamento")
     ).toBeInTheDocument();
-    expect(screen.getByText("Distribuzione stato azioni")).toBeInTheDocument();
+    expect(screen.getByText("Stato azioni")).toBeInTheDocument();
   });
 
   it("aggregates and pass data to eCommerce chart correctly", () => {
@@ -133,7 +133,7 @@ describe("ChartsStatistics", () => {
   });
 
   it("aggregates and pass data to payment method chart correctly", () => {
-    const pie = getChartPieByTitle("Distribuzione metodi di pagamento");
+    const pie = getChartPieByTitle("Metodi di pagamento");
     const data = getChartData(pie);
 
     expect(data).toEqual(
@@ -146,7 +146,7 @@ describe("ChartsStatistics", () => {
   });
 
   it("correctly group and pass data to action types chart", () => {
-    const pie = getChartPieByTitle("Distribuzione stato azioni");
+    const pie = getChartPieByTitle("Stato azioni");
     const data = getChartData(pie);
 
     expect(data).toEqual(
