@@ -14,13 +14,14 @@ export function TransactionsTable(
   }>
 ) {
   const columns: GridColDef[] = [
-    { field: "insertionDate", headerName: "insertionDate", flex: 1 },
-    {
+      {
       field: "transactionId",
       headerName: "transactionId",
-      flex: 1,
+      resizable: false,
+      width: 275,
       filterable: true,
     },
+    { field: "insertionDate", headerName: "insertionDate", flex: 1 },
     {
       field: "paymentToken",
       headerName: "paymentToken",
@@ -30,13 +31,13 @@ export function TransactionsTable(
     {
       field: "paymentEndToEndId",
       headerName: "paymentEndToEndId",
-      flex: 0.5,
+      flex: 1,
       filterable: true,
     },
     {
       field: "operationId",
       headerName: "operationId",
-      flex: 0.5,
+      flex: 1,
       filterable: true,
     },
     {
@@ -53,66 +54,44 @@ export function TransactionsTable(
       flex: 0.5,
     },
     {
-      field: "nodoDetails",
-      headerName: "nodoDetails",
-      flex: 0.6,
+      field: "details",
+      headerName: "Details",
+      flex: 0.5,
+      resizable: false,
       renderCell: (params) => {
-        if (!params.value) {
+        const nodo = params.row.nodoDetails;
+        const npg = params.row.npgDetails;
+        const ecommerce = params.row.eCommerceDetails;
+
+        const combined = {
+          nodoDetails: nodo || null,
+          npgDetails: npg || null,
+          eCommerceDetails: ecommerce || null,
+        };
+
+        const hasContent = nodo || npg || ecommerce;
+
+        if (!hasContent) {
           return <span>N/A</span>;
         }
+
         return (
           <Button
             variant="outlined"
             size="small"
-            onClick={() => props.handleOpenDialog(params.value)}
+            onClick={() => props.handleOpenDialog(combined)}
           >
             View
           </Button>
         );
       },
     },
-    {
-      field: "npgDetails",
-      headerName: "npgDetails",
-      flex: 0.6,
-      renderCell: (params) => {
-        if (!params.value) {
-          return <span>N/A</span>;
-        }
-        return (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => props.handleOpenDialog(params.value)}
-          >
-            View
-          </Button>
-        );
-      },
-    },
-    {
-      field: "eCommerceDetails",
-      headerName: "eCommerceDetails",
-      flex: 0.6,
-      renderCell: (params) => {
-        if (!params.value) {
-          return <span>N/A</span>;
-        }
-        return (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => props.handleOpenDialog(params.value)}
-          >
-            View
-          </Button>
-        );
-      },
-    },
+
     {
       field: "azioni",
       headerName: "Azioni",
-      flex: 1,
+      flex: 1.25,
+      resizable: false,
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
@@ -171,24 +150,48 @@ export function TransactionsTable(
   ];
 
   return (
-    <DataGrid
-      rows={props.transactions}
-      columns={columns}
-      getRowId={(row) => row.transactionId}
-      getRowHeight={() => "auto"}
-      disableRowSelectionOnClick
+    <Box
       sx={{
-        fontSize: "0.85rem",
-        border: 0,
-        "& .MuiDataGrid-cell": {
-          alignItems: "start",
-          py: 1,
-        },
-        "& .MuiInputBase-input": {
-          fontSize: "0.75rem",
-        },
+        height: 'calc(100vh - 150px)',
+        width: '100%',  
+        overflowX: 'auto',  
+        overflowY: 'hidden',  
+        display: 'flex',
+        flexDirection: 'column',
       }}
-      showToolbar
-    />
+    >
+      <DataGrid
+        rows={props.transactions}
+        columns={columns}
+        getRowId={(row) => row.transactionId}
+        getRowHeight={() => "auto"}
+        disableRowSelectionOnClick
+        sx={{
+          fontSize: "0.85rem",
+          border: 0,
+          "& .MuiDataGrid-cell": {
+            alignItems: "start",
+            py: 1,
+          },
+          "& .MuiInputBase-input": {
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            color: "#0d47a1",           
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-row:nth-of-type(even)": {
+            backgroundColor: "#e6f2ff",  
+          },
+          "& .MuiDataGrid-row:nth-of-type(odd)": {
+            backgroundColor: "#ffffff",  
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: "#cde4ff", 
+          },
+        }}
+        showToolbar
+      />
+    </Box>
   );
 }
