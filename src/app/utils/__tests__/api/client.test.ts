@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import { ActionType, DeadletterAction } from "@/app/types/DeadletterAction";
 import {
   fetchActions,

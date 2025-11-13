@@ -224,8 +224,8 @@ describe('Home', () => {
     // wait until the graphs and the table are in the document
     expect(await screen.findByText("Stato Ecommerce")).toBeInTheDocument();
     expect(await screen.findByText("Stato NPG")).toBeInTheDocument();
-    expect(await screen.findByText("Distribuzione metodi di pagamento")).toBeInTheDocument();
-    expect(await screen.findByText("Distribuzione stato azioni")).toBeInTheDocument();
+    expect(await screen.findByText("Metodi di pagamento")).toBeInTheDocument();
+    expect(await screen.findByText("Stato azioni")).toBeInTheDocument();
     expect(await screen.findByRole("grid")).toBeInTheDocument();  
   
 

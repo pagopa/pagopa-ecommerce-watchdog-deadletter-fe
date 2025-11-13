@@ -43,7 +43,13 @@ const mockAction2: DeadletterAction = {
 };
 
 const mockActionsMap = new Map([
-  ["505db4c0c7be4f4582868fd0780359f4", new Map([["Stornata", mockAction1], ["Da stornare", mockAction2]])],
+  [
+    "505db4c0c7be4f4582868fd0780359f4",
+    new Map([
+      ["Stornata", mockAction1],
+      ["Da stornare", mockAction2],
+    ]),
+  ],
   ["429a7b69689c4e6197f4d4fd412ae355", new Map()],
 ]);
 
@@ -211,12 +217,10 @@ const renderComponent = (props = {}) => {
   return render(<TransactionsTable {...defaultProps} {...props} />);
 };
 
-
 describe("TransactionsTable", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-
 
   it("renders table correctly", () => {
     renderComponent();
@@ -230,9 +234,7 @@ describe("TransactionsTable", () => {
     expect(screen.getByText("pspId")).toBeInTheDocument();
     expect(screen.getByText("statoEcommerce")).toBeInTheDocument();
     expect(screen.getByText("gatewayStatus")).toBeInTheDocument();
-    expect(screen.getByText("nodoDetails")).toBeInTheDocument();
-    expect(screen.getByText("npgDetails")).toBeInTheDocument();
-    expect(screen.getByText("eCommerceDetails")).toBeInTheDocument();
+    expect(screen.getByText("Details")).toBeInTheDocument();
     expect(screen.getByText("Azioni")).toBeInTheDocument();
 
     //Check transaction row
@@ -258,13 +260,12 @@ describe("TransactionsTable", () => {
     expect(
       screen.getByText(mockTransactions[0].gatewayAuthorizationStatus!)
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "View" })).toHaveLength(3); // nodoDetails, npgDetails, eCommerceDetails
+    expect(screen.getAllByRole("button", { name: "View" })).toHaveLength(1); // nodoDetails, npgDetails, eCommerceDetails
     expect(screen.getByText(mockAction1.action.value)).toBeInTheDocument();
     expect(screen.getByText(mockAction2.action.value)).toBeInTheDocument();
   });
 
-
-  it('renders "N/A" for detail cells with no data', () => {
+  it('renders "N/A" for Detail cell with no data', () => {
     renderComponent();
 
     const row2 = screen
@@ -272,11 +273,16 @@ describe("TransactionsTable", () => {
       .closest('div[role="row"]');
 
     expect(row2).toBeInTheDocument();
-    expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(3);
+    expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(1);
   });
 
+  it('renders "View" button for Detail cell with data and calls handleOpenDialog on click', async () => {
+    const combinedDetails = {
+      nodoDetails: mockTransactions[0].nodoDetails,
+      npgDetails: mockTransactions[0].npgDetails,
+      eCommerceDetails: mockTransactions[0].eCommerceDetails,
+    };
 
-  it('renders "View" button for detail cells with data and calls handleOpenDialog on click', async () => {
     const user = userEvent.setup();
     renderComponent();
 
@@ -289,31 +295,16 @@ describe("TransactionsTable", () => {
       "button",
       { name: "View" }
     );
-    expect(detailsViewButton).toHaveLength(3);
+    expect(detailsViewButton).toHaveLength(1);
 
-    //Click on nodoDetails "View" button
+    //Click on Details "View" button
     await user.click(detailsViewButton[0]);
-    expect(mockHandleOpenDialog).toHaveBeenCalledWith(
-      mockTransactions[0].nodoDetails
-    );
+    expect(mockHandleOpenDialog).toHaveBeenCalledWith(combinedDetails);
 
-    //Click on npgDetails "View" button
-    await user.click(detailsViewButton[1]);
-    expect(mockHandleOpenDialog).toHaveBeenCalledWith(
-      mockTransactions[0].npgDetails
-    );
-
-    //Click on eCommerceDetails "View" button
-    await user.click(detailsViewButton[2]);
-    expect(mockHandleOpenDialog).toHaveBeenCalledWith(
-      mockTransactions[0].eCommerceDetails
-    );
-
-    expect(mockHandleOpenDialog).toHaveBeenCalledTimes(3);
+    expect(mockHandleOpenDialog).toHaveBeenCalledTimes(1);
   });
 
-  
-  it('renders existing action chips for a transaction', () => {
+  it("renders existing action chips for a transaction", () => {
     renderComponent();
 
     const row1 = screen
@@ -321,16 +312,19 @@ describe("TransactionsTable", () => {
       .closest('div[role="row"]');
     expect(row1).toBeInTheDocument();
 
-    const action1Div = within(row1 as HTMLElement).getByText(mockAction1.action.value).closest('div');
-    const action2Div = within(row1 as HTMLElement).getByText(mockAction2.action.value).closest('div');
+    const action1Div = within(row1 as HTMLElement)
+      .getByText(mockAction1.action.value)
+      .closest("div");
+    const action2Div = within(row1 as HTMLElement)
+      .getByText(mockAction2.action.value)
+      .closest("div");
     expect(action1Div).toBeInTheDocument();
     expect(action2Div).toBeInTheDocument();
 
     // Check chip colors
-    expect(action1Div).toHaveClass('MuiChip-colorSuccess');
-    expect(action2Div).toHaveClass('MuiChip-colorPrimary');
+    expect(action1Div).toHaveClass("MuiChip-colorSuccess");
+    expect(action2Div).toHaveClass("MuiChip-colorPrimary");
   });
-
 
   it("does not render action chips when none exist", () => {
     renderComponent();
@@ -351,7 +345,6 @@ describe("TransactionsTable", () => {
       within(row2 as HTMLElement).getByText("➕ Aggiungi azione")
     ).toBeInTheDocument();
   });
-
 
   it("calls handleAddActionToTransaction when a new action is selected", async () => {
     const user = userEvent.setup();
