@@ -116,6 +116,7 @@ export default function Home() {
       return;
     }
     setTransactions(data.deadletterTransactions);
+    setLoadingData(false);
     const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
     await Promise.all(
       data.deadletterTransactions.map(async (transaction) => {
@@ -128,7 +129,7 @@ export default function Home() {
           actionsMap.set(transaction.transactionId, singleActionMap);
         }
       })
-    ).finally(() => { setLoadingData(false); });
+    );
     setActionsMap(actionsMap);
   };
 
