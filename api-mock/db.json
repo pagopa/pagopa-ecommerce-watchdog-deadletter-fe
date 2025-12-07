@@ -1004,9 +1004,9 @@
         "transactionId": "505db4c0c7be4f4582868fd0780359f4",
         "insertionDate": "2025-07-02T16:53:08.537435644Z",
         "paymentToken": "6a9f3de24ede4f2f8a0177b49b74ca3d",
-        "paymentMethodName": "CARDS",
+        "paymentMethodName": "MYBANK",
         "pspId": "UNCRITMM",
-        "eCommerceStatus": "NOTIFIED_OK",
+        "eCommerceStatus": "REFUND_ERROR",
         "gatewayAuthorizationStatus": "EXECUTED",
         "paymentEndToEndId": "113147082357551839",
         "operationId": "113147082357551839",
@@ -1055,7 +1055,7 @@
             "authorizationCode": "944565",
             "authorizationOperationId": "113147082357551839",
             "refundOperationId": null,
-            "paymentMethodName": "CARDS",
+            "paymentMethodName": "MYBANK",
             "brand": "VISA",
             "authorizationRequestId": "E1751471219206bfxL",
             "paymentGateway": "NPG",
@@ -1106,7 +1106,7 @@
               "orderId": "E1751471219206bfxL",
               "paymentCircuit": "VISA",
               "paymentEndToEndId": "113147082357551839",
-              "paymentMethod": "CARD"
+              "paymentMethod": "MYBANK"
             }
           ]
         }
