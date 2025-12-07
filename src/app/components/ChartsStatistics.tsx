@@ -9,8 +9,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Transaction } from "./types/DeadletterResponse";
-import { DeadletterAction } from "./types/DeadletterAction";
+import { Transaction } from "../types/DeadletterResponse";
+import { DeadletterAction } from "../types/DeadletterAction";
 
 export default function ChartsStatistics(
   props: Readonly<{

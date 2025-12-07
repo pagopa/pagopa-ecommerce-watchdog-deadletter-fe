@@ -2,8 +2,8 @@ import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import { TransactionsTable } from "../TransactionsTable";
 import userEvent from "@testing-library/user-event";
-import { ActionType, DeadletterAction } from "../types/DeadletterAction";
-import { Transaction } from "../types/DeadletterResponse";
+import { ActionType, DeadletterAction } from "../../types/DeadletterAction";
+import { Transaction } from "../../types/DeadletterResponse";
 
 jest.mock("@/app/utils/types/DeadletterActionUtils", () => ({
   getDeadletterActionAsString: jest.fn(

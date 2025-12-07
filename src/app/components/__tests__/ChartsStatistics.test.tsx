@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import ChartsStatistics from "../ChartsStatistics";
-import { DeadletterAction } from "../types/DeadletterAction";
-import { Transaction } from "../types/DeadletterResponse";
+import { DeadletterAction } from "../../types/DeadletterAction";
+import { Transaction } from "../../types/DeadletterResponse";
 
 jest.mock("recharts", () => {
   const OriginalRecharts = jest.requireActual("recharts");
