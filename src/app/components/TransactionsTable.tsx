@@ -17,15 +17,25 @@ export function TransactionsTable(
     {
       field: "rowNumber",
       headerName: "#",
-      width: 20,
+      width: 60,
       resizable: false,
       sortable: false,
       filterable: false,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => {
         const index = props.transactions.findIndex(
           (t) => t.transactionId === params.id
         );
-        return index + 1;
+        return (
+          <Box sx={{ 
+            fontWeight: 600, 
+            color: "#6b7280",
+            fontSize: "0.85rem"
+          }}>
+            {index + 1}
+          </Box>
+        );
       },
     },
     {
@@ -34,6 +44,15 @@ export function TransactionsTable(
       resizable: false,
       width: 260,
       filterable: true,
+      renderCell: (params) => (
+        <Box sx={{ 
+          fontFamily: "monospace", 
+          fontSize: "0.8rem",
+          color: "#1f2937"
+        }}>
+          {params.value}
+        </Box>
+      ),
     },
     { 
       field: "insertionDate", 
@@ -56,12 +75,30 @@ export function TransactionsTable(
       headerName: "paymentToken",
       flex: 0.8,
       filterable: true,
+      renderCell: (params) => (
+        <Box sx={{ 
+          fontFamily: "monospace", 
+          fontSize: "0.75rem",
+          color: "#4b5563"
+        }}>
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "paymentEndToEndId",
       headerName: "paymentEndToEndId",
       flex: 0.8,
       filterable: true,
+      renderCell: (params) => (
+        <Box sx={{ 
+          fontFamily: "monospace", 
+          fontSize: "0.75rem",
+          color: "#4b5563"
+        }}>
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "authorizationRequestId",
@@ -71,6 +108,15 @@ export function TransactionsTable(
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
       },
+      renderCell: (params) => (
+        <Box sx={{ 
+          fontFamily: "monospace", 
+          fontSize: "0.75rem",
+          color: params.value ? "#4b5563" : "#9ca3af"
+        }}>
+          {params.value || "N/A"}
+        </Box>
+      ),
     },
     {
       field: "Amount",
@@ -87,7 +133,11 @@ export function TransactionsTable(
       flex: 0.6,
       filterable: true,
     },
-    { field: "pspId", headerName: "pspId", flex: 0.5 },
+    { 
+      field: "pspId", 
+      headerName: "pspId",
+      flex: 0.5,
+    },
     { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7 },
     {
       field: "gatewayAuthorizationStatus",
@@ -113,7 +163,7 @@ export function TransactionsTable(
         const hasContent = nodo || npg || ecommerce;
 
         if (!hasContent) {
-          return <span>N/A</span>;
+          return <span style={{ color: "#9ca3af" }}>N/A</span>;
         }
 
         return (
@@ -121,13 +171,22 @@ export function TransactionsTable(
             variant="outlined"
             size="small"
             onClick={() => props.handleOpenDialog(combined)}
+            sx={{
+              textTransform: "none",
+              fontSize: "0.75rem",
+              borderColor: "#3b82f6",
+              color: "#3b82f6",
+              "&:hover": {
+                borderColor: "#2563eb",
+                backgroundColor: "#eff6ff"
+              }
+            }}
           >
             View
           </Button>
         );
       },
     },
-
     {
       field: "azioni",
       headerName: "Azioni",
@@ -175,7 +234,7 @@ export function TransactionsTable(
               displayEmpty
               fullWidth
               sx={{ fontSize: "0.75rem" }}
-              onChange={(e) => props.handleAddActionToTransaction( e.target.value, id)}
+              onChange={(e) => props.handleAddActionToTransaction(e.target.value, id)}
             >
               <MenuItem value="">➕ Aggiungi azione</MenuItem>
               {props.actions.map((option) => (
@@ -209,29 +268,41 @@ export function TransactionsTable(
         disableRowSelectionOnClick
         sx={{
           fontSize: "0.85rem",
-          border: 0,
+          border: "1px solid #e5e7eb",
+          borderRadius: 2,
+          backgroundColor: "#fff",
           "& .MuiDataGrid-cell": {
             alignItems: "start",
-            py: 1,
+            py: 1.5,
+            borderColor: "#f3f4f6"
           },
           "& .MuiInputBase-input": {
             fontSize: "0.75rem",
           },
           "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "#f9fafb",
             color: "#0d47a1",           
             fontWeight: "bold",
+            fontSize: "0.85rem",
+            borderBottom: "2px solid #e5e7eb"
           },
-          "& .MuiDataGrid-row:nth-of-type(even)": {
-            backgroundColor: "#e6f2ff",  
+          "& .MuiDataGrid-row": {
+            "&:nth-of-type(even)": {
+              backgroundColor: "#f9fafb",  
+            },
+            "&:nth-of-type(odd)": {
+              backgroundColor: "#ffffff",  
+            },
+            "&:hover": {
+              backgroundColor: "#eff6ff", 
+              transition: "background-color 0.2s ease"
+            }
           },
-          "& .MuiDataGrid-row:nth-of-type(odd)": {
-            backgroundColor: "#ffffff",  
-          },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: "#cde4ff", 
-          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "2px solid #e5e7eb",
+            backgroundColor: "#f9fafb"
+          }
         }}
-        showToolbar
       />
     </Box>
   );
