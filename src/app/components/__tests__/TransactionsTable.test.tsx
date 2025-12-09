@@ -229,7 +229,7 @@ describe("TransactionsTable", () => {
     expect(screen.getByText("transactionId")).toBeInTheDocument();
     expect(screen.getByText("paymentToken")).toBeInTheDocument();
     expect(screen.getByText("paymentEndToEndId")).toBeInTheDocument();
-    expect(screen.getByText("operationId")).toBeInTheDocument();
+    expect(screen.getByText("authorizationRequestId")).toBeInTheDocument();
     expect(screen.getByText("methodName")).toBeInTheDocument();
     expect(screen.getByText("pspId")).toBeInTheDocument();
     expect(screen.getByText("statoEcommerce")).toBeInTheDocument();
@@ -246,9 +246,6 @@ describe("TransactionsTable", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(mockTransactions[0].paymentEndToEndId!)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(mockTransactions[0].operationId)
     ).toBeInTheDocument();
     expect(
       screen.getByText(mockTransactions[0].paymentMethodName)
@@ -273,7 +270,7 @@ describe("TransactionsTable", () => {
       .closest('div[role="row"]');
 
     expect(row2).toBeInTheDocument();
-    expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(1);
+    expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(2);
   });
 
   it('renders "View" button for Detail cell with data and calls handleOpenDialog on click', async () => {
