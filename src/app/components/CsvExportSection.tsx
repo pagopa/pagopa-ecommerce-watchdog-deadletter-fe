@@ -1,5 +1,5 @@
 import { FileDownload } from "@mui/icons-material";
-import { Button, FormControl, InputLabel, Select, MenuItem, Box, Chip, Paper, Grid } from "@mui/material";
+import { Button, FormControl, InputLabel, Select, MenuItem, Box, Chip, Paper, Grid, Typography } from "@mui/material";
 import { useState } from "react";
 import { Transaction } from "../types/DeadletterResponse";
 import { ExportType, exportConfigs } from "../utils/csvExportConfig";
@@ -58,11 +58,30 @@ export default function CsvExportSection({ transactions, selectedDate }: CsvExpo
   };
 
   return (
-    <Grid item xs={12}>
-      <Paper elevation={3} style={{ padding: "20px" }}>
-        <Box display="flex" flexDirection="column" gap={2}>
-          <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
-            <FormControl style={{ minWidth: 250 }}>
+    <Grid container spacing={3} sx={{ mb: 3 }}>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper 
+          sx={{ 
+            p: 2,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            borderRadius: 2,
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              mb: 1.5,
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              color: "#1f2937"
+            }}
+          >
+            Esporta CSV
+          </Typography>
+
+          <Box display="flex" flexDirection="column" gap={1.5}>
+            <FormControl fullWidth size="small">
               <InputLabel id="export-type-label">Tipo Export</InputLabel> 
               <Select
                 labelId="export-type-label"  
@@ -79,45 +98,43 @@ export default function CsvExportSection({ transactions, selectedDate }: CsvExpo
               </Select>
             </FormControl>
 
+            <Box 
+              sx={{ 
+                p: 1.5, 
+                backgroundColor: "#f9fafb", 
+                borderRadius: 1,
+                border: "1px solid #e5e7eb"
+              }}
+            >
+              <Typography variant="body2" sx={{ color: '#6b7280', fontSize: "0.8rem", mb: 0.5 }}>
+                {exportConfigs[selectedExportType].description}
+              </Typography>
+              <Chip 
+                label={`${getFilteredTransactions(selectedExportType).length} transazioni`}
+                color={getFilteredTransactions(selectedExportType).length > 0 ? "success" : "default"}
+                size="small"
+              />
+            </Box>
+
             <Button
               variant="contained"
               color="primary"
               startIcon={<FileDownload />}
               onClick={handleExportCSV}
               disabled={getFilteredTransactions(selectedExportType).length === 0}
+              fullWidth
+              size="small"
+              sx={{ 
+                fontWeight: 600,
+                textTransform: "none",
+                fontSize: "0.85rem"
+              }}
             >
-              Esporta CSV
+              Scarica CSV
             </Button>
-
-            <Chip 
-              label={`${getFilteredTransactions(selectedExportType).length} transazioni`}
-              color={getFilteredTransactions(selectedExportType).length > 0 ? "success" : "default"}
-            />
           </Box>
-
-          <Box>
-            <small style={{ color: '#666' }}>
-              {exportConfigs[selectedExportType].description}
-            </small>
-          </Box>
-
-          {/* Mostra contatori per tutti i tipi */}
-          <Box display="flex" gap={1} flexWrap="wrap">
-            {(Object.keys(exportConfigs) as ExportType[]).map(key => {
-              const count = getFilteredTransactions(key).length;
-              return (
-                <Chip
-                  key={key}
-                  label={`${exportConfigs[key].label}: ${count}`}
-                  size="small"
-                  variant={selectedExportType === key ? "filled" : "outlined"}
-                  color={count > 0 ? "primary" : "default"}
-                />
-              );
-            })}
-          </Box>
-        </Box>
-      </Paper>
+        </Paper>
+      </Grid>
     </Grid>
   );
 }
