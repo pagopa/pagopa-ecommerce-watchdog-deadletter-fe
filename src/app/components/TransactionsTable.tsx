@@ -14,31 +14,72 @@ export function TransactionsTable(
   }>
 ) {
   const columns: GridColDef[] = [
-      {
+    {
+      field: "rowNumber",
+      headerName: "#",
+      width: 20,
+      resizable: false,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => {
+        const index = props.transactions.findIndex(
+          (t) => t.transactionId === params.id
+        );
+        return index + 1;
+      },
+    },
+    {
       field: "transactionId",
       headerName: "transactionId",
       resizable: false,
-      width: 275,
+      width: 260,
       filterable: true,
     },
-    { field: "insertionDate", headerName: "insertionDate", flex: 1 },
+    { 
+      field: "insertionDate", 
+      headerName: "insertionDate", 
+      flex: 0.6,
+      valueFormatter: (value) => {
+        if (!value) return "";
+        const date = new Date(value);
+        return date.toLocaleString("it-IT", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+    },
     {
       field: "paymentToken",
       headerName: "paymentToken",
-      flex: 1,
+      flex: 0.8,
       filterable: true,
     },
     {
       field: "paymentEndToEndId",
       headerName: "paymentEndToEndId",
-      flex: 1,
+      flex: 0.8,
       filterable: true,
     },
     {
-      field: "operationId",
-      headerName: "operationId",
+      field: "authorizationRequestId",
+      headerName: "authorizationRequestId",
       flex: 1,
       filterable: true,
+      valueGetter: (_value, row) => {
+        return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
+      },
+    },
+    {
+      field: "Amount",
+      headerName: "Amount",
+      flex: 0.5,
+      filterable: true,
+      valueGetter: (_value, row) => {
+        return row.eCommerceDetails?.transactionInfo?.grandTotal || "";
+      },
     },
     {
       field: "paymentMethodName",
