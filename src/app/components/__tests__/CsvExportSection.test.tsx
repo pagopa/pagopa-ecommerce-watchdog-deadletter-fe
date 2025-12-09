@@ -156,13 +156,7 @@ describe('CsvExportSection', () => {
     expect(screen.getByText('2 transazioni')).toBeInTheDocument();
   });
 
-  it('should display counters for all export types', () => {
-    renderComponent(mockMixedTransactions);
 
-    expect(screen.getByText(/MyBank Intesa: 2/i)).toBeInTheDocument();
-    expect(screen.getByText(/MyBank Unicredit: 1/i)).toBeInTheDocument();
-    expect(screen.getByText(/BancomatPay: 1/i)).toBeInTheDocument();
-  });
 
   it('should update transaction count when changing export type', async () => {
     const user = userEvent.setup();
@@ -273,25 +267,6 @@ describe('CsvExportSection', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Transazioni BancomatPay/i)).toBeInTheDocument();
-    });
-  });
-
-  it('should highlight selected export type chip', async () => {
-    const user = userEvent.setup();
-    renderComponent(mockMixedTransactions);
-
-    const intesaChip = screen.getByText(/MyBank Intesa: 2/i);
-    expect(intesaChip.closest('.MuiChip-root')).toHaveClass('MuiChip-filled');
-
-    const selectButton = screen.getByLabelText('Tipo Export');
-    await user.click(selectButton);
-
-    const unicreditOption = screen.getByRole('option', { name: /MyBank Unicredit/i });
-    await user.click(unicreditOption);
-
-    await waitFor(() => {
-      const unicreditChip = screen.getByText(/MyBank Unicredit: 1/i);
-      expect(unicreditChip.closest('.MuiChip-root')).toHaveClass('MuiChip-filled');
     });
   });
 

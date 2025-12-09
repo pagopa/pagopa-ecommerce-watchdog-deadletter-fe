@@ -130,7 +130,7 @@ export default function CsvExportSection({ transactions, selectedDate }: CsvExpo
                 fontSize: "0.85rem"
               }}
             >
-              Scarica CSV
+              Esporta CSV
             </Button>
           </Box>
         </Paper>
