@@ -1,16 +1,16 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginDialog from "../LoginDialog";
-import { fetchAuthentication } from '../utils/api/client';
+import { fetchAuthentication } from '../../utils/api/client';
 import React from "react";
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
-import { AuthenticationOk } from '../types/Authentication';
+import { AuthenticationOk } from '../../types/Authentication';
 import { JwtUser } from "@pagopa/mui-italia";
-import { getTokenFromUrl } from "../utils/utils";
+import { getTokenFromUrl } from "../../utils/utils";
 
 
-jest.mock('../utils/api/client', () => ({
+jest.mock('../../utils/api/client', () => ({
   fetchAuthentication: jest.fn(),
 }));
 
@@ -18,7 +18,7 @@ jest.mock('jose', () => ({
   decodeJwt: jest.fn(),
 }));
 
-jest.mock('../utils/utils', () => ({
+jest.mock('../../utils/utils', () => ({
   getTokenFromUrl: jest.fn(),
 }));
 

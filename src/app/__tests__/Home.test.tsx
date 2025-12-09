@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { JwtUser } from "@pagopa/mui-italia";
 import { getTokenFromUrl } from "../utils/utils";
-import {deadletterResponse, emptyDeadletterResponse} from "./mock/DataMocks";
+import {deadletterResponse} from "./mock/DataMocks";
 
 
 // Mocks

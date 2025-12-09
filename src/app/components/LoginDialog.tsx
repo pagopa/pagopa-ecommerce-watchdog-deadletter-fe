@@ -9,13 +9,12 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { IconButton, Grid, TextField, Alert, FormHelperText } from "@mui/material";
-import { fetchAuthentication } from "./utils/api/client";
-import { AuthenticationCredential, AuthenticationOk } from "./types/Authentication";
-import { getTokenFromUrl } from "./utils/utils";
+import { fetchAuthentication } from "../utils/api/client";
+import { AuthenticationCredential, AuthenticationOk } from "../types/Authentication";
+import { getTokenFromUrl } from "../utils/utils";
 import { JwtUser } from "@pagopa/mui-italia";
 import { LoadingButton } from "@mui/lab";
 import { decodeJwt } from "jose";
-
 
 
 

@@ -1,24 +1,28 @@
 "use client";
 import { Logout } from "@mui/icons-material";
-import {
-  Grid,
-  TextField,
-} from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import Paper from "@mui/material/Paper";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
 import { useEffect, useRef, useState } from "react";
-import { TransactionsTable } from "./TransactionsTable";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from "./utils/api/client";
-import ChartsStatistics from "./ChartsStatistics";
+import { 
+  fetchActions, 
+  fetchActionsByTransactionId, 
+  fetchAddActionToDeadletterTransaction, 
+  fetchDeadletterTransactions 
+} from "./utils/api/client";
+import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
-import LoginDialog from "./LoginDialog";
-import CircularProgress from '@mui/material/CircularProgress';
+ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import CsvExportSection from "./components/CsvExportSection";
+import DateSelector from "./components/DateSelector";
+import SectionDivider from "./components/SectionDivider";
+import SectionHeader from "./components/SectionHeader";
+import TransactionsListSection from "./components/TransactionListSection";
+import LoginDialog from "./components/LoginDialog";
 
 
 export default function Home() {
@@ -46,15 +50,13 @@ export default function Home() {
         setJwtUser(jwtCurr);
         setIsLoginDialogOpen(false);
       } else {
-        // LOGOUT
         setJwtUser(null);
         setIsLoginDialogOpen(true);
       }
-
     } else {
       setIsLoginDialogOpen(false);
     }
-  }, []);
+  }, [jwtUser]);
 
   useEffect(() => {
     token.current = sessionStorage.getItem("authToken");
@@ -64,7 +66,6 @@ export default function Home() {
       });
     }
   }, [jwtUser]);
-
 
   const handleOpenDialog = (content: object) => {
     setDialogContent(content);
@@ -80,7 +81,6 @@ export default function Home() {
     if (!jwtUser || actionsMap.get(id)?.has(actionValue)) return;
     const newMap = new Map(actionsMap);
 
-    //search the actionType with this value
     const actionType = actions.find(action => action.value === actionValue);
     if (!actionType) return;
 
@@ -94,11 +94,10 @@ export default function Home() {
 
     if (token.current) {
       fetchAddActionToDeadletterTransaction(token.current, newAction).then((res) => {
-        if(!res) return;
+        if (!res) return;
         if (!newMap.get(id))
           newMap.set(id, new Map());
         newMap.get(id)?.set(actionType.value, newAction);
-        console.log("new map: ", newMap);
         setActionsMap(newMap);
       });
     }
@@ -116,28 +115,31 @@ export default function Home() {
       return;
     }
     setTransactions(data.deadletterTransactions);
-    setLoadingData(false);
     const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
     await Promise.all(
       data.deadletterTransactions.map(async (transaction) => {
         if (token.current) {
           const actions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
           const singleActionMap: Map<string, DeadletterAction> = new Map();
-          for(const act of actions) {
+          for (const act of actions) {
             singleActionMap.set(act.action.value, act);
           }
           actionsMap.set(transaction.transactionId, singleActionMap);
         }
       })
-    );
+    ).finally(() => { setLoadingData(false); });
     setActionsMap(actionsMap);
+  };
+
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+    handleLoadData(date);
   };
 
   const handleLogout = () => {
     setJwtUser(null);
     setTransactions([]);
     globalThis.location.href = process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/";
-    // Delete the local store
     sessionStorage.clear();
   }
 
@@ -150,18 +152,24 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <HeaderAccount enableDropdown rootLink={pagoPALink} loggedUser={jwtUser ?? undefined}
+      <HeaderAccount 
+        enableDropdown 
+        rootLink={pagoPALink} 
+        loggedUser={jwtUser ?? undefined}
         onAssistanceClick={() => {
           console.log("Clicked/Tapped on Assistance");
-        }} onLogin={() => {
+        }} 
+        onLogin={() => {
           console.log("User login");
           setIsLoginDialogOpen(true);
-        }} userActions={[{
+        }} 
+        userActions={[{
           id: "logout",
           label: "Esci",
           onClick: handleLogout,
           icon: <Logout id="logout-button-icon" fontSize="small" />,
-        }]} />
+        }]} 
+      />
       <HeaderProduct
         chipLabel="Beta"
         productsList={[
@@ -174,38 +182,54 @@ export default function Home() {
         ]}
       />
       <main className={styles.main}>
-        <Paper sx={{ p: 2, mb: 3 }}>
-          <Grid container spacing={2} alignItems="center" justifyContent="center">
-            <Grid item xs={12} md={4}>
-              <TextField
-                label="Data transazioni in deadletter"
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={selectedDate}
-                onChange={(e) => {
-                  const date = e.target.value;
-                  setSelectedDate(date);
-                  handleLoadData(date);
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Paper>
+        <DateSelector selectedDate={selectedDate} onDateChange={handleDateChange} />
 
         {transactions.length > 0 && !loadingData && (
           <>
+            <SectionDivider />
+            
+            <SectionHeader 
+              icon="📊"
+              title="Metriche e Statistiche"
+              subtitle="Panoramica delle transazioni del giorno selezionato"
+            />
+
             <ChartsStatistics transactions={transactions} actionsMap={actionsMap} />
-            <Paper sx={{ height: "100%", width: "100%" }}>
-              <TransactionsTable transactions={transactions} actionsMap={actionsMap} actions={actions} handleOpenDialog={handleOpenDialog} handleAddActionToTransaction={handleAddActionToTransaction} />
-            </Paper>
+
+            <SectionDivider />
+
+            <SectionHeader 
+              icon="⚡"
+              title="Azioni Rapide"
+              subtitle="Export CSV per gestione storni e tanto altro"
+            />
+
+            <CsvExportSection transactions={transactions} selectedDate={selectedDate} />
+
+            <SectionDivider />
+
+            <SectionHeader 
+              icon="📋"
+              title="Lista Transazioni della Giornata"
+              subtitle={`Tutte le transazioni deadletter del ${selectedDate ? new Date(selectedDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }) : 'giorno selezionato'} (${transactions.length} totali)`}
+            />
+
+            <TransactionsListSection
+              transactions={transactions}
+              actionsMap={actionsMap}
+              actions={actions}
+              handleOpenDialog={handleOpenDialog}
+              handleAddActionToTransaction={handleAddActionToTransaction}
+            />
           </>
         )}
-        {loadingData &&
-          (<Box display='flex' alignItems="center" justifyContent="center" minHeight="50vh">
+
+        {loadingData && (
+          <Box display='flex' alignItems="center" justifyContent="center" minHeight="50vh">
             <CircularProgress />
-          </Box>)
-          }
+          </Box>
+        )}
+
         <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
           <DialogTitle>Dettaglio</DialogTitle>
           <DialogContent>
@@ -214,7 +238,14 @@ export default function Home() {
             </pre>
           </DialogContent>
         </Dialog>
-        {isLoginDialogOpen && <LoginDialog isLoginDialogOpen={isLoginDialogOpen} setIsLoginDialogOpen={setIsLoginDialogOpen} setJwtUser={setJwtUser} />}
+
+        {isLoginDialogOpen && (
+          <LoginDialog 
+            isLoginDialogOpen={isLoginDialogOpen} 
+            setIsLoginDialogOpen={setIsLoginDialogOpen} 
+            setJwtUser={setJwtUser} 
+          />
+        )}
       </main>
     </div>
   );
