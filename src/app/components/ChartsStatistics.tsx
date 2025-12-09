@@ -18,7 +18,16 @@ export default function ChartsStatistics(
     actionsMap: Map<string, Map<string, DeadletterAction>>;
   }>
 ) {
-  const COLORS = ["#00C49F", "#0088FE", "#FFBB28", "#FF8042"];
+  const COLORS = [
+    "#3b82f6", 
+    "#10b981", 
+    "#f59e0b", 
+    "#ef4444",  
+    "#8b5cf6", 
+    "#ec4899", 
+    "#06b6d4", 
+    "#f97316", 
+  ];
 
   const aggregateBy = useCallback(
     (field: keyof Transaction) => {
@@ -87,8 +96,23 @@ export default function ChartsStatistics(
         { title: "Stato azioni", data: actionTypes },
       ].map((chart) => (
         <Grid item xs={12} md={3} key={chart.title}>
-          <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
+          <Paper 
+            sx={{ 
+              p: 2,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              borderRadius: 2,
+              border: "1px solid #e5e7eb"
+            }}
+          >
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 1,
+                fontSize: "1rem",
+                fontWeight: 600,
+                color: "#1f2937"
+              }}
+            >
               {chart.title}
             </Typography>
             <ResponsiveContainer width="100%" height={250}>
@@ -99,13 +123,26 @@ export default function ChartsStatistics(
                   nameKey="name"
                   outerRadius={80}
                   label
+                  strokeWidth={2}
+                  stroke="#fff"
                 >
                   {chart.data.map((val, i) => (
                     <Cell key={val.name} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+                  }}
+                />
+                <Legend 
+                  wrapperStyle={{
+                    fontSize: "0.875rem"
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </Paper>
