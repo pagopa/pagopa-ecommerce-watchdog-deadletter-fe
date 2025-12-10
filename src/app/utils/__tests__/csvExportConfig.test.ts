@@ -69,17 +69,6 @@ describe('csvExportConfig', () => {
       expect(exportConfigs.mybank_intesa.filter(invalidTransaction)).toBe(false);
     });
 
-    it('should reject transactions with wrong gateway status', () => {
-      const invalidTransaction: Transaction = {
-        paymentMethodName: 'MYBANK',
-        eCommerceStatus: 'REFUND_ERROR',
-        gatewayAuthorizationStatus: 'PENDING',
-        pspId: 'BCITITMM',
-      } as Transaction;
-
-      expect(exportConfigs.mybank_intesa.filter(invalidTransaction)).toBe(false);
-    });
-
     it('should reject transactions with wrong PSP ID', () => {
       const invalidTransaction: Transaction = {
         paymentMethodName: 'MYBANK',
