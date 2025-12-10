@@ -56,7 +56,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     label: "BancomatPay",
     description: "Transazioni BancomatPay con gatewayAuthorizationStatus = PENDING",
     filter: (t) => {
-      return ( t.gatewayAuthorizationStatus === 'PENDING' || t.gatewayAuthorizationStatus == null ) && 
+      return ( t.gatewayAuthorizationStatus === 'PENDING' || t.gatewayAuthorizationStatus == null || t.gatewayAuthorizationStatus == 'null') && 
              t.paymentMethodName === 'BANCOMATPAY';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'gatewayAuthorizationStatus'],
