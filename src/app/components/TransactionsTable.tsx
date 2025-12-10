@@ -303,6 +303,7 @@ export function TransactionsTable(
             backgroundColor: "#f9fafb"
           }
         }}
+        showToolbar
       />
     </Box>
   );
