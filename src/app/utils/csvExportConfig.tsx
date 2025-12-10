@@ -14,11 +14,10 @@ export interface ExportConfig {
 export const exportConfigs: Record<ExportType, ExportConfig> = {
   mybank_intesa: {
     label: "MyBank Intesa",
-    description: "Storni MyBank Intesa (REFUND_ERROR, EXECUTED, BCITITMM)",
+    description: "Storni MyBank Intesa (REFUND_ERROR, BCITITMM)",
     filter: (t) => {
       return t.paymentMethodName === 'MYBANK' &&
              t.eCommerceStatus === 'REFUND_ERROR' &&
-             t.gatewayAuthorizationStatus === 'EXECUTED' &&
              t.pspId === 'BCITITMM';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId'],
@@ -35,11 +34,10 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
   },
   mybank_unicredit: {
     label: "MyBank Unicredit",
-    description: "Storni MyBank Unicredit (REFUND_ERROR, EXECUTED, UNCRITMM)",
+    description: "Storni MyBank Unicredit (REFUND_ERROR, UNCRITMM)",
     filter: (t) => {
       return t.paymentMethodName === 'MYBANK' &&
              t.eCommerceStatus === 'REFUND_ERROR' &&
-             t.gatewayAuthorizationStatus === 'EXECUTED' &&
              t.pspId === 'UNCRITMM';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId'],
@@ -58,7 +56,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     label: "BancomatPay",
     description: "Transazioni BancomatPay con gatewayAuthorizationStatus = PENDING",
     filter: (t) => {
-      return t.gatewayAuthorizationStatus === 'PENDING' && 
+      return ( t.gatewayAuthorizationStatus === 'PENDING' || t.gatewayAuthorizationStatus == null ) && 
              t.paymentMethodName === 'BANCOMATPAY';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'gatewayAuthorizationStatus'],
