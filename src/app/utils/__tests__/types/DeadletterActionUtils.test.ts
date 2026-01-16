@@ -25,14 +25,7 @@ describe("getDeadletterActionAsString", () => {
       deadletterTransactionId: "",
     };
 
-    const dateObj = new Date(timestamp);
-    const date = dateObj.toLocaleDateString();
-    const time = dateObj.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    const expectedString = `[test-id ${date} ${time}] Stornata`;
+    const expectedString = `[test-id - 06/11/2025, 19:30] Stornata`;
     const result = getDeadletterActionAsString(mockAction);
 
     expect(result).toBe(expectedString);
@@ -50,7 +43,7 @@ describe("getDeadletterActionAsString", () => {
       deadletterTransactionId: "",
     };
 
-    const expectedString = `[test-id  ] Stornata`;
+    const expectedString = `[test-id - ] Stornata`;
     const result = getDeadletterActionAsString(mockAction);
 
     expect(result).toBe(expectedString);
@@ -70,14 +63,7 @@ describe("getDeadletterActionAsString", () => {
       deadletterTransactionId: "",
     };
 
-    const dateObj = new Date(timestamp);
-    const date = dateObj.toLocaleDateString();
-    const time = dateObj.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    const expectedString = `[ ${date} ${time}] `;
+    const expectedString = `[ - 06/11/2025, 19:30] `;
     const result = getDeadletterActionAsString(mockAction);
 
     expect(result).toBe(expectedString);

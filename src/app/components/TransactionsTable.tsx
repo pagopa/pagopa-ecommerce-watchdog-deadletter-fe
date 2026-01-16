@@ -3,6 +3,7 @@ import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
+import { dateTimeLocale, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
 
 export function TransactionsTable(
   props: Readonly<{
@@ -56,18 +57,11 @@ export function TransactionsTable(
     },
     { 
       field: "insertionDate", 
-      headerName: "insertionDate", 
+      headerName: "insertionDate (UTC)", 
       flex: 0.6,
       valueFormatter: (value) => {
         if (!value) return "";
-        const date = new Date(value);
-        return date.toLocaleString("it-IT", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
+        return new Date(value).toLocaleString(dateTimeLocale, utcDateTimeFormatOptions);
       }
     },
     {
