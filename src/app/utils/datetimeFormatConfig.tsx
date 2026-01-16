@@ -7,7 +7,6 @@ export const utcDateTimeFormatOptions: Intl.DateTimeFormatOptions = {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
 };
 
 export const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
