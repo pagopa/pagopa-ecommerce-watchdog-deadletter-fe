@@ -11,6 +11,17 @@ describe("getDeadletterActionAsString", () => {
     jest.useRealTimers();
   });
 
+  const formatExpectedDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    
+    return `${day}/${month}/${year}, ${hours}:${minutes}`;
+  };
+
   it("should correctly format a deadletter action string with a valid timestamp", () => {
     const timestamp = "2025-11-06T18:30:00.000Z";
 
@@ -25,7 +36,9 @@ describe("getDeadletterActionAsString", () => {
       deadletterTransactionId: "",
     };
 
-    const expectedString = `[test-id - 06/11/2025, 19:30] Stornata`;
+    const expectedTime = formatExpectedDate(timestamp);
+    const expectedString = `[test-id - ${expectedTime}] Stornata`;
+
     const result = getDeadletterActionAsString(mockAction);
 
     expect(result).toBe(expectedString);
@@ -63,7 +76,8 @@ describe("getDeadletterActionAsString", () => {
       deadletterTransactionId: "",
     };
 
-    const expectedString = `[ - 06/11/2025, 19:30] `;
+    const expectedTime = formatExpectedDate(timestamp);
+    const expectedString = `[ - ${expectedTime}] `;
     const result = getDeadletterActionAsString(mockAction);
 
     expect(result).toBe(expectedString);

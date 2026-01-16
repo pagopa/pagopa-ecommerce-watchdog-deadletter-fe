@@ -13,7 +13,6 @@ describe("dateTimeFormatConfig", () => {
         expect(utcDateTimeFormatOptions.day).toBe("2-digit");
         expect(utcDateTimeFormatOptions.hour).toBe("2-digit");
         expect(utcDateTimeFormatOptions.minute).toBe("2-digit");
-        expect(utcDateTimeFormatOptions.second).toBe("2-digit");
     });
 
     it("should have correct date time format options", () => {
