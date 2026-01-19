@@ -234,7 +234,7 @@ describe('Home', () => {
 
   });
   
-  it('check that if the selected date not has data, graphs and table are not showed',async () => {
+  it('should only show the no transaction found message if the selected date not has data',async () => {
     // Mock the presence of a token in the sessionStorage would be logged without login needed
     const tokenMock: string = "mockToken123";
     mockSessionStorage.setItem("authToken", tokenMock);
@@ -270,8 +270,10 @@ describe('Home', () => {
     expect(screen.queryByText("Stato NPG")).not.toBeInTheDocument();
     expect(screen.queryByText("Distribuzione metodi di pagamento")).not.toBeInTheDocument();
     expect(screen.queryByText("Distribuzione stato azioni")).not.toBeInTheDocument();
-    expect(screen.queryByText("grid")).not.toBeInTheDocument();  
-  
+    expect(screen.queryByText("grid")).not.toBeInTheDocument();
+    
+    // check for the no transaction found message
+    expect(await screen.findByText(/Nessuna transazione deadletter trovata/i)).toBeInTheDocument();
 
     expect(mockedFetchDeadletterTransactions).toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();

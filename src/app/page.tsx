@@ -225,6 +225,12 @@ export default function Home() {
           </>
         )}
 
+        {!loadingData && transactions.length === 0 && selectedDate && (
+          <Box mt={4} textAlign="center">
+            <h3>Nessuna transazione deadletter trovata per il {new Date(selectedDate).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}</h3>
+          </Box>
+        )}
+
         {loadingData && (
           <Box display='flex' alignItems="center" justifyContent="center" minHeight="50vh">
             <CircularProgress />
