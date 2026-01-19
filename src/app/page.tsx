@@ -23,6 +23,7 @@ import SectionDivider from "./components/SectionDivider";
 import SectionHeader from "./components/SectionHeader";
 import TransactionsListSection from "./components/TransactionListSection";
 import LoginDialog from "./components/LoginDialog";
+import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 
 
 export default function Home() {
@@ -211,7 +212,7 @@ export default function Home() {
             <SectionHeader 
               icon="📋"
               title="Lista Transazioni della Giornata"
-              subtitle={`Tutte le transazioni deadletter del ${selectedDate ? new Date(selectedDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }) : 'giorno selezionato'} (${transactions.length} totali)`}
+              subtitle={`Tutte le transazioni deadletter del ${selectedDate ? new Date(selectedDate).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions) : 'giorno selezionato'} (${transactions.length} totali)`}
             />
 
             <TransactionsListSection

@@ -167,7 +167,7 @@ const mockTransactions: Transaction[] = [
   },
   {
     transactionId: "429a7b69689c4e6197f4d4fd412ae355",
-    insertionDate: "2025-07-02T16:17:17.897798317Z",
+    insertionDate: "",
     paymentToken: "2330a6e6748b441887bff9cc5579661b",
     paymentMethodName: "GOOGLEPAY",
     pspId: "CIPBITMM",
@@ -227,6 +227,7 @@ describe("TransactionsTable", () => {
 
     // Check column headers
     expect(screen.getByText("transactionId")).toBeInTheDocument();
+    expect(screen.getByText("insertionDate (UTC)")).toBeInTheDocument();
     expect(screen.getByText("paymentToken")).toBeInTheDocument();
     expect(screen.getByText("paymentEndToEndId")).toBeInTheDocument();
     expect(screen.getByText("authorizationRequestId")).toBeInTheDocument();
