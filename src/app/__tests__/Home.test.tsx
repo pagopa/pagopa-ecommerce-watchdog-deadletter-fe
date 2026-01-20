@@ -233,8 +233,8 @@ describe('Home', () => {
     expect(mockedFetchActionsByTransactionId).toHaveBeenCalled();
 
   });
-  
-  it('should only show the no transaction found message if the selected date not has data',async () => {
+
+  it('should only show the no transaction found message if the selected date has no data',async () => {
     // Mock the presence of a token in the sessionStorage would be logged without login needed
     const tokenMock: string = "mockToken123";
     mockSessionStorage.setItem("authToken", tokenMock);
