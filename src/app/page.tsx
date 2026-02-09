@@ -137,7 +137,7 @@ export default function Home() {
       const data = await fetchDeadletterTransactionsV2(token.current!, start, end, paginationModel.page, paginationModel.pageSize);
       const transactionsList = data ? data.deadletterTransactions : [];
       setTransactions(transactionsList);
-      setTotalResults(data?.page.total ?? 0);
+      setTotalResults((data?.page?.total ?? 0) * paginationModel.pageSize);
 
       const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       await Promise.all(
