@@ -43,7 +43,7 @@ export default function Home() {
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [actions, setActions] = useState<ActionType[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 2 });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [totalResults, setTotalResults] = useState(0);
 
   const token = useRef<string | null>();
