@@ -113,7 +113,7 @@ export default function Home() {
     }
   }
 
-  const loadDataForRange = async (start: string, end: string) => {
+  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 10) => {
     if (!start || !end || !token.current) {
       setTransactions([]);
       return;
@@ -134,10 +134,10 @@ export default function Home() {
     setLoadingData(true);
 
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current!, start, end, paginationModel.page, paginationModel.pageSize);
+      const data = await fetchDeadletterTransactionsV2(token.current!, start, end, page, pageSize);
       const transactionsList = data ? data.deadletterTransactions : [];
       setTransactions(transactionsList);
-      setTotalResults((data?.page?.total ?? 0) * paginationModel.pageSize);
+      setTotalResults((data?.page?.total ?? 0) * pageSize);
 
       const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       await Promise.all(
@@ -167,7 +167,7 @@ export default function Home() {
     setPaginationModel({ ...paginationModel, page: 0 });
 
     if (start && end) {
-      loadDataForRange(start, end);
+      loadDataForRange(start, end, 0, paginationModel.pageSize);
     }
   };
 
@@ -175,7 +175,7 @@ export default function Home() {
   const handlePaginationModelChange = (model: { page: number; pageSize: number }) => {
     setPaginationModel(model);
     if (rangeStart && rangeEnd) {
-      loadDataForRange(rangeStart, rangeEnd);
+      loadDataForRange(rangeStart, rangeEnd, model.page, model.pageSize);
     }
   };
 
