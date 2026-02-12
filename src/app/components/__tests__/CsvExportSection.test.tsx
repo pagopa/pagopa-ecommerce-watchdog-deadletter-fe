@@ -252,6 +252,20 @@ describe('CsvExportSection', () => {
     });
   });
 
+  it('should show alert and stop loading if onFetchAllForExport fails', async () => {
+    const user = userEvent.setup();
+    const mockOnFetchAll = jest.fn().mockRejectedValue(new Error('Fetch failed'));
+
+    renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06', mockOnFetchAll);
+
+    const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
+    await user.click(exportButton);
+
+    await waitFor(() => {
+      expect(global.alert).toHaveBeenCalledWith("Errore durante il recupero dei dati per l'export.");
+    });
+  });
+
   it('should escape CSV values containing special characters', async () => {
     const user = userEvent.setup();
 
