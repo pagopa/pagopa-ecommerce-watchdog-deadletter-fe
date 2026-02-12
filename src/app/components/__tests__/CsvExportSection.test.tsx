@@ -219,7 +219,7 @@ describe('CsvExportSection', () => {
     renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06');
 
     const blobMock = setupBlobMock();
-    const downloadMocks = setupDownloadMocks();
+    setupDownloadMocks();
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     await user.click(exportButton);
@@ -285,7 +285,7 @@ describe('CsvExportSection', () => {
     renderComponent(transactionWithSpecialChars, '2024-12-06', '2024-12-06');
 
     const blobMock = setupBlobMock();
-    const downloadMocks = setupDownloadMocks();
+    setupDownloadMocks();
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     await user.click(exportButton);

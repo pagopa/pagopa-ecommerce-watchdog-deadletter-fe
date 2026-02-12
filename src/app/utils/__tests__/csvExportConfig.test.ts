@@ -121,7 +121,7 @@ describe('csvExportConfig', () => {
 
     it('should accept transactions with null gateway status', () => {
       const validTransaction: Transaction = {
-        gatewayAuthorizationStatus: null as any,
+        gatewayAuthorizationStatus: null as unknown as string,
         paymentMethodName: 'BANCOMATPAY',
       } as Transaction;
 
@@ -130,7 +130,7 @@ describe('csvExportConfig', () => {
 
     it('should accept transactions with "null" string as gateway status', () => {
       const validTransaction: Transaction = {
-        gatewayAuthorizationStatus: 'null' as any,
+        gatewayAuthorizationStatus: 'null' as unknown as string,
         paymentMethodName: 'BANCOMATPAY',
       } as Transaction;
 
@@ -158,7 +158,7 @@ describe('csvExportConfig', () => {
 
   describe('all_range filter', () => {
     it('should accept any transaction', () => {
-      const anyTransaction = { id: 'any' } as any;
+      const anyTransaction = { id: 'any' } as unknown as Transaction;
       expect(exportConfigs.all_range.filter(anyTransaction)).toBe(true);
     });
   });
