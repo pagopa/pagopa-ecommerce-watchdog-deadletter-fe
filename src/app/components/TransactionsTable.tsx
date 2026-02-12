@@ -12,6 +12,10 @@ export function TransactionsTable(
     actions: ActionType[];
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
+    rowCount?: number;
+    paginationMode?: "client" | "server";
+    paginationModel?: { page: number; pageSize: number };
+    onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
   const columns: GridColDef[] = [
@@ -29,8 +33,8 @@ export function TransactionsTable(
           (t) => t.transactionId === params.id
         );
         return (
-          <Box sx={{ 
-            fontWeight: 600, 
+          <Box sx={{
+            fontWeight: 600,
             color: "#6b7280",
             fontSize: "0.85rem"
           }}>
@@ -46,8 +50,8 @@ export function TransactionsTable(
       width: 260,
       filterable: true,
       renderCell: (params) => (
-        <Box sx={{ 
-          fontFamily: "monospace", 
+        <Box sx={{
+          fontFamily: "monospace",
           fontSize: "0.8rem",
           color: "#1f2937"
         }}>
@@ -55,9 +59,9 @@ export function TransactionsTable(
         </Box>
       ),
     },
-    { 
-      field: "insertionDate", 
-      headerName: "insertionDate (UTC)", 
+    {
+      field: "insertionDate",
+      headerName: "insertionDate (UTC)",
       flex: 0.6,
       valueFormatter: (value) => {
         if (!value) return "";
@@ -70,8 +74,8 @@ export function TransactionsTable(
       flex: 0.8,
       filterable: true,
       renderCell: (params) => (
-        <Box sx={{ 
-          fontFamily: "monospace", 
+        <Box sx={{
+          fontFamily: "monospace",
           fontSize: "0.75rem",
           color: "#4b5563"
         }}>
@@ -85,8 +89,8 @@ export function TransactionsTable(
       flex: 0.8,
       filterable: true,
       renderCell: (params) => (
-        <Box sx={{ 
-          fontFamily: "monospace", 
+        <Box sx={{
+          fontFamily: "monospace",
           fontSize: "0.75rem",
           color: "#4b5563"
         }}>
@@ -103,8 +107,8 @@ export function TransactionsTable(
         return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
       },
       renderCell: (params) => (
-        <Box sx={{ 
-          fontFamily: "monospace", 
+        <Box sx={{
+          fontFamily: "monospace",
           fontSize: "0.75rem",
           color: params.value ? "#4b5563" : "#9ca3af"
         }}>
@@ -127,8 +131,8 @@ export function TransactionsTable(
       flex: 0.6,
       filterable: true,
     },
-    { 
-      field: "pspId", 
+    {
+      field: "pspId",
       headerName: "pspId",
       flex: 0.5,
     },
@@ -189,17 +193,17 @@ export function TransactionsTable(
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
-        const value = props.actionsMap
-          .get(id)
-          ?.values()
-          .map(getDeadletterActionAsString)
-          .toArray();
-        return value && value.length > 0 ? value : null;
+        const actions = props.actionsMap.get(id);
+        const value = actions
+          ? Array.from(actions.values()).map(getDeadletterActionAsString)
+          : [];
+        return value.length > 0 ? value : null;
       },
       renderCell: (params) => {
         const id = params.id as string;
-        const transactionActions =
-          props.actionsMap.get(id)?.values().toArray() || [];
+        const transactionActions = props.actionsMap.get(id)
+          ? Array.from(props.actionsMap.get(id)!.values())
+          : [];
 
         return (
           <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -247,9 +251,9 @@ export function TransactionsTable(
     <Box
       sx={{
         height: 'calc(100vh - 150px)',
-        width: '100%',  
-        overflowX: 'auto',  
-        overflowY: 'hidden',  
+        width: '100%',
+        overflowX: 'auto',
+        overflowY: 'hidden',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -275,29 +279,40 @@ export function TransactionsTable(
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "#f9fafb",
-            color: "#0d47a1",           
+            color: "#0d47a1",
             fontWeight: "bold",
             fontSize: "0.85rem",
             borderBottom: "2px solid #e5e7eb"
           },
           "& .MuiDataGrid-row": {
             "&:nth-of-type(even)": {
-              backgroundColor: "#f9fafb",  
+              backgroundColor: "#f9fafb",
             },
             "&:nth-of-type(odd)": {
-              backgroundColor: "#ffffff",  
+              backgroundColor: "#ffffff",
             },
             "&:hover": {
-              backgroundColor: "#eff6ff", 
+              backgroundColor: "#eff6ff",
               transition: "background-color 0.2s ease"
             }
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "2px solid #e5e7eb",
             backgroundColor: "#f9fafb"
+          },
+          "& .MuiTablePagination-selectLabel": {
+            display: "none"
+          },
+          "& .MuiTablePagination-input": {
+            display: "none"
           }
         }}
         showToolbar
+        rowCount={props.rowCount}
+        paginationMode={props.paginationMode}
+        paginationModel={props.paginationModel}
+        onPaginationModelChange={props.onPaginationModelChange}
+
       />
     </Box>
   );

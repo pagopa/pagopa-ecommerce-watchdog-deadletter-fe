@@ -1,6 +1,6 @@
 import { Transaction } from "../types/DeadletterResponse";
 
-export type ExportType = 'mybank_intesa' | 'mybank_unicredit' | 'bancomat_pay';
+export type ExportType = 'mybank_intesa' | 'mybank_unicredit' | 'bancomat_pay' | 'all_range';
 
 export interface ExportConfig {
   label: string;
@@ -17,8 +17,8 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     description: "Storni MyBank Intesa (REFUND_ERROR, BCITITMM)",
     filter: (t) => {
       return t.paymentMethodName === 'MYBANK' &&
-             t.eCommerceStatus === 'REFUND_ERROR' &&
-             t.pspId === 'BCITITMM';
+        t.eCommerceStatus === 'REFUND_ERROR' &&
+        t.pspId === 'BCITITMM';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId'],
     getColumnValue: (transaction: Transaction, column: string) => {
@@ -37,8 +37,8 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     description: "Storni MyBank Unicredit (REFUND_ERROR, UNCRITMM)",
     filter: (t) => {
       return t.paymentMethodName === 'MYBANK' &&
-             t.eCommerceStatus === 'REFUND_ERROR' &&
-             t.pspId === 'UNCRITMM';
+        t.eCommerceStatus === 'REFUND_ERROR' &&
+        t.pspId === 'UNCRITMM';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId'],
     getColumnValue: (transaction, column) => {
@@ -56,8 +56,8 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     label: "BancomatPay",
     description: "Transazioni BancomatPay con gatewayAuthorizationStatus = PENDING",
     filter: (t) => {
-      return ( t.gatewayAuthorizationStatus === 'PENDING' || t.gatewayAuthorizationStatus == null || t.gatewayAuthorizationStatus == 'null') && 
-             t.paymentMethodName === 'BANCOMATPAY';
+      return (t.gatewayAuthorizationStatus === 'PENDING' || t.gatewayAuthorizationStatus == null || t.gatewayAuthorizationStatus == 'null') &&
+        t.paymentMethodName === 'BANCOMATPAY';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'gatewayAuthorizationStatus'],
     getColumnValue: (transaction, column) => {
@@ -70,5 +70,21 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
       return transaction[column as keyof Transaction] as string || '';
     },
     fileNamePrefix: 'BancomatPay_Pending'
+  },
+  all_range: {
+    label: "Tutte le transazioni",
+    description: "Tutte le transazioni nel range selezionato",
+    filter: () => true,
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'paymentEndToEndId'],
+    getColumnValue: (transaction, column) => {
+      if (column === 'insertionDate') {
+        const date = transaction.insertionDate;
+        if (!date) return '';
+        const dateObj = new Date(date);
+        return dateObj.toISOString().split('T')[0];
+      }
+      return transaction[column as keyof Transaction] as string || '';
+    },
+    fileNamePrefix: 'Tutte_Transazioni'
   }
 };

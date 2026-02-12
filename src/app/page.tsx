@@ -4,21 +4,24 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
-import { 
-  fetchActions, 
-  fetchActionsByTransactionId, 
-  fetchAddActionToDeadletterTransaction, 
-  fetchDeadletterTransactions 
+import {
+  fetchActions,
+  fetchActionsByTransactionId,
+  fetchAddActionToDeadletterTransaction,
+  fetchDeadletterTransactionsV2
 } from "./utils/api/client";
 import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
- import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import CsvExportSection from "./components/CsvExportSection";
-import DateSelector from "./components/DateSelector";
+import WorkloadCalendar from "./components/WorkloadCalendar";
+import DateRangeSelector from "./components/DateRangeSelector";
 import SectionDivider from "./components/SectionDivider";
 import SectionHeader from "./components/SectionHeader";
 import TransactionsListSection from "./components/TransactionListSection";
@@ -26,9 +29,12 @@ import LoginDialog from "./components/LoginDialog";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 
 
+
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [rangeStart, setRangeStart] = useState("");
+  const [rangeEnd, setRangeEnd] = useState("");
+
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
   const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -36,6 +42,9 @@ export default function Home() {
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [actions, setActions] = useState<ActionType[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [totalResults, setTotalResults] = useState(0);
 
   const token = useRef<string | null>();
 
@@ -104,37 +113,81 @@ export default function Home() {
     }
   }
 
-  const handleLoadData = async (date: string) => {
-    if (!date || !token.current) {
+  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 10) => {
+    if (!start || !end || !token.current) {
       setTransactions([]);
       return;
     }
-    setLoadingData(true);
-    const data = await fetchDeadletterTransactions(token.current, date);
-    if (!data) {
-      setLoadingData(false);
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > 7) {
+      setTransactions([]);
+      setErrorMsg("Il range selezionato non può superare i 7 giorni.");
       return;
     }
-    setTransactions(data.deadletterTransactions);
-    const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
-    await Promise.all(
-      data.deadletterTransactions.map(async (transaction) => {
-        if (token.current) {
-          const actions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
-          const singleActionMap: Map<string, DeadletterAction> = new Map();
-          for (const act of actions) {
-            singleActionMap.set(act.action.value, act);
+    setErrorMsg(null);
+
+    setLoadingData(true);
+
+    try {
+      const data = await fetchDeadletterTransactionsV2(token.current!, start, end, page, pageSize);
+      const transactionsList = data ? data.deadletterTransactions : [];
+      setTransactions(transactionsList);
+      setTotalResults((data?.page?.total ?? 0) * pageSize);
+
+      const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
+      await Promise.all(
+        transactionsList.map(async (transaction) => {
+          if (token.current) {
+            const actions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
+            const singleActionMap: Map<string, DeadletterAction> = new Map();
+            for (const act of actions) {
+              singleActionMap.set(act.action.value, act);
+            }
+            actionsMap.set(transaction.transactionId, singleActionMap);
           }
-          actionsMap.set(transaction.transactionId, singleActionMap);
-        }
-      })
-    ).finally(() => { setLoadingData(false); });
-    setActionsMap(actionsMap);
+        })
+      );
+      setActionsMap(actionsMap);
+
+    } catch (error) {
+      console.error("Error loading range data", error);
+    } finally {
+      setLoadingData(false);
+    }
   };
 
-  const handleDateChange = (date: string) => {
-    setSelectedDate(date);
-    handleLoadData(date);
+  const handleRangeChange = (start: string, end: string) => {
+    setRangeStart(start);
+    setRangeEnd(end);
+    setPaginationModel({ ...paginationModel, page: 0 });
+
+    if (start && end) {
+      loadDataForRange(start, end, 0, paginationModel.pageSize);
+    }
+  };
+
+
+  const handlePaginationModelChange = (model: { page: number; pageSize: number }) => {
+    setPaginationModel(model);
+    if (rangeStart && rangeEnd) {
+      loadDataForRange(rangeStart, rangeEnd, model.page, model.pageSize);
+    }
+  };
+
+  const handleFetchAllForExport = async (): Promise<Transaction[]> => {
+    if (!rangeStart || !rangeEnd || !token.current) return [];
+    try {
+      const data = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, 0, 500);
+      return data ? data.deadletterTransactions : [];
+    } catch (e) {
+      console.error("Error fetching all for export", e);
+      return [];
+    }
   };
 
   const handleLogout = () => {
@@ -153,23 +206,23 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <HeaderAccount 
-        enableDropdown 
-        rootLink={pagoPALink} 
+      <HeaderAccount
+        enableDropdown
+        rootLink={pagoPALink}
         loggedUser={jwtUser ?? undefined}
         onAssistanceClick={() => {
           console.log("Clicked/Tapped on Assistance");
-        }} 
+        }}
         onLogin={() => {
           console.log("User login");
           setIsLoginDialogOpen(true);
-        }} 
+        }}
         userActions={[{
           id: "logout",
           label: "Esci",
           onClick: handleLogout,
           icon: <Logout id="logout-button-icon" fontSize="small" />,
-        }]} 
+        }]}
       />
       <HeaderProduct
         chipLabel="Beta"
@@ -183,36 +236,54 @@ export default function Home() {
         ]}
       />
       <main className={styles.main}>
-        <DateSelector selectedDate={selectedDate} onDateChange={handleDateChange} />
+        <Grid container spacing={3} alignItems="stretch" sx={{ mb: 3 }}>
+          <Grid item xs={12} md={6}>
+            <WorkloadCalendar />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <DateRangeSelector startDate={rangeStart} endDate={rangeEnd} onDateRangeChange={handleRangeChange} />
+          </Grid>
+        </Grid>
+
+        {errorMsg && (
+          <Box mt={2} mb={2} textAlign="center" color="error.main">
+            <Typography variant="body1" fontWeight="bold">⚠️ {errorMsg}</Typography>
+          </Box>
+        )}
 
         {transactions.length > 0 && !loadingData && (
           <>
             <SectionDivider />
-            
-            <SectionHeader 
+
+            <SectionHeader
+              icon="⚡"
+              title="Azioni Rapide"
+              subtitle="Export CSV per gestione storni e tanto altro"
+            />
+
+            <CsvExportSection
+              transactions={transactions}
+              startDate={rangeStart}
+              endDate={rangeEnd}
+              onFetchAllForExport={handleFetchAllForExport}
+            />
+
+            <SectionDivider />
+
+            <SectionHeader
               icon="📊"
               title="Metriche e Statistiche"
-              subtitle="Panoramica delle transazioni del giorno selezionato"
+              subtitle={`Panoramica delle transazioni dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
             />
 
             <ChartsStatistics transactions={transactions} actionsMap={actionsMap} />
 
             <SectionDivider />
 
-            <SectionHeader 
-              icon="⚡"
-              title="Azioni Rapide"
-              subtitle="Export CSV per gestione storni e tanto altro"
-            />
-
-            <CsvExportSection transactions={transactions} selectedDate={selectedDate} />
-
-            <SectionDivider />
-
-            <SectionHeader 
+            <SectionHeader
               icon="📋"
-              title="Lista Transazioni della Giornata"
-              subtitle={`Tutte le transazioni deadletter del ${selectedDate ? new Date(selectedDate).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions) : 'giorno selezionato'} (${transactions.length} totali)`}
+              title="Lista Transazioni"
+              subtitle={`Tutte le transazioni deadletter dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} (${transactions.length} totali)`}
             />
 
             <TransactionsListSection
@@ -221,13 +292,17 @@ export default function Home() {
               actions={actions}
               handleOpenDialog={handleOpenDialog}
               handleAddActionToTransaction={handleAddActionToTransaction}
+              rowCount={totalResults}
+              paginationMode="server"
+              paginationModel={paginationModel}
+              onPaginationModelChange={handlePaginationModelChange}
             />
           </>
         )}
 
-        {!loadingData && transactions.length === 0 && selectedDate && (
+        {!loadingData && transactions.length === 0 && (rangeStart && rangeEnd) && (
           <Box mt={4} textAlign="center">
-            <h3>Nessuna transazione deadletter trovata per il {new Date(selectedDate).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}</h3>
+            <h3>Nessuna transazione deadletter trovata dal {new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al {new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}</h3>
           </Box>
         )}
 
@@ -247,10 +322,10 @@ export default function Home() {
         </Dialog>
 
         {isLoginDialogOpen && (
-          <LoginDialog 
-            isLoginDialogOpen={isLoginDialogOpen} 
-            setIsLoginDialogOpen={setIsLoginDialogOpen} 
-            setJwtUser={setJwtUser} 
+          <LoginDialog
+            isLoginDialogOpen={isLoginDialogOpen}
+            setIsLoginDialogOpen={setIsLoginDialogOpen}
+            setJwtUser={setJwtUser}
           />
         )}
       </main>

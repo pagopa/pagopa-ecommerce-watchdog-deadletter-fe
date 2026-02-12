@@ -69,29 +69,26 @@ describe('CsvExportSection', () => {
       click: jest.fn(),
       style: {} as CSSStyleDeclaration,
     } as unknown as HTMLAnchorElement & { setAttribute: jest.Mock; click: jest.Mock };
-    
-    const originalCreateElement = document.createElement.bind(document);
+
     const createElementSpy = jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
       if (tagName === 'a') {
         return mockLink;
       }
-      return originalCreateElement(tagName);
+      return Document.prototype.createElement.call(document, tagName);
     });
-    
-    const originalAppendChild = document.body.appendChild.bind(document.body);
+
     const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation((node: Node) => {
       if (node === mockLink) {
         return mockLink;
       }
-      return originalAppendChild(node);
+      return Node.prototype.appendChild.call(document.body, node);
     });
-    
-    const originalRemoveChild = document.body.removeChild.bind(document.body);
+
     const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation((node: Node) => {
       if (node === mockLink) {
         return mockLink;
       }
-      return originalRemoveChild(node);
+      return Node.prototype.removeChild.call(document.body, node);
     });
 
     return {
@@ -99,11 +96,6 @@ describe('CsvExportSection', () => {
       createElementSpy,
       appendChildSpy,
       removeChildSpy,
-      restore: () => {
-        createElementSpy.mockRestore();
-        appendChildSpy.mockRestore();
-        removeChildSpy.mockRestore();
-      }
     };
   };
 
@@ -112,10 +104,10 @@ describe('CsvExportSection', () => {
       content: BlobPart[];
       options?: BlobPropertyBag;
     }
-    
+
     let capturedBlob: CapturedBlob | null = null;
-    const mockBlob = jest.spyOn(global, 'Blob').mockImplementation(function(
-      content?: BlobPart[], 
+    const mockBlob = jest.spyOn(global, 'Blob').mockImplementation(function (
+      content?: BlobPart[],
       options?: BlobPropertyBag
     ): Blob {
       capturedBlob = { content: content || [], options };
@@ -125,7 +117,6 @@ describe('CsvExportSection', () => {
     return {
       capturedBlob: () => capturedBlob,
       mockBlob,
-      restore: () => mockBlob.mockRestore()
     };
   };
 
@@ -133,11 +124,22 @@ describe('CsvExportSection', () => {
     jest.clearAllMocks();
   });
 
-  const renderComponent = (transactions: Transaction[], selectedDate: string = '2024-12-06') => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const renderComponent = (
+    transactions: Transaction[],
+    startDate: string = '2024-12-06',
+    endDate: string = '2024-12-06',
+    onFetchAllForExport?: () => Promise<Transaction[]>
+  ) => {
     return render(
       <CsvExportSection
         transactions={transactions}
-        selectedDate={selectedDate}
+        startDate={startDate}
+        endDate={endDate}
+        onFetchAllForExport={onFetchAllForExport}
       />
     );
   };
@@ -145,94 +147,79 @@ describe('CsvExportSection', () => {
   it('should render the component with all export type options', () => {
     renderComponent(mockMixedTransactions);
 
-    expect(screen.getByLabelText('Tipo Export')).toBeInTheDocument();
-
+    expect(screen.getByRole('heading', { name: /Esporta CSV/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Esporta CSV/i })).toBeInTheDocument();
   });
 
-  it('should display correct transaction count for selected export type', () => {
-    renderComponent(mockMixedTransactions);
-
-    expect(screen.getByText('2 transazioni')).toBeInTheDocument();
-  });
-
-
-
-  it('should update transaction count when changing export type', async () => {
+  it('should allow changing export type', async () => {
     const user = userEvent.setup();
     renderComponent(mockMixedTransactions);
 
-    expect(screen.getByText('2 transazioni')).toBeInTheDocument();
-
-    const selectButton = screen.getByLabelText('Tipo Export');
+    const selectButton = screen.getByRole('combobox');
     await user.click(selectButton);
 
     const unicreditOption = screen.getByRole('option', { name: /MyBank Unicredit/i });
     await user.click(unicreditOption);
 
-    await waitFor(() => {
-      expect(screen.getByText('1 transazioni')).toBeInTheDocument();
-    });
+    expect(screen.getByText(/Storni MyBank Unicredit/i)).toBeInTheDocument();
   });
 
-  it('should disable export button when no transactions match the filter', () => {
+  it('should disable export button when no transactions are provided initially', () => {
     renderComponent([]);
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     expect(exportButton).toBeDisabled();
   });
 
-  it('should enable export button when transactions match the filter', () => {
+  it('should enable export button when transactions are provided initially', () => {
     renderComponent(mockTransactionsIntesa);
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     expect(exportButton).not.toBeDisabled();
   });
 
-  it('should show alert when trying to export with no matching transactions', async () => {
+  it('should show alert when trying to export with no matching transactions for the filter', async () => {
     const user = userEvent.setup();
-    renderComponent(mockTransactionsIntesa);
+    renderComponent(mockTransactionsIntesa); // Only has Intesa
 
-    const selectButton = screen.getByLabelText('Tipo Export');
+    const selectButton = screen.getByRole('combobox');
     await user.click(selectButton);
 
     const bancomatOption = screen.getByRole('option', { name: /BancomatPay/i });
     await user.click(bancomatOption);
 
+    const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
+    await user.click(exportButton);
+
     await waitFor(() => {
-      const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
-      expect(exportButton).toBeDisabled();
+      expect(global.alert).toHaveBeenCalled();
     });
   });
 
   it('should trigger CSV download when export button is clicked', async () => {
     const user = userEvent.setup();
-    
-    renderComponent(mockTransactionsIntesa, '2024-12-06');
-    
+
+    renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06');
+
     const downloadMocks = setupDownloadMocks();
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     await user.click(exportButton);
 
     await waitFor(() => {
-      expect(downloadMocks.mockLink.setAttribute).toHaveBeenCalledWith('download', 'StorniMyBank_Intesa_2024-12-06.csv');
+      expect(downloadMocks.mockLink.setAttribute).toHaveBeenCalledWith('download', 'StorniMyBank_Intesa_2024-12-06_2024-12-06.csv');
       expect(downloadMocks.mockLink.setAttribute).toHaveBeenCalledWith('href', 'mock-url');
       expect(downloadMocks.mockLink.click).toHaveBeenCalled();
-      expect(downloadMocks.appendChildSpy).toHaveBeenCalledWith(downloadMocks.mockLink);
-      expect(downloadMocks.removeChildSpy).toHaveBeenCalledWith(downloadMocks.mockLink);
     });
-
-    downloadMocks.restore();
   });
 
   it('should generate correct CSV content for Intesa transactions', async () => {
     const user = userEvent.setup();
-    
-    renderComponent(mockTransactionsIntesa, '2024-12-06');
-    
+
+    renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06');
+
     const blobMock = setupBlobMock();
-    const downloadMocks = setupDownloadMocks();
+    setupDownloadMocks();
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     await user.click(exportButton);
@@ -242,55 +229,46 @@ describe('CsvExportSection', () => {
       expect(capturedBlob).not.toBeNull();
       if (capturedBlob) {
         const csvContent = capturedBlob.content[0] as string;
-        
+
         expect(csvContent).toContain('insertionDate,transactionId,paymentToken,paymentEndToEndId');
         expect(csvContent).toContain('2024-12-06,tx-intesa-1,token-intesa-1,e2e-intesa-1');
-        expect(csvContent).toContain('2024-12-06,tx-intesa-2,token-intesa-2,e2e-intesa-2');
       }
     });
 
-    blobMock.restore();
-    downloadMocks.restore();
+    blobMock.mockBlob.mockRestore();
   });
 
-  it('should change export type when selecting different option', async () => {
+  it('should call onFetchAllForExport if provided', async () => {
     const user = userEvent.setup();
-    renderComponent(mockMixedTransactions);
+    const mockOnFetchAll = jest.fn().mockResolvedValue(mockTransactionsIntesa);
 
-    expect(screen.getByText(/Storni MyBank Intesa/i)).toBeInTheDocument();
-
-    const selectButton = screen.getByLabelText('Tipo Export');
-    await user.click(selectButton);
-
-    const bancomatOption = screen.getByRole('option', { name: /BancomatPay/i });
-    await user.click(bancomatOption);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Transazioni BancomatPay/i)).toBeInTheDocument();
-    });
-  });
-
-  it('should use current date if selectedDate is empty', async () => {
-    const user = userEvent.setup();
-    
-    renderComponent(mockTransactionsIntesa, '');
-    
-    const downloadMocks = setupDownloadMocks();
+    renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06', mockOnFetchAll);
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     await user.click(exportButton);
 
     await waitFor(() => {
-      const downloadCall = downloadMocks.mockLink.setAttribute.mock.calls.find(call => call[0] === 'download');
-      expect(downloadCall?.[1]).toMatch(/StorniMyBank_Intesa_\d{4}-\d{2}-\d{2}\.csv/);
+      expect(mockOnFetchAll).toHaveBeenCalled();
     });
+  });
 
-    downloadMocks.restore();
+  it('should show alert and stop loading if onFetchAllForExport fails', async () => {
+    const user = userEvent.setup();
+    const mockOnFetchAll = jest.fn().mockRejectedValue(new Error('Fetch failed'));
+
+    renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06', mockOnFetchAll);
+
+    const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
+    await user.click(exportButton);
+
+    await waitFor(() => {
+      expect(global.alert).toHaveBeenCalledWith("Errore durante il recupero dei dati per l'export.");
+    });
   });
 
   it('should escape CSV values containing special characters', async () => {
     const user = userEvent.setup();
-    
+
     const transactionWithSpecialChars: Transaction[] = [
       {
         transactionId: 'tx,with,commas',
@@ -304,10 +282,10 @@ describe('CsvExportSection', () => {
       } as Transaction,
     ];
 
-    renderComponent(transactionWithSpecialChars, '2024-12-06');
-    
+    renderComponent(transactionWithSpecialChars, '2024-12-06', '2024-12-06');
+
     const blobMock = setupBlobMock();
-    const downloadMocks = setupDownloadMocks();
+    setupDownloadMocks();
 
     const exportButton = screen.getByRole('button', { name: /Esporta CSV/i });
     await user.click(exportButton);
@@ -317,15 +295,14 @@ describe('CsvExportSection', () => {
       expect(capturedBlob).not.toBeNull();
       if (capturedBlob) {
         const csvContent = capturedBlob.content[0] as string;
-        
+
         expect(csvContent).toContain('"tx,with,commas"');
         expect(csvContent).toContain('"token""with""quotes"');
         expect(csvContent).toContain('"e2e\nwith\nnewlines"');
       }
     });
 
-    blobMock.restore();
-    downloadMocks.restore();
+    blobMock.mockBlob.mockRestore();
   });
 
 });

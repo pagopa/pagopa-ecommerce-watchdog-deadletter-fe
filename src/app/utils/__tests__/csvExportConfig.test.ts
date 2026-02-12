@@ -4,28 +4,32 @@ import { Transaction } from '../../types/DeadletterResponse';
 describe('csvExportConfig', () => {
 
   describe('exportConfigs structure', () => {
-    it('should have all three export types defined', () => {
+    it('should have all four export types defined', () => {
       expect(exportConfigs).toHaveProperty('mybank_intesa');
       expect(exportConfigs).toHaveProperty('mybank_unicredit');
       expect(exportConfigs).toHaveProperty('bancomat_pay');
+      expect(exportConfigs).toHaveProperty('all_range');
     });
 
     it('should have correct labels for each export type', () => {
       expect(exportConfigs.mybank_intesa.label).toBe('MyBank Intesa');
       expect(exportConfigs.mybank_unicredit.label).toBe('MyBank Unicredit');
       expect(exportConfigs.bancomat_pay.label).toBe('BancomatPay');
+      expect(exportConfigs.all_range.label).toBe('Tutte le transazioni');
     });
 
     it('should have descriptions for each export type', () => {
       expect(exportConfigs.mybank_intesa.description).toContain('Storni MyBank Intesa');
       expect(exportConfigs.mybank_unicredit.description).toContain('Storni MyBank Unicredit');
       expect(exportConfigs.bancomat_pay.description).toContain('BancomatPay');
+      expect(exportConfigs.all_range.description).toContain('Tutte le transazioni');
     });
 
     it('should have correct file name prefixes', () => {
       expect(exportConfigs.mybank_intesa.fileNamePrefix).toBe('StorniMyBank_Intesa');
       expect(exportConfigs.mybank_unicredit.fileNamePrefix).toBe('StorniMyBank_Unicredit');
       expect(exportConfigs.bancomat_pay.fileNamePrefix).toBe('BancomatPay_Pending');
+      expect(exportConfigs.all_range.fileNamePrefix).toBe('Tutte_Transazioni');
     });
 
     it('should have columns defined for each export type', () => {
@@ -115,6 +119,24 @@ describe('csvExportConfig', () => {
       expect(exportConfigs.bancomat_pay.filter(validTransaction)).toBe(true);
     });
 
+    it('should accept transactions with null gateway status', () => {
+      const validTransaction: Transaction = {
+        gatewayAuthorizationStatus: null as unknown as string,
+        paymentMethodName: 'BANCOMATPAY',
+      } as Transaction;
+
+      expect(exportConfigs.bancomat_pay.filter(validTransaction)).toBe(true);
+    });
+
+    it('should accept transactions with "null" string as gateway status', () => {
+      const validTransaction: Transaction = {
+        gatewayAuthorizationStatus: 'null' as unknown as string,
+        paymentMethodName: 'BANCOMATPAY',
+      } as Transaction;
+
+      expect(exportConfigs.bancomat_pay.filter(validTransaction)).toBe(true);
+    });
+
     it('should reject transactions with wrong gateway status', () => {
       const invalidTransaction: Transaction = {
         gatewayAuthorizationStatus: 'EXECUTED',
@@ -131,6 +153,13 @@ describe('csvExportConfig', () => {
       } as Transaction;
 
       expect(exportConfigs.bancomat_pay.filter(invalidTransaction)).toBe(false);
+    });
+  });
+
+  describe('all_range filter', () => {
+    it('should accept any transaction', () => {
+      const anyTransaction = { id: 'any' } as unknown as Transaction;
+      expect(exportConfigs.all_range.filter(anyTransaction)).toBe(true);
     });
   });
 
@@ -201,6 +230,18 @@ describe('csvExportConfig', () => {
         expect(result).toBe('PENDING');
       });
     });
+
+    describe('for all_range', () => {
+      it('should format insertionDate to YYYY-MM-DD', () => {
+        const result = exportConfigs.all_range.getColumnValue(mockTransaction, 'insertionDate');
+        expect(result).toBe('2024-12-06');
+      });
+
+      it('should return all requested columns correctly', () => {
+        expect(exportConfigs.all_range.getColumnValue(mockTransaction, 'transactionId')).toBe('tx-123');
+        expect(exportConfigs.all_range.getColumnValue(mockTransaction, 'paymentToken')).toBe('token-abc');
+      });
+    });
   });
 
   describe('columns configuration', () => {
@@ -230,12 +271,25 @@ describe('csvExportConfig', () => {
         'gatewayAuthorizationStatus'
       ]);
     });
+
+    it('should have correct columns for all_range', () => {
+      expect(exportConfigs.all_range.columns).toEqual([
+        'insertionDate',
+        'transactionId',
+        'paymentToken',
+        'paymentMethodName',
+        'pspId',
+        'eCommerceStatus',
+        'gatewayAuthorizationStatus',
+        'paymentEndToEndId'
+      ]);
+    });
   });
 
   describe('edge cases', () => {
     it('should handle transactions with all fields undefined', () => {
       const emptyTransaction = {} as Transaction;
-      
+
       expect(exportConfigs.mybank_intesa.filter(emptyTransaction)).toBe(false);
       expect(exportConfigs.mybank_unicredit.filter(emptyTransaction)).toBe(false);
       expect(exportConfigs.bancomat_pay.filter(emptyTransaction)).toBe(false);
@@ -255,8 +309,8 @@ describe('csvExportConfig', () => {
 
   describe('type safety', () => {
     it('should have all ExportType keys in exportConfigs', () => {
-      const exportTypes: ExportType[] = ['mybank_intesa', 'mybank_unicredit', 'bancomat_pay'];
-      
+      const exportTypes: ExportType[] = ['mybank_intesa', 'mybank_unicredit', 'bancomat_pay', 'all_range'];
+
       exportTypes.forEach(type => {
         expect(exportConfigs).toHaveProperty(type);
         expect(exportConfigs[type]).toBeDefined();
