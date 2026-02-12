@@ -193,17 +193,17 @@ export function TransactionsTable(
       sortable: false,
       valueGetter: (_value, row) => {
         const id = row.transactionId;
-        const value = props.actionsMap
-          .get(id)
-          ?.values()
-          .map(getDeadletterActionAsString)
-          .toArray();
-        return value && value.length > 0 ? value : null;
+        const actions = props.actionsMap.get(id);
+        const value = actions
+          ? Array.from(actions.values()).map(getDeadletterActionAsString)
+          : [];
+        return value.length > 0 ? value : null;
       },
       renderCell: (params) => {
         const id = params.id as string;
-        const transactionActions =
-          props.actionsMap.get(id)?.values().toArray() || [];
+        const transactionActions = props.actionsMap.get(id)
+          ? Array.from(props.actionsMap.get(id)!.values())
+          : [];
 
         return (
           <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>

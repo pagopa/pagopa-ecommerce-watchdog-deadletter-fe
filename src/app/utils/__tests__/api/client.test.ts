@@ -7,7 +7,7 @@ import {
   fetchActionsByTransactionId,
   fetchAddActionToDeadletterTransaction,
   fetchAuthentication,
-  fetchDeadletterTransactions,
+  fetchDeadletterTransactionsV2,
 } from "../../api/client";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 
@@ -22,7 +22,8 @@ const mockAuthenticationCredential = {
 
 const mockToken = "abc123";
 const mockTransactionId = "test-id";
-const mockDate = "2023-10-01";
+const mockFromDate = "2023-10-01";
+const mockToDate = "2023-10-07";
 
 const mockActionType: ActionType = {
   value: "test",
@@ -151,7 +152,7 @@ describe("fetchActionsByTransactionId", () => {
     const error = new Error(`Failed to fetch actions for ${mockTransactionId}`);
     const consoleErrorSpy = jest
       .spyOn(console, "error")
-      .mockImplementation(() => {});
+      .mockImplementation(() => { });
 
     const result = await fetchActionsByTransactionId(
       mockToken,
@@ -163,7 +164,7 @@ describe("fetchActionsByTransactionId", () => {
   });
 });
 
-describe("fetchDeadletterTransactions", () => {
+describe("fetchDeadletterTransactionsV2", () => {
   it("should return DeadletterResponse array on a successful fetch (200)", async () => {
     jest.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
@@ -171,11 +172,11 @@ describe("fetchDeadletterTransactions", () => {
       json: jest.fn().mockResolvedValue(mockDeadletterResponse),
     } as unknown as Response);
 
-    const result = await fetchDeadletterTransactions(mockToken, mockDate);
+    const result = await fetchDeadletterTransactionsV2(mockToken, mockFromDate, mockToDate);
 
     expect(result).toEqual(mockDeadletterResponse);
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      `https://api.mock.com/deadletter-transactions?date=${mockDate}&pageNumber=0&pageSize=500`,
+      `https://api.mock.com/v2/deadletter-transactions?fromDate=${mockFromDate}&toDate=${mockToDate}&pageNumber=0&pageSize=2`,
       {
         headers: { Authorization: `Bearer ${mockToken}` },
       }
@@ -190,9 +191,9 @@ describe("fetchDeadletterTransactions", () => {
     const error = new Error("Failed to fetch deadletter transactions");
     const consoleErrorSpy = jest
       .spyOn(console, "error")
-      .mockImplementation(() => {});
+      .mockImplementation(() => { });
 
-    const result = await fetchDeadletterTransactions(mockToken, mockDate);
+    const result = await fetchDeadletterTransactionsV2(mockToken, mockFromDate, mockToDate);
 
     expect(result).toEqual(null);
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);
@@ -237,7 +238,7 @@ describe("fetchAddActionToDeadletterTransaction", () => {
     );
     const consoleErrorSpy = jest
       .spyOn(console, "error")
-      .mockImplementation(() => {});
+      .mockImplementation(() => { });
 
     const result = await fetchAddActionToDeadletterTransaction(
       mockToken,
@@ -276,7 +277,7 @@ describe("fetchActions", () => {
     const error = new Error("Failed to fetch actions");
     const consoleErrorSpy = jest
       .spyOn(console, "error")
-      .mockImplementation(() => {});
+      .mockImplementation(() => { });
 
     const result = await fetchActions(mockToken);
 

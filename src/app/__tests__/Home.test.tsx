@@ -1,13 +1,13 @@
 import Home from "../page"
 import { render, screen, within } from '@testing-library/react';
-import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactions } from '../utils/api/client';
+import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2 } from '../utils/api/client';
 import React from "react";
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { JwtUser } from "@pagopa/mui-italia";
 import { getTokenFromUrl } from "../utils/utils";
-import {deadletterResponse} from "./mock/DataMocks";
+import { deadletterResponse } from "./mock/DataMocks";
 
 
 // Mocks
@@ -16,7 +16,7 @@ jest.mock('../utils/api/client', () => ({
   fetchActions: jest.fn(),
   fetchActionsByTransactionId: jest.fn(),
   fetchAddActionToDeadletterTransaction: jest.fn(),
-  fetchDeadletterTransactions: jest.fn(),
+  fetchDeadletterTransactionsV2: jest.fn(),
 }));
 
 // Mock for ResizeObserver
@@ -39,7 +39,7 @@ const mockedFetchAuthentication = fetchAuthentication as jest.Mock;
 const mockedFetchActions = fetchActions as jest.Mock;
 const mockedFetchActionsByTransactionId = fetchActionsByTransactionId as jest.Mock;
 const mockedFetchAddActionToDeadletterTransaction = fetchAddActionToDeadletterTransaction as jest.Mock;
-const mockedFetchDeadletterTransactions = fetchDeadletterTransactions as jest.Mock;
+const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
 const mockGetTokenFromUrl = getTokenFromUrl as jest.Mock;
 const mockedDecodeJwt = decodeJwt as jest.Mock
 
@@ -72,7 +72,7 @@ describe('Home', () => {
     mockedFetchActions.mockReset();
     mockedFetchActionsByTransactionId.mockReset();
     mockedFetchAddActionToDeadletterTransaction.mockReset();
-    mockedFetchDeadletterTransactions.mockReset();
+    mockedFetchDeadletterTransactionsV2.mockReset();
     mockGetTokenFromUrl.mockReset();
     mockedDecodeJwt.mockReset();
 
@@ -107,7 +107,7 @@ describe('Home', () => {
     mockedFetchActions.mockResolvedValue([]);
 
     renderComponent();
-    
+
     // Verify that the user info are show in the header
     expect(await screen.findByText('Mario Rossi')).toBeInTheDocument();
 
@@ -203,38 +203,42 @@ describe('Home', () => {
     mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
 
     // Mock the api
-    mockedFetchDeadletterTransactions.mockResolvedValue(deadletterResponse);
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([]);
-    
+
     renderComponent();
 
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date picker
-    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
-    expect(datePicker).toBeInTheDocument();
+    // check the presence of the date pickers
+    const startDatePicker = await screen.findByLabelText("Data inizio");
+    const endDatePicker = await screen.findByLabelText("Data fine");
+    expect(startDatePicker).toBeInTheDocument();
+    expect(endDatePicker).toBeInTheDocument();
 
-    // click on the date picker and select a date
-    await userEvent.type(datePicker, "2025-11-07");
+    // click on the date pickers and select a range
+    await userEvent.type(startDatePicker, "2025-11-07");
+    await userEvent.type(endDatePicker, "2025-11-08");
 
-    expect(datePicker).toHaveValue("2025-11-07");
+    expect(startDatePicker).toHaveValue("2025-11-07");
+    expect(endDatePicker).toHaveValue("2025-11-08");
 
     // wait until the graphs and the table are in the document
     expect(await screen.findByText("Stato Ecommerce")).toBeInTheDocument();
     expect(await screen.findByText("Stato NPG")).toBeInTheDocument();
     expect(await screen.findByText("Metodi di pagamento")).toBeInTheDocument();
     expect(await screen.findByText("Stato azioni")).toBeInTheDocument();
-    expect(await screen.findByRole("grid")).toBeInTheDocument();  
-  
+    expect(await screen.findByRole("grid")).toBeInTheDocument();
 
-    expect(mockedFetchDeadletterTransactions).toHaveBeenCalled();
+
+    expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).toHaveBeenCalled();
 
   });
 
-  it('should only show the no transaction found message if the selected date has no data',async () => {
+  it('should only show the no transaction found message if the selected date has no data', async () => {
     // Mock the presence of a token in the sessionStorage would be logged without login needed
     const tokenMock: string = "mockToken123";
     mockSessionStorage.setItem("authToken", tokenMock);
@@ -247,23 +251,27 @@ describe('Home', () => {
     mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
 
     // Mock the api
-    mockedFetchDeadletterTransactions.mockResolvedValue(null);
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(null);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([]);
-    
+
     renderComponent();
 
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date picker
-    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
-    expect(datePicker).toBeInTheDocument();
+    // check the presence of the date pickers
+    const startDatePicker = await screen.findByLabelText("Data inizio");
+    const endDatePicker = await screen.findByLabelText("Data fine");
+    expect(startDatePicker).toBeInTheDocument();
+    expect(endDatePicker).toBeInTheDocument();
 
-    // click on the date picker and select a date
-    await userEvent.type(datePicker, "2025-11-07");
+    // click on the date pickers and select a range
+    await userEvent.type(startDatePicker, "2025-11-07");
+    await userEvent.type(endDatePicker, "2025-11-08");
 
-    expect(datePicker).toHaveValue("2025-11-07");
+    expect(startDatePicker).toHaveValue("2025-11-07");
+    expect(endDatePicker).toHaveValue("2025-11-08");
 
     // wait until the graphs and the table are in the document
     expect(screen.queryByText("Stato Ecommerce")).not.toBeInTheDocument();
@@ -271,36 +279,40 @@ describe('Home', () => {
     expect(screen.queryByText("Distribuzione metodi di pagamento")).not.toBeInTheDocument();
     expect(screen.queryByText("Distribuzione stato azioni")).not.toBeInTheDocument();
     expect(screen.queryByText("grid")).not.toBeInTheDocument();
-    
+
     // check for the no transaction found message
     expect(await screen.findByText(/Nessuna transazione deadletter trovata/i)).toBeInTheDocument();
 
-    expect(mockedFetchDeadletterTransactions).toHaveBeenCalled();
+    expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
   });
 
   it('check if not logged no table or charts is showed', async () => {
     // Mock the api
-    mockedFetchDeadletterTransactions.mockResolvedValue(deadletterResponse);
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([]);
-    
+
     renderComponent();
 
     // Check if the dialog and button components are visible and close it
     expect(screen.getByRole('dialog', { name: "Login" })).toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
 
-    // check the presence of the date picker
-    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
-    expect(datePicker).toBeInTheDocument();
-    
-    // click on the date picker and select a date
-    await userEvent.type(datePicker, "2025-11-07");
+    // check the presence of the date pickers
+    const startDatePicker = await screen.findByLabelText("Data inizio");
+    const endDatePicker = await screen.findByLabelText("Data fine");
+    expect(startDatePicker).toBeInTheDocument();
+    expect(endDatePicker).toBeInTheDocument();
 
-    expect(datePicker).toHaveValue("2025-11-07");
+    // click on the date pickers and select a range
+    await userEvent.type(startDatePicker, "2025-11-07");
+    await userEvent.type(endDatePicker, "2025-11-08");
 
-    expect(mockedFetchDeadletterTransactions).not.toHaveBeenCalled();
+    expect(startDatePicker).toHaveValue("2025-11-07");
+    expect(endDatePicker).toHaveValue("2025-11-08");
+
+    expect(mockedFetchDeadletterTransactionsV2).not.toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
 
   });
@@ -319,24 +331,28 @@ describe('Home', () => {
     mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
 
     // Mock the api
-    mockedFetchDeadletterTransactions.mockResolvedValue(deadletterResponse);
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
-    mockedFetchActions.mockResolvedValue([{value:"testAction", type:"FINAL"}]);
-    mockedFetchAddActionToDeadletterTransaction.mockResolvedValue({response: "200"});
+    mockedFetchActions.mockResolvedValue([{ value: "testAction", type: "FINAL" }]);
+    mockedFetchAddActionToDeadletterTransaction.mockResolvedValue({ response: "200" });
 
     renderComponent();
 
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date picker
-    const datePicker = await screen.findByLabelText("Data transazioni in deadletter");
-    expect(datePicker).toBeInTheDocument();
+    // check the presence of the date pickers
+    const startDatePicker = await screen.findByLabelText("Data inizio");
+    const endDatePicker = await screen.findByLabelText("Data fine");
+    expect(startDatePicker).toBeInTheDocument();
+    expect(endDatePicker).toBeInTheDocument();
 
-    // click on the date picker and select a date
-    await userEvent.type(datePicker, "2025-11-07");
+    // click on the date pickers and select a range
+    await userEvent.type(startDatePicker, "2025-11-07");
+    await userEvent.type(endDatePicker, "2025-11-08");
 
-    expect(datePicker).toHaveValue("2025-11-07");
+    expect(startDatePicker).toHaveValue("2025-11-07");
+    expect(endDatePicker).toHaveValue("2025-11-08");
 
     // wait until the graphs and the table are in the document
     const table = await screen.findByRole("grid");
