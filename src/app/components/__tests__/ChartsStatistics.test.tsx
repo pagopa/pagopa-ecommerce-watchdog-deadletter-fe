@@ -102,7 +102,7 @@ describe("ChartsStatistics", () => {
     expect(
       screen.getByText("Metodi di pagamento")
     ).toBeInTheDocument();
-    expect(screen.getByText("Stato azioni")).toBeInTheDocument();
+    expect(screen.getByText("Stato analisi")).toBeInTheDocument();
   });
 
   it("aggregates and pass data to eCommerce chart correctly", () => {
@@ -146,7 +146,7 @@ describe("ChartsStatistics", () => {
   });
 
   it("correctly group and pass data to action types chart", () => {
-    const pie = getChartPieByTitle("Stato azioni");
+    const pie = getChartPieByTitle("Stato analisi");
     const data = getChartData(pie);
 
     expect(data).toEqual(

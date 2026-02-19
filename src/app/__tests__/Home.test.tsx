@@ -229,7 +229,7 @@ describe('Home', () => {
     expect(await screen.findByText("Stato Ecommerce")).toBeInTheDocument();
     expect(await screen.findByText("Stato NPG")).toBeInTheDocument();
     expect(await screen.findByText("Metodi di pagamento")).toBeInTheDocument();
-    expect(await screen.findByText("Stato azioni")).toBeInTheDocument();
+    expect(await screen.findByText("Stato analisi")).toBeInTheDocument();
     expect(await screen.findByRole("grid")).toBeInTheDocument();
 
 
@@ -276,8 +276,8 @@ describe('Home', () => {
     // wait until the graphs and the table are in the document
     expect(screen.queryByText("Stato Ecommerce")).not.toBeInTheDocument();
     expect(screen.queryByText("Stato NPG")).not.toBeInTheDocument();
-    expect(screen.queryByText("Distribuzione metodi di pagamento")).not.toBeInTheDocument();
-    expect(screen.queryByText("Distribuzione stato azioni")).not.toBeInTheDocument();
+    expect(screen.queryByText("Metodi di pagamento")).not.toBeInTheDocument();
+    expect(screen.queryByText("Stato analisi")).not.toBeInTheDocument();
     expect(screen.queryByText("grid")).not.toBeInTheDocument();
 
     // check for the no transaction found message
