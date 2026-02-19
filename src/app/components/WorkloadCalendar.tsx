@@ -108,7 +108,7 @@ export default function WorkloadCalendar() {
 
                 {/* Days */}
                 {days.map((date) => {
-                    const hasDeadletter = isDeadletterDay(date);
+                    const hasDeadletter = true; //isDeadletterDay(date);
                     const isToday = new Date().toDateString() === date.toDateString();
 
                     return (

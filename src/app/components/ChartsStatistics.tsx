@@ -29,6 +29,16 @@ export default function ChartsStatistics(
     "#f97316", 
   ];
 
+  const FINAL_STATUS = "FINALE";
+  const NON_ANALYZED_STATUS = "NON ANALIZZATO";
+  const NON_FINAL_STATUS = "NON FINALE";
+
+  const analysisStatusColors = {
+    [FINAL_STATUS]: "#10b981", 
+    [NON_ANALYZED_STATUS]: "#E65100", 
+    [NON_FINAL_STATUS]: "#F5B800", 
+  };
+
   const aggregateBy = useCallback(
     (field: keyof Transaction) => {
       return Object.entries(
@@ -46,20 +56,20 @@ export default function ChartsStatistics(
     actionsMap: Map<string, Map<string, DeadletterAction>>
   ) {
     const grouped = new Map<string, number>();
-    grouped.set("FINALE", 0);
-    grouped.set("NON FINALE", 0);
-    grouped.set("NON ANALIZZATO", 0);
+    grouped.set(FINAL_STATUS, 0);
+    grouped.set(NON_FINAL_STATUS, 0);
+    grouped.set(NON_ANALYZED_STATUS, 0);
 
     for (const transactionActionMap of actionsMap.values()) {
       if (transactionActionMap.size === 0) {
-        grouped.set("NON ANALIZZATO", grouped.get("NON ANALIZZATO")! + 1);
+        grouped.set(NON_ANALYZED_STATUS, grouped.get(NON_ANALYZED_STATUS)! + 1);
         continue;
       }
       for (const actionItem of transactionActionMap.values()) {
         if (actionItem.action.type === "FINAL") {
-          grouped.set("FINALE", grouped.get("FINALE")! + 1);
+          grouped.set(FINAL_STATUS, grouped.get(FINAL_STATUS)! + 1);
         } else {
-          grouped.set("NON FINALE", grouped.get("NON FINALE")! + 1);
+          grouped.set(NON_FINAL_STATUS, grouped.get(NON_FINAL_STATUS)! + 1);
         }
       }
     }
@@ -93,7 +103,7 @@ export default function ChartsStatistics(
         { title: "Stato Ecommerce", data: ecommerceData },
         { title: "Stato NPG", data: npgData },
         { title: "Metodi di pagamento", data: paymentMethodName },
-        { title: "Stato azioni", data: actionTypes },
+        { title: "Stato analisi", data: actionTypes },
       ].map((chart) => (
         <Grid item xs={12} md={3} key={chart.title}>
           <Paper 
@@ -127,7 +137,7 @@ export default function ChartsStatistics(
                   stroke="#fff"
                 >
                   {chart.data.map((val, i) => (
-                    <Cell key={val.name} fill={COLORS[i % COLORS.length]} />
+                    <Cell key={val.name} fill={analysisStatusColors[val.name as keyof typeof analysisStatusColors] || COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
