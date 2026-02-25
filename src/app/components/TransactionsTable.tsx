@@ -30,7 +30,7 @@ export function TransactionsTable(
       align: "center",
       renderCell: (params) => {
         const index = props.transactions.findIndex(
-          (t) => t.transactionId === params.id
+          (t) => t.transactionId + t.insertionDate === params.id
         );
         return (
           <Box sx={{
@@ -261,7 +261,7 @@ export function TransactionsTable(
       <DataGrid
         rows={props.transactions}
         columns={columns}
-        getRowId={(row) => row.transactionId}
+        getRowId={(row) => row.transactionId + row.insertionDate}
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
         sx={{
