@@ -1254,12 +1254,12 @@
         }
       },
       {
-        "transactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
+        "transactionId": "b202ea99a53643c4bb1d73114a06ea21",
         "insertionDate": "2025-07-02T17:33:15.633702275Z",
         "paymentToken": "cde7b3ba3d0548cc983d6fd9c79fb641",
         "paymentMethodName": "GOOGLEPAY",
         "pspId": "CIPBITMM",
-        "eCommerceStatus": "REFUND_ERROR",
+        "eCommerceStatus": "EXPIRED",
         "gatewayAuthorizationStatus": "null",
         "paymentEndToEndId": null,
         "operationId": "496313910637251839",
@@ -1268,7 +1268,7 @@
           "data": "{\"event\":{\"_class\":\"it.pagopa.ecommerce.commons.documents.v2.TransactionRefundRetriedEvent\",\"id\":\"1ac6e2da-9293-4380-8de2-b26bc83ab82c\",\"transactionId\":\"ca2d9476cdbe4535a693606b8c3bb9d6\",\"creationDate\":\"2025-07-02T17:03:13.114738363Z[Etc/UTC]\",\"data\":{\"retryCount\":3,\"transactionGatewayAuthorizationData\":null},\"eventCode\":\"TRANSACTION_REFUND_RETRIED_EVENT\"},\"tracingInfo\":{\"traceparent\":\"00-1c90fc292e996760eb4e7e48807c30b4-da073a5f371af2e7-01\",\"tracestate\":null,\"baggage\":null}}",
           "timestamp": "2025-07-02T17:33:15.633702275Z",
           "transactionInfo": {
-            "transactionId": "ca2d9476cdbe4535a693606b8c3bb9d6",
+            "transactionId": "b202ea99a53643c4bb1d73114a06ea21",
             "authorizationRequestId": "E1751473092968ofcB",
             "eCommerceStatus": "REFUND_ERROR",
             "paymentGateway": "NPG",
