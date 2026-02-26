@@ -44,7 +44,7 @@ const mockAction2: DeadletterAction = {
 
 const mockActionsMap = new Map([
   [
-    "505db4c0c7be4f4582868fd0780359f42025-07-02T16:53:08.537435644Z",
+    "505db4c0c7be4f4582868fd0780359f4",
     new Map([
       ["Stornata", mockAction1],
       ["Da stornare", mockAction2],
@@ -366,7 +366,7 @@ describe("TransactionsTable", () => {
     expect(mockHandleAddActionToTransaction).toHaveBeenCalledTimes(1);
     expect(mockHandleAddActionToTransaction).toHaveBeenCalledWith(
       finalAction.value,
-      mockTransactions[0].transactionId + mockTransactions[0].insertionDate
+      mockTransactions[0].transactionId
     );
   });
 });

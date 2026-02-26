@@ -200,7 +200,7 @@ export function TransactionsTable(
         return value.length > 0 ? value : null;
       },
       renderCell: (params) => {
-        const id = params.id as string;
+        const id = params.row.transactionId;
         const transactionActions = props.actionsMap.get(id)
           ? Array.from(props.actionsMap.get(id)!.values())
           : [];
@@ -312,7 +312,6 @@ export function TransactionsTable(
         paginationMode={props.paginationMode}
         paginationModel={props.paginationModel}
         onPaginationModelChange={props.onPaginationModelChange}
-
       />
     </Box>
   );
