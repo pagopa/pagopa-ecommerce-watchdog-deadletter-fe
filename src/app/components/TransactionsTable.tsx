@@ -1,10 +1,12 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
-import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
+import { Box, Button, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
-import { dateTimeLocale, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
+import { dateTimeLocale, extendedMonthDateFormatOptions, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
 import { TransactionNote } from "../types/TransactionNotes";
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import AddCommentIcon from '@mui/icons-material/AddComment';
 
 export function TransactionsTable(
   props: Readonly<{
@@ -246,6 +248,79 @@ export function TransactionsTable(
           </Box>
         );
       },
+    },
+    {
+      field: 'notes',
+      headerName: 'Note',
+      flex: 1,
+      minWidth: 250,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => {
+        const id = params.row.transactionId; 
+        const transactionNotes = props.notesMap.get(id) || [];
+        
+        const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
+        const latestNote = hasNotes ? transactionNotes.at(- 1) : null;
+
+        const tooltipContent = latestNote ? (
+          <Box sx={{ p: 0.5 }}>
+            {/* Tooltip header: userId + date */}
+            <Typography variant="caption" sx={{ color: 'secondary.light', display: 'block', mb: 1, fontWeight: 'bold' }}>
+              Scritto da {latestNote.userId} • {new Date(latestNote.createdAt).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}
+            </Typography>
+            {/* Complete note text */}
+            <Typography variant="body2" sx={{ color: 'common.white' }}>
+              {latestNote.note}
+            </Typography>
+          </Box>
+        ) : null;
+
+        return (
+          <Stack 
+            direction="row" 
+            alignItems="center" 
+            justifyContent="space-between" 
+            sx={{ width: '100%', height: '100%', pr: 1 }}
+          >
+            <Tooltip 
+              title={tooltipContent} 
+              placement="bottom-start" 
+              arrow 
+              enterDelay={400}
+            >
+              <Box sx={{ flexGrow: 1, overflow: 'hidden', mr: 1, cursor: 'pointer' }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: hasNotes ? 'text.primary' : 'text.disabled',
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2, // Max visible rows
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'normal'
+                  }}
+                >
+                  {latestNote?.note}
+                </Typography>
+              </Box>
+            </Tooltip>
+            <IconButton 
+              size="small" 
+              sx={{ flexShrink: 0 }}
+            >
+              {hasNotes ? (
+                <Badge badgeContent={transactionNotes.length} color="primary">
+                  <ChatBubbleOutlineIcon fontSize="small" />
+                </Badge>
+              ) : (
+                <AddCommentIcon fontSize="small" color="primary" />
+              )}
+            </IconButton>
+          </Stack>
+        );
+      }
     },
   ];
 
