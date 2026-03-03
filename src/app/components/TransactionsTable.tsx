@@ -338,6 +338,14 @@ export function TransactionsTable(
       <DataGrid
         rows={props.transactions}
         columns={columns}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              paymentEndToEndId: false,
+              Amount: false,
+            },
+          },
+        }}
         getRowId={(row) => row.transactionId + row.insertionDate}
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
