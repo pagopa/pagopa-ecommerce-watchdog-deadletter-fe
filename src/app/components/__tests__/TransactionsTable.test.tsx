@@ -205,8 +205,31 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
+const mockNotesMap = new Map([
+  ["505db4c0c7be4f4582868fd0780359f4", [
+    {
+      "noteId": "69a565036aa9daa75d16a0f9",
+      "transactionId": "6438d77a7fa3448da8baffe420acae77",
+      "userId": "mario.rossi",
+      "note": "Mock note",
+      "createdAt": "2026-03-01T14:29:42.244Z",
+      "updatedAt": "2026-03-02T10:29:42.244Z"
+    },
+    {
+      "noteId": "69a565036aa9daa75d16a012",
+      "transactionId": "6438d77a7fa3448da8baffe420acae77",
+      "userId": "mario.rossi",
+      "note": "Mock note (latest)",
+      "createdAt": "2026-03-02T14:29:42.244Z",
+      "updatedAt": "2026-03-02T10:29:42.244Z"
+    }
+  ]],
+]);
+
+
 const defaultProps = {
   transactions: mockTransactions,
+  notesMap: mockNotesMap,
   actionsMap: mockActionsMap,
   actions: mockActionTypes,
   handleOpenDialog: mockHandleOpenDialog,
@@ -229,7 +252,6 @@ describe("TransactionsTable", () => {
     expect(screen.getByText("transactionId")).toBeInTheDocument();
     expect(screen.getByText("insertionDate (UTC)")).toBeInTheDocument();
     expect(screen.getByText("paymentToken")).toBeInTheDocument();
-    expect(screen.getByText("paymentEndToEndId")).toBeInTheDocument();
     expect(screen.getByText("authorizationRequestId")).toBeInTheDocument();
     expect(screen.getByText("methodName")).toBeInTheDocument();
     expect(screen.getByText("pspId")).toBeInTheDocument();
@@ -238,15 +260,16 @@ describe("TransactionsTable", () => {
     expect(screen.getByText("Details")).toBeInTheDocument();
     expect(screen.getByText("Azioni")).toBeInTheDocument();
 
+    // Columns that should not be rendered (disabled in the default view)
+    expect(screen.queryByText("paymentEndToEndId")).not.toBeInTheDocument();
+    expect(screen.queryByText("Amount")).not.toBeInTheDocument();
+
     //Check transaction row
     expect(
       screen.getByText(mockTransactions[0].transactionId)
     ).toBeInTheDocument();
     expect(
       screen.getByText(mockTransactions[0].paymentToken)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(mockTransactions[0].paymentEndToEndId!)
     ).toBeInTheDocument();
     expect(
       screen.getByText(mockTransactions[0].paymentMethodName)
@@ -368,5 +391,39 @@ describe("TransactionsTable", () => {
       finalAction.value,
       mockTransactions[0].transactionId
     );
+  });
+
+  it("should render the last added note for a transaction with badge and icon", () => {
+    renderComponent();
+    const transactionId = mockTransactions[0].transactionId;
+
+    const row1 = screen
+      .getByText(transactionId)
+      .closest('div[role="row"]');
+    expect(row1).toBeInTheDocument();
+
+    expect(
+      within(row1 as HTMLElement).getByText(mockNotesMap.get(transactionId)![1].note)
+    ).toBeInTheDocument();
+
+    const badge = within(row1 as HTMLElement).getByTestId("transaction-notes-badge");
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveTextContent("2");
+
+    const icon = within(row1 as HTMLElement).getByTestId("transaction-notes-icon");
+    expect(icon).toBeInTheDocument();
+  });
+
+  it("should render the add note icon for a transaction with no notes", () => {
+    renderComponent();
+    const transactionId = mockTransactions[1].transactionId;
+
+    const row2 = screen
+      .getByText(transactionId)
+      .closest('div[role="row"]');
+    expect(row2).toBeInTheDocument();
+
+    const addNoteIcon = within(row2 as HTMLElement).getByTestId("transaction-add-note-icon");
+    expect(addNoteIcon).toBeInTheDocument();
   });
 });

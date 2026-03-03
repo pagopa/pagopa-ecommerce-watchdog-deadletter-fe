@@ -311,11 +311,11 @@ export function TransactionsTable(
               sx={{ flexShrink: 0 }}
             >
               {hasNotes ? (
-                <Badge badgeContent={transactionNotes.length} color="primary">
-                  <ChatBubbleOutlineIcon fontSize="small" />
+                <Badge data-testid="transaction-notes-badge" badgeContent={transactionNotes.length} color="primary">
+                  <ChatBubbleOutlineIcon data-testid="transaction-notes-icon" fontSize="small" />
                 </Badge>
               ) : (
-                <AddCommentIcon fontSize="small" color="primary" />
+                <AddCommentIcon data-testid="transaction-add-note-icon" fontSize="small" color="primary" />
               )}
             </IconButton>
           </Stack>
