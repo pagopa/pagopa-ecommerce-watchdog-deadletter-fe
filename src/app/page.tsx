@@ -142,12 +142,15 @@ export default function Home() {
       setTransactions(transactionsList);
       setTotalResults((data?.page?.total ?? 0) * pageSize);
 
-      const notesData = await fetchNotesByTransactionIds(token.current, transactionsList.map(t => t.transactionId));
-      const notesMap: Map<string, TransactionNote[]> = new Map();
-      for (const note of notesData) {
-        notesMap.set(note.transactionId, note.notesList);
+      const transactionIds = transactionsList.map(t => t.transactionId);
+      if(transactionIds.length) {
+        const notesData = await fetchNotesByTransactionIds(token.current, transactionIds);
+        const notesMap: Map<string, TransactionNote[]> = new Map();
+        for (const note of notesData) {
+          notesMap.set(note.transactionId, note.notesList);
+        }
+        setNotesMap(notesMap);
       }
-      setNotesMap(notesMap);
 
       const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       await Promise.all(
