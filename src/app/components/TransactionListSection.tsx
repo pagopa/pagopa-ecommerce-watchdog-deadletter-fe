@@ -2,9 +2,11 @@ import { Paper, Grid } from "@mui/material";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
 import { Transaction } from "../types/DeadletterResponse";
 import { TransactionsTable } from "./TransactionsTable";
+import { TransactionNote } from "../types/TransactionNotes";
 
 interface TransactionsListSectionProps {
   transactions: Transaction[];
+  notesMap: Map<string, TransactionNote[]>;
   actionsMap: Map<string, Map<string, DeadletterAction>>;
   actions: ActionType[];
   handleOpenDialog: (content: object) => void;
@@ -15,9 +17,10 @@ interface TransactionsListSectionProps {
   onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
 }
 
-export default function TransactionsListSection(props: TransactionsListSectionProps) {
+export default function TransactionsListSection(props: Readonly<TransactionsListSectionProps>) {
   const {
     transactions,
+    notesMap,
     actionsMap,
     actions,
     handleOpenDialog,
@@ -29,6 +32,7 @@ export default function TransactionsListSection(props: TransactionsListSectionPr
       <Paper sx={{ height: "100%", width: "100%" }}>
         <TransactionsTable
           transactions={transactions}
+          notesMap={notesMap}
           actionsMap={actionsMap}
           actions={actions}
           handleOpenDialog={handleOpenDialog}

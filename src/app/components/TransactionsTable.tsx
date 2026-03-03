@@ -4,10 +4,12 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
 import { dateTimeLocale, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
+import { TransactionNote } from "../types/TransactionNotes";
 
 export function TransactionsTable(
   props: Readonly<{
     transactions: Transaction[];
+    notesMap: Map<string, TransactionNote[]>;
     actionsMap: Map<string, Map<string, DeadletterAction>>;
     actions: ActionType[];
     handleOpenDialog: (content: object) => void;
@@ -101,7 +103,7 @@ export function TransactionsTable(
     {
       field: "authorizationRequestId",
       headerName: "authorizationRequestId",
-      flex: 1,
+      flex: 0.8,
       filterable: true,
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
@@ -210,9 +212,9 @@ export function TransactionsTable(
             {/* Storico azioni */}
             {transactionActions.length > 0 && (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-                {transactionActions.map((deadletterAction, idx) => (
+                {transactionActions.map((deadletterAction) => (
                   <Chip
-                    key={idx}
+                    key={deadletterAction.id}
                     label={getDeadletterActionAsString(deadletterAction)}
                     size="small"
                     color={
