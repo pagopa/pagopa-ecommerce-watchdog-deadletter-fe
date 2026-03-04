@@ -283,7 +283,7 @@ export default function Home() {
             <SectionHeader
               icon="📋"
               title="Lista Transazioni"
-              subtitle={`Tutte le transazioni deadletter dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} (${transactions.length} totali)`}
+              subtitle={`Tutte le transazioni deadletter dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
             />
 
             <TransactionsListSection
