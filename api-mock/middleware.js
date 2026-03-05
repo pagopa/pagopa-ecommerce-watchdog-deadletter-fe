@@ -16,7 +16,7 @@ module.exports = function middleware (req, res, next) {
   }
 
   if (req.method === 'PUT' || req.method === 'DELETE') {
-    return res.sendStatus(200);
+    return res.sendStatus(204);
   }
 
   if (req.method === 'POST') {
