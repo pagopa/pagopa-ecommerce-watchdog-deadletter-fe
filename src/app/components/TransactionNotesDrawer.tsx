@@ -42,6 +42,7 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const MAX_TRANSACTION_NOTES = 10;
+  const MAX_NOTE_LENGTH = 300;
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -213,6 +214,16 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
                         value={editDraft}
                         onChange={(e) => setEditDraft(e.target.value)}
                         autoFocus
+                        inputProps={{ maxLength: MAX_NOTE_LENGTH }}
+                        helperText={`${editDraft.length} / ${MAX_NOTE_LENGTH}`}
+                        FormHelperTextProps={{
+                          sx: { 
+                            textAlign: 'right', 
+                            margin: 0, 
+                            mt: 0.5,
+                            color: editDraft.length >= MAX_NOTE_LENGTH ? 'error.main' : 'text.secondary'
+                          }
+                        }}
                       />
                       <Stack
                         direction="row"
@@ -269,6 +280,16 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
               sx={{ mb: 1.5 }}
+              inputProps={{ maxLength: MAX_NOTE_LENGTH }}
+              helperText={`${noteText.length} / ${MAX_NOTE_LENGTH}`}
+              FormHelperTextProps={{
+                sx: { 
+                  textAlign: 'right', 
+                  margin: 0, 
+                  mt: 0.5,
+                  color: noteText.length >= MAX_NOTE_LENGTH ? 'error.main' : 'text.secondary'
+                }
+              }}
             />
             <Button
               fullWidth
