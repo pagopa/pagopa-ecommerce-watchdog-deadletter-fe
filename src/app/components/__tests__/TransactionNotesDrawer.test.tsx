@@ -103,8 +103,8 @@ describe("TransactionNotesDrawer", () => {
     const user = userEvent.setup();
     render(<TransactionNotesDrawer {...defaultProps} />);
     
-    const menuButton = screen.getByTestId("MoreVertIcon").parentElement;
-    await user.click(menuButton!);
+    const menuButtons = screen.getAllByRole("button", { name: /opzioni nota/i });
+    await user.click(menuButtons[0]);
     
     const editMenuItem = await screen.findByText(/Modifica/i);
     await user.click(editMenuItem);
@@ -125,8 +125,8 @@ describe("TransactionNotesDrawer", () => {
     const user = userEvent.setup();
     render(<TransactionNotesDrawer {...defaultProps} />);
     
-    const menuButton = screen.getByTestId("MoreVertIcon").parentElement;
-    await user.click(menuButton!);
+    const menuButtons = screen.getAllByRole("button", { name: /opzioni nota/i });
+    await user.click(menuButtons[0]);
     
     const deleteMenuItem = await screen.findByText(/Elimina/i);
     await user.click(deleteMenuItem);
@@ -162,8 +162,9 @@ describe("TransactionNotesDrawer", () => {
     const user = userEvent.setup();
     render(<TransactionNotesDrawer {...defaultProps} />);
     
-    const menuButton = screen.getAllByTestId("MoreVertIcon")[0].parentElement;
-    await user.click(menuButton!);
+    const menuButtons = screen.getAllByRole("button", { name: /opzioni nota/i });
+    await user.click(menuButtons[0]);
+
     const editMenuItem = await screen.findByText(/Modifica/i);
     await user.click(editMenuItem);
     
@@ -179,8 +180,8 @@ describe("TransactionNotesDrawer", () => {
     const user = userEvent.setup();
     render(<TransactionNotesDrawer {...defaultProps} />);
     
-    const menuButton = screen.getByTestId("MoreVertIcon").parentElement;
-    await user.click(menuButton!);
+    const menuButtons = screen.getAllByRole("button", { name: /opzioni nota/i });
+    await user.click(menuButtons[0]);
     
     const editMenuItem = await screen.findByText(/Modifica/i);
     await user.click(editMenuItem);
@@ -201,9 +202,9 @@ describe("TransactionNotesDrawer", () => {
     const user = userEvent.setup();
     render(<TransactionNotesDrawer {...defaultProps} />);
     
-    const menuButton = screen.getByTestId("MoreVertIcon").parentElement;
-    await user.click(menuButton!);
-    
+    const menuButtons = screen.getAllByRole("button", { name: /opzioni nota/i });
+    await user.click(menuButtons[0]);
+
     const deleteMenuItem = await screen.findByText(/Elimina/i);
     await user.click(deleteMenuItem);
     

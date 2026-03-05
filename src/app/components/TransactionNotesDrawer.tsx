@@ -198,6 +198,7 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
                         <IconButton
                           size="small"
                           onClick={(e) => handleMenuOpen(e, note)}
+                          aria-label="Opzioni nota"
                         >
                           <MoreVertIcon fontSize="inherit" />
                         </IconButton>
