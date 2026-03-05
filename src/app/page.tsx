@@ -14,7 +14,10 @@ import {
   fetchActionsByTransactionId,
   fetchAddActionToDeadletterTransaction,
   fetchDeadletterTransactionsV2,
-  fetchNotesByTransactionIds
+  fetchNotesByTransactionIds,
+  addNoteToTransaction,
+  updateTransactionNote,
+  deleteTransactionNote,
 } from "./utils/api/client";
 import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
@@ -203,6 +206,66 @@ export default function Home() {
     }
   };
 
+
+  const handleAddNote = (transactionId: string, text: string) => {
+    if(!token.current) return;
+
+    addNoteToTransaction(token.current, transactionId, text).then((newNote) => {
+      if (!newNote) return;
+      setNotesMap((prev) => {
+        const newMap = new Map(prev);
+        const transactionNotes = newMap.get(transactionId) || [];
+        newMap.set(transactionId, [...transactionNotes, newNote]);
+        return newMap;
+      });
+    });
+  };
+
+  const handleEditNote = (currentNote: TransactionNote, newText: string) => {
+    if(!token.current) return;
+
+    const transactionId = currentNote.transactionId;
+    const noteId = currentNote.noteId;
+
+    updateTransactionNote(token.current, currentNote.transactionId, currentNote.noteId, newText).then((res) => {
+      if (!res) return;
+      const newMap = new Map(notesMap);
+      const transactionNotes = newMap.get(transactionId)!;
+
+      const updatedNotes = transactionNotes.map((note) => {
+        if (note.noteId === noteId) {
+          return { ...note, note: newText };
+        }
+        return note;
+      });
+
+      newMap.set(transactionId, updatedNotes);
+      setNotesMap(newMap);
+    });
+  };
+
+  const handleDeleteNote = (noteToDelete: TransactionNote) => {
+    if(!token.current) return;
+
+    const transactionId = noteToDelete.transactionId;
+    const noteId = noteToDelete.noteId;
+
+    deleteTransactionNote(token.current, transactionId, noteId).then((res) => {
+      if (!res) return;
+      const newMap = new Map(notesMap);
+      const transactionNotes = newMap.get(transactionId)!;
+
+      const updatedNotes = transactionNotes.filter((note) => note.noteId !== noteId);
+      if (updatedNotes.length === 0) {
+        newMap.delete(transactionId);
+      } else {
+        newMap.set(transactionId, updatedNotes);
+      }
+
+      setNotesMap(newMap);
+    });
+  };
+
   const handleLogout = () => {
     setJwtUser(null);
     setTransactions([]);
@@ -304,8 +367,12 @@ export default function Home() {
               notesMap={notesMap}
               actionsMap={actionsMap}
               actions={actions}
+              userId={jwtUser?.id || ""}
               handleOpenDialog={handleOpenDialog}
               handleAddActionToTransaction={handleAddActionToTransaction}
+              handleAddNote={handleAddNote}
+              handleEditNote={handleEditNote}
+              handleDeleteNote={handleDeleteNote}
               rowCount={totalResults}
               paginationMode="server"
               paginationModel={paginationModel}
