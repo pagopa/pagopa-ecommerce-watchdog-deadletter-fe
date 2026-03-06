@@ -96,7 +96,7 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
       setSnackbarOpen(true);
       return;
     }
-    
+
     if (editingNoteId && editDraft.trim() && onEditNote) {
       onEditNote(activeNote!, editDraft);
     }
@@ -347,7 +347,7 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
         ) : (
           <Box sx={{ p: 2, bgcolor: "background.paper" }}>
             <Typography variant="body2" color="error.main" align="center">
-              Limite di {MAX_TRANSACTION_NOTES} note raggiunto. Elimina alcune note per aggiungerne di nuove.
+              Limite di {MAX_TRANSACTION_NOTES} note raggiunto.
             </Typography>
           </Box>
         )}
@@ -394,7 +394,7 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
 
         <Snackbar 
           open={snackbarOpen} 
-          autoHideDuration={6000}
+          autoHideDuration={30000}
           onClose={handleCloseSnackbar}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
