@@ -17,7 +17,7 @@ const mockNotesMap = [
     "transactionId": "6438d77a7fa3448da8baffe420acae77",
     "userId": "mario.rossi",
     "note": "Mock note",
-    "createdAt": "2026-03-01T14:29:42.244Z",
+    "createdAt": new Date().toISOString(),
     "updatedAt": "2026-03-02T10:29:42.244Z"
   },
   {
@@ -219,6 +219,56 @@ describe("TransactionNotesDrawer", () => {
     await waitFor(() => {
       expect(screen.queryByText("Eliminare questa nota?")).not.toBeInTheDocument();
     });
+  });
+
+  it("doesn't show the edit option for expired notes", () => {
+    const expiredNotes = [
+      {
+        noteId: "1",
+        transactionId: mockTransactionId,
+        userId: mockUserId,
+        note: "test",
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+
+    render(<TransactionNotesDrawer {...defaultProps} notes={expiredNotes} />);
+
+    const menuButton = screen.queryByRole("button", { name: /opzioni nota/i });
+    expect(menuButton).not.toBeInTheDocument();
+  });
+
+  it("blocks editing after the time limit has expired and shows a snackbar", async () => {
+    const user = userEvent.setup();
+    
+    const realDateNow = Date.now.bind(globalThis.Date);
+    const startTime = realDateNow();
+    globalThis.Date.now = jest.fn(() => startTime);
+
+    render(<TransactionNotesDrawer {...defaultProps} />);
+
+    const menuButton = screen.getByRole("button", { name: /opzioni nota/i });
+    await user.click(menuButton);
+    const editMenuItem = await screen.findByText(/Modifica/i);
+    await user.click(editMenuItem);
+
+    const editInput = screen.getByDisplayValue(mockNotesMap[0].note);
+    await user.type(editInput, " - new text");
+    
+    // Advance time by 61 minutes to exceed the 1-hour limit
+    globalThis.Date.now = jest.fn(() => startTime + 61 * 60 * 1000);
+
+    const saveButton = screen.getByRole("button", { name: /Salva/i });
+    await user.click(saveButton);
+
+    expect(mockOnEditNote).not.toHaveBeenCalled();
+    
+    const snackbarMessage = await screen.findByText(/Questa nota non può più essere modificata o eliminata./i);
+    expect(snackbarMessage).toBeInTheDocument();
+
+    // reset Date.now to the original implementation
+    globalThis.Date.now = realDateNow;
   });
 
 });
