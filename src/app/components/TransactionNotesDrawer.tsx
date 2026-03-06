@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Drawer,Box, Typography, IconButton, TextField, Button, Divider, Stack, Paper, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import { Drawer,Box, Typography, IconButton, TextField, Button, Divider, Stack, Paper, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, Alert } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SendIcon from "@mui/icons-material/Send";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { TransactionNote } from "../types/TransactionNotes";
-import { dateTimeLocale, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
+import { dateTimeLocale, dateTimeFormatOptions } from "../utils/datetimeFormatConfig";
 
 interface TransactionNotesDrawerProps {
   open: boolean;
@@ -41,13 +41,29 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
   const MAX_TRANSACTION_NOTES = 10;
   const MAX_NOTE_LENGTH = 300;
+  const NOTE_UPDATABLE_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
+
+  const isNoteUpdatable = (note: TransactionNote, now: number = Date.now()) => {
+    return (now - new Date(note.createdAt).getTime()) < NOTE_UPDATABLE_WINDOW;
+  }
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
     note: TransactionNote,
   ) => {
+    const now = Date.now();
+    setCurrentTime(now);
+
+    if (!isNoteUpdatable(note, now)) {
+      setSnackbarOpen(true);
+      return;
+    }
+
     setAnchorEl(event.currentTarget);
     setActiveNote(note);
   };
@@ -72,12 +88,19 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
   };
 
   const handleSaveEdit = () => {
+    const now = Date.now();
+    setCurrentTime(now);
+
+    if (activeNote && !isNoteUpdatable(activeNote, now)) {
+      handleCancelEdit();
+      setSnackbarOpen(true);
+      return;
+    }
+    
     if (editingNoteId && editDraft.trim() && onEditNote) {
       onEditNote(activeNote!, editDraft);
     }
-    setEditingNoteId(null);
-    setEditDraft("");
-    setActiveNote(null);
+    handleCancelEdit();
   };
 
   const handleCancelEdit = () => {
@@ -92,17 +115,29 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
   };
 
   const handleConfirmDelete = () => {
-    console.log("Nota da eliminare:", activeNote);
+    const now = Date.now();
+    setCurrentTime(now);
     if (activeNote) {
+      if (!isNoteUpdatable(activeNote, now)) {
+        handleCancelDelete();
+        setSnackbarOpen(true);
+        return;
+      }
       onDeleteNote(activeNote);
     }
-    setDeleteDialogOpen(false);
-    setActiveNote(null);
+    handleCancelDelete();
   };
 
   const handleCancelDelete = () => {
     setDeleteDialogOpen(false);
     setActiveNote(null);
+  };
+
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
@@ -157,13 +192,18 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
             </Box>
           ) : (
             <Stack spacing={2}>
-              {notes.map((note) => (
-                <Paper
-                  key={note.noteId}
-                  elevation={0}
-                  sx={{
-                    p: 1.5,
-                    borderRadius: 2,
+              {notes.map((note) => {
+                const createdAtDate = new Date(note.createdAt);
+                const isEditable = note.userId === userId && 
+                  isNoteUpdatable(note, currentTime);
+
+                return (
+                  <Paper
+                    key={note.noteId}
+                    elevation={0}
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 2,
                     border: "1px solid",
                     borderColor: "divider",
                   }}
@@ -190,10 +230,10 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
                         color="text.secondary"
                         sx={{ fontSize: "0.7rem" }}
                       >
-                        {new Date(note.createdAt).toLocaleString(dateTimeLocale, utcDateTimeFormatOptions)}
+                        {createdAtDate.toLocaleString(dateTimeLocale, dateTimeFormatOptions)}
                       </Typography>
                     </Box>
-                    {note.userId === userId &&
+                    { isEditable &&
                       editingNoteId !== note.noteId && (
                         <IconButton
                           size="small"
@@ -261,8 +301,9 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
                       {note.note}
                     </Typography>
                   )}
-                </Paper>
-              ))}
+                  </Paper>
+                )}
+              )}
             </Stack>
           )}
         </Box>
@@ -350,6 +391,22 @@ export default function TransactionNotesDrawer(props: Readonly<TransactionNotesD
             </Button>
           </DialogActions>
         </Dialog>
+
+        <Snackbar 
+          open={snackbarOpen} 
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert 
+            onClose={handleCloseSnackbar} 
+            severity="warning" 
+            sx={{ width: '100%' }}
+            variant="filled"
+          >
+            Questa nota non può più essere modificata o eliminata.
+          </Alert>
+        </Snackbar>
 
       </Box>
     </Drawer>
