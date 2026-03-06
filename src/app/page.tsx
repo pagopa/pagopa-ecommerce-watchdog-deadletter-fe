@@ -13,7 +13,8 @@ import {
   fetchActions,
   fetchActionsByTransactionId,
   fetchAddActionToDeadletterTransaction,
-  fetchDeadletterTransactionsV2
+  fetchDeadletterTransactionsV2,
+  fetchNotesByTransactionIds
 } from "./utils/api/client";
 import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
@@ -27,6 +28,7 @@ import SectionHeader from "./components/SectionHeader";
 import TransactionsListSection from "./components/TransactionListSection";
 import LoginDialog from "./components/LoginDialog";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
+import { TransactionNote } from "./types/TransactionNotes";
 
 
 
@@ -37,6 +39,7 @@ export default function Home() {
 
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
   const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
+  const [notesMap, setNotesMap] = useState<Map<string, TransactionNote[]>>(new Map());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
@@ -138,6 +141,16 @@ export default function Home() {
       const transactionsList = data ? data.deadletterTransactions : [];
       setTransactions(transactionsList);
       setTotalResults((data?.page?.total ?? 0) * pageSize);
+
+      const transactionIds = new Set(transactionsList.map(t => t.transactionId));
+      if(transactionIds.size > 0) {
+        const notesData = await fetchNotesByTransactionIds(token.current, Array.from(transactionIds));
+        const notesMap: Map<string, TransactionNote[]> = new Map();
+        for (const note of notesData) {
+          notesMap.set(note.transactionId, note.notesList);
+        }
+        setNotesMap(notesMap);
+      }
 
       const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       await Promise.all(
@@ -288,6 +301,7 @@ export default function Home() {
 
             <TransactionsListSection
               transactions={transactions}
+              notesMap={notesMap}
               actionsMap={actionsMap}
               actions={actions}
               handleOpenDialog={handleOpenDialog}

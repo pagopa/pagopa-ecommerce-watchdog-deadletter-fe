@@ -8,6 +8,7 @@ import {
   fetchAddActionToDeadletterTransaction,
   fetchAuthentication,
   fetchDeadletterTransactionsV2,
+  fetchNotesByTransactionIds,
 } from "../../api/client";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 
@@ -48,6 +49,17 @@ const mockDeadletterResponse: DeadletterResponse = {
 } as DeadletterResponse;
 
 const mockActionTypeArray: ActionType[] = [mockActionType];
+
+const mockTransactionNotesArray = [
+  {
+    noteId: "note-id-1",
+    transactionId: mockTransactionId,
+    userId: "user1",
+    note: "Note 1",
+    createdAt: "2023-10-01T12:00:00Z",
+    updatedAt: "2023-10-01T12:00:00Z",
+  },
+];  
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -280,6 +292,48 @@ describe("fetchActions", () => {
       .mockImplementation(() => { });
 
     const result = await fetchActions(mockToken);
+
+    expect(result).toEqual([]);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("fetchNotesByTransactionIds", () => {
+  it("should return TransactionNotes array on a successful fetch (200)", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue(mockTransactionNotesArray),
+    } as unknown as Response);
+
+    const result = await fetchNotesByTransactionIds(mockToken, [mockTransactionId]);
+
+    expect(result).toEqual(mockTransactionNotesArray);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/notes`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mockToken}`,
+        },
+        body: JSON.stringify({ transactionIds: [mockTransactionId] }),
+      }
+    );
+  });
+
+  it("should return an empty array on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error("Failed to fetch transaction notes for transactionIds: " + mockTransactionId);
+
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const result = await fetchNotesByTransactionIds(mockToken, [mockTransactionId]);
 
     expect(result).toEqual([]);
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);

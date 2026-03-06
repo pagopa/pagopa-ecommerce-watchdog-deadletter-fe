@@ -1,6 +1,6 @@
 import Home from "../page"
 import { render, screen, within } from '@testing-library/react';
-import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2 } from '../utils/api/client';
+import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2, fetchNotesByTransactionIds } from '../utils/api/client';
 import React from "react";
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
@@ -17,6 +17,7 @@ jest.mock('../utils/api/client', () => ({
   fetchActionsByTransactionId: jest.fn(),
   fetchAddActionToDeadletterTransaction: jest.fn(),
   fetchDeadletterTransactionsV2: jest.fn(),
+  fetchNotesByTransactionIds: jest.fn(),
 }));
 
 // Mock for ResizeObserver
@@ -40,6 +41,7 @@ const mockedFetchActions = fetchActions as jest.Mock;
 const mockedFetchActionsByTransactionId = fetchActionsByTransactionId as jest.Mock;
 const mockedFetchAddActionToDeadletterTransaction = fetchAddActionToDeadletterTransaction as jest.Mock;
 const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
+const mockedFetchNotesByTransactionIds = fetchNotesByTransactionIds as jest.Mock;
 const mockGetTokenFromUrl = getTokenFromUrl as jest.Mock;
 const mockedDecodeJwt = decodeJwt as jest.Mock
 
@@ -73,6 +75,7 @@ describe('Home', () => {
     mockedFetchActionsByTransactionId.mockReset();
     mockedFetchAddActionToDeadletterTransaction.mockReset();
     mockedFetchDeadletterTransactionsV2.mockReset();
+    mockedFetchNotesByTransactionIds.mockReset();
     mockGetTokenFromUrl.mockReset();
     mockedDecodeJwt.mockReset();
 
@@ -204,6 +207,7 @@ describe('Home', () => {
 
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([]);
 
@@ -234,6 +238,7 @@ describe('Home', () => {
 
 
     expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
+    expect(mockedFetchNotesByTransactionIds).toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).toHaveBeenCalled();
 
   });
@@ -252,6 +257,7 @@ describe('Home', () => {
 
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(null);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([]);
 
@@ -284,12 +290,14 @@ describe('Home', () => {
     expect(await screen.findByText(/Nessuna transazione deadletter trovata/i)).toBeInTheDocument();
 
     expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
+    expect(mockedFetchNotesByTransactionIds).not.toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
   });
 
   it('check if not logged no table or charts is showed', async () => {
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([]);
 
@@ -313,6 +321,7 @@ describe('Home', () => {
     expect(endDatePicker).toHaveValue("2025-11-08");
 
     expect(mockedFetchDeadletterTransactionsV2).not.toHaveBeenCalled();
+    expect(mockedFetchNotesByTransactionIds).not.toHaveBeenCalled();
     expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
 
   });
@@ -332,6 +341,7 @@ describe('Home', () => {
 
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
     mockedFetchActionsByTransactionId.mockResolvedValue([]);
     mockedFetchActions.mockResolvedValue([{ value: "testAction", type: "FINAL" }]);
     mockedFetchAddActionToDeadletterTransaction.mockResolvedValue({ response: "200" });

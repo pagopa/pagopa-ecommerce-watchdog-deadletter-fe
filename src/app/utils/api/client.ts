@@ -1,6 +1,7 @@
 import { ActionType, DeadletterAction } from "@/app/types/DeadletterAction";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authentication";
+import { TransactionNotes } from "@/app/types/TransactionNotes";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST}/authenticate`, {
@@ -84,6 +85,25 @@ export const fetchActions = async (token: string): Promise<ActionType[]> => {
     });
     if (!res.ok) throw new Error(`Failed to fetch actions`);
     return await res.json();
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
+export const fetchNotesByTransactionIds = async (token: string, transactionIds: string[]): Promise<TransactionNotes[]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/notes`, {
+      method: "POST", // GET with body payload
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ "transactionIds": transactionIds }),
+    });
+
+    if (!res.ok) throw new Error(`Failed to fetch transaction notes for transactionIds: ${transactionIds.join(", ")}`);
+    return res.json();
   } catch (e) {
     console.error(e);
     return [];
