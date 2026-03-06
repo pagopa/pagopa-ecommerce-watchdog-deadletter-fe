@@ -9,8 +9,12 @@ interface TransactionsListSectionProps {
   notesMap: Map<string, TransactionNote[]>;
   actionsMap: Map<string, Map<string, DeadletterAction>>;
   actions: ActionType[];
+  userId: string;
   handleOpenDialog: (content: object) => void;
   handleAddActionToTransaction: (actionValue: string, id: string) => void;
+  handleAddNote: (transactionId: string, text: string) => void;
+  handleEditNote: (currentNote: TransactionNote, newText: string) => void;
+  handleDeleteNote: (note: TransactionNote) => void;
   rowCount?: number;
   paginationMode?: "client" | "server";
   paginationModel?: { page: number; pageSize: number };
@@ -24,7 +28,10 @@ export default function TransactionsListSection(props: Readonly<TransactionsList
     actionsMap,
     actions,
     handleOpenDialog,
-    handleAddActionToTransaction
+    handleAddActionToTransaction,
+    handleAddNote,
+    handleEditNote,
+    handleDeleteNote
   } = props;
 
   return (
@@ -35,8 +42,12 @@ export default function TransactionsListSection(props: Readonly<TransactionsList
           notesMap={notesMap}
           actionsMap={actionsMap}
           actions={actions}
+          userId={props.userId}
           handleOpenDialog={handleOpenDialog}
           handleAddActionToTransaction={handleAddActionToTransaction}
+          handleAddNote={handleAddNote}
+          handleEditNote={handleEditNote}
+          handleDeleteNote={handleDeleteNote}
           rowCount={props.rowCount}
           paginationMode={props.paginationMode}
           paginationModel={props.paginationModel}
