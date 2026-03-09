@@ -1,6 +1,6 @@
 import Home from "../page"
-import { render, screen, within } from '@testing-library/react';
-import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2, fetchNotesByTransactionIds } from '../utils/api/client';
+import { render, screen, within, waitFor } from '@testing-library/react';
+import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2, fetchNotesByTransactionIds, addNoteToTransaction, updateTransactionNote, deleteTransactionNote } from '../utils/api/client';
 import React from "react";
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
@@ -18,6 +18,9 @@ jest.mock('../utils/api/client', () => ({
   fetchAddActionToDeadletterTransaction: jest.fn(),
   fetchDeadletterTransactionsV2: jest.fn(),
   fetchNotesByTransactionIds: jest.fn(),
+  addNoteToTransaction: jest.fn(),
+  updateTransactionNote: jest.fn(),
+  deleteTransactionNote: jest.fn(),
 }));
 
 // Mock for ResizeObserver
@@ -42,6 +45,9 @@ const mockedFetchActionsByTransactionId = fetchActionsByTransactionId as jest.Mo
 const mockedFetchAddActionToDeadletterTransaction = fetchAddActionToDeadletterTransaction as jest.Mock;
 const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
 const mockedFetchNotesByTransactionIds = fetchNotesByTransactionIds as jest.Mock;
+const mockedAddNoteToTransaction = addNoteToTransaction as jest.Mock;
+const mockedUpdateTransactionNote = updateTransactionNote as jest.Mock;
+const mockedDeleteTransactionNote = deleteTransactionNote as jest.Mock;
 const mockGetTokenFromUrl = getTokenFromUrl as jest.Mock;
 const mockedDecodeJwt = decodeJwt as jest.Mock
 
@@ -378,5 +384,130 @@ describe('Home', () => {
 
   });
 
+  it('should add a note and update the UI', async () => {
+    const tokenMock = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    mockSessionStorage.setItem("jwtUser", JSON.stringify({ name: 'Mario', surname: 'Rossi', email: 'mario.rossi@example.com', id: 'testId' }));
+
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([]);
+
+    const noteText = "Test add";
+    const mockNewNote = { 
+      noteId: "new-note-1", 
+      transactionId: deadletterResponse.deadletterTransactions[0].transactionId, 
+      note: noteText, 
+      userId: "testId", 
+      createdAt: new Date().toISOString() 
+    };
+    mockedAddNoteToTransaction.mockResolvedValue(mockNewNote);
+
+    renderComponent();
+
+    await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
+    await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
+    await screen.findByRole("grid");
+
+    const openDrawerButton = screen.getAllByTestId("transaction-add-note-icon")[0];
+    await userEvent.click(openDrawerButton);
+
+    const noteInput = await screen.findByPlaceholderText("Scrivi una nota...");
+    await userEvent.type(noteInput, noteText);
+
+    const addButton = screen.getByRole("button", { name: /Aggiungi nota/i });
+    await userEvent.click(addButton);
+
+    expect(mockedAddNoteToTransaction).toHaveBeenCalledWith(tokenMock, expect.any(String), noteText);
+    const addedNotes = await screen.findAllByText(noteText);
+    expect(addedNotes.length).toBeGreaterThan(0);
+    expect(addedNotes[0]).toBeInTheDocument();
+  });
+
+
+  it('should edit a note and update the UI', async () => {
+    const tokenMock = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    mockSessionStorage.setItem("jwtUser", JSON.stringify({ name: 'Mario', surname: 'Rossi', email: 'mario.rossi@example.com', id: 'testId' }));
+
+    const transactionId = deadletterResponse.deadletterTransactions[0].transactionId;
+
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([{
+      transactionId: transactionId,
+      notesList: [{ noteId: "note-1", transactionId: transactionId, note: "Original text", userId: "testId", createdAt: new Date().toISOString() }]
+    }]);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([]);
+    mockedUpdateTransactionNote.mockResolvedValue(true);
+
+    renderComponent();
+
+    await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
+    await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
+    await screen.findByRole("grid");
+
+    const openDrawerButton = screen.getAllByTestId("transaction-notes-icon")[0];
+    await userEvent.click(openDrawerButton);
+
+    const menuButtons = await screen.findAllByRole("button", { name: /opzioni nota/i });
+    await userEvent.click(menuButtons[0]);
+
+    const editMenuItem = await screen.findByText(/Modifica/i);
+    await userEvent.click(editMenuItem);
+
+    const editInput = screen.getByDisplayValue("Original text");
+    await userEvent.clear(editInput);
+    await userEvent.type(editInput, "New text");
+
+    const saveButton = screen.getByRole("button", { name: /Salva/i });
+    await userEvent.click(saveButton);
+
+    expect(mockedUpdateTransactionNote).toHaveBeenCalledWith(tokenMock, transactionId, "note-1", "New text");
+    expect(await screen.findByText("New text")).toBeInTheDocument();
+  });
+
+
+  it('should delete a note and remove it from the UI', async () => {
+    const tokenMock = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    mockSessionStorage.setItem("jwtUser", JSON.stringify({ name: 'Mario', surname: 'Rossi', email: 'mario.rossi@example.com', id: 'testId' }));
+
+    const trxId = deadletterResponse.deadletterTransactions[0].transactionId;
+
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([{
+      transactionId: trxId,
+      notesList: [{ noteId: "note-1", transactionId: trxId, note: "Test delete", userId: "testId", createdAt: new Date().toISOString() }]
+    }]);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([]);
+    mockedDeleteTransactionNote.mockResolvedValue(true);
+
+    renderComponent();
+
+    await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
+    await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
+    await screen.findByRole("grid");
+
+    const openDrawerButton = screen.getAllByTestId("transaction-notes-icon")[0];
+    await userEvent.click(openDrawerButton);
+
+    const menuButtons = await screen.findAllByRole("button", { name: /opzioni nota/i });
+    await userEvent.click(menuButtons[0]);
+
+    const deleteMenuItem = await screen.findByText(/Elimina/i);
+    await userEvent.click(deleteMenuItem);
+
+    const confirmButtons = screen.getAllByRole("button", { name: /Elimina/i });
+    await userEvent.click(confirmButtons[0]); 
+
+    expect(mockedDeleteTransactionNote).toHaveBeenCalledWith(tokenMock, trxId, "note-1");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Test delete")).not.toBeInTheDocument();
+    });
+  });
 
 })
