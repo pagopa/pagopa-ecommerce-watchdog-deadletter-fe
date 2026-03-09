@@ -8,6 +8,10 @@ import {
   fetchAddActionToDeadletterTransaction,
   fetchAuthentication,
   fetchDeadletterTransactionsV2,
+  fetchNotesByTransactionIds,
+  addNoteToTransaction,
+  updateTransactionNote,
+  deleteTransactionNote 
 } from "../../api/client";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 
@@ -48,6 +52,17 @@ const mockDeadletterResponse: DeadletterResponse = {
 } as DeadletterResponse;
 
 const mockActionTypeArray: ActionType[] = [mockActionType];
+
+const mockTransactionNotesArray = [
+  {
+    noteId: "note-id-1",
+    transactionId: mockTransactionId,
+    userId: "user1",
+    note: "Note 1",
+    createdAt: "2023-10-01T12:00:00Z",
+    updatedAt: "2023-10-01T12:00:00Z",
+  },
+];  
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -282,6 +297,177 @@ describe("fetchActions", () => {
     const result = await fetchActions(mockToken);
 
     expect(result).toEqual([]);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("fetchNotesByTransactionIds", () => {
+  it("should return TransactionNotes array on a successful fetch (200)", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue(mockTransactionNotesArray),
+    } as unknown as Response);
+
+    const result = await fetchNotesByTransactionIds(mockToken, [mockTransactionId]);
+
+    expect(result).toEqual(mockTransactionNotesArray);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/notes`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mockToken}`,
+        },
+        body: JSON.stringify({ transactionIds: [mockTransactionId] }),
+      }
+    );
+  });
+
+  it("should return an empty array on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error("Failed to fetch transaction notes for transactionIds: " + mockTransactionId);
+
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const result = await fetchNotesByTransactionIds(mockToken, [mockTransactionId]);
+
+    expect(result).toEqual([]);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("addNoteToTransaction", () => {
+  it("should return TransactionNote on a successful fetch (200)", async () => {
+    const mockNote = mockTransactionNotesArray[0];
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue(mockNote),
+    } as unknown as Response);
+
+    const result = await addNoteToTransaction(mockToken, mockNote.transactionId, mockNote.note);
+
+    expect(result).toEqual(mockNote);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/${mockNote.transactionId}/notes`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mockToken}`,
+        },
+        body: JSON.stringify({ note: mockNote.note }),
+      }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    const mockNote = mockTransactionNotesArray[0];
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error("Failed to add note to transaction with id: " + mockNote.transactionId);
+
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const result = await addNoteToTransaction(mockToken, mockNote.transactionId, mockNote.note);
+
+    expect(result).toBeNull();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("updateTransactionNote", () => {
+  it("should return Response on a successful fetch (200)", async () => {
+    const mockNote = mockTransactionNotesArray[0];
+    const mockResponse = {
+      ok: true,
+      status: 201,
+      json: jest.fn().mockResolvedValue({}),
+    } as unknown as Response;
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse);
+
+    const result = await updateTransactionNote(mockToken, mockNote.transactionId, mockNote.noteId, mockNote.note);
+
+    expect(result).toEqual(mockResponse);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/${mockNote.transactionId}/notes/${mockNote.noteId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mockToken}`,
+        },
+        body: JSON.stringify({ note: mockNote.note }),
+      }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    const mockNote = mockTransactionNotesArray[0];
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error(`Failed to update note with id: ${mockNote.noteId} for transaction with id: ${mockNote.transactionId}`);
+
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const result = await updateTransactionNote(mockToken, mockNote.transactionId, mockNote.noteId, mockNote.note);
+
+    expect(result).toBeNull();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("deleteTransactionNote", () => {
+  it("should return Response on a successful fetch (200)", async () => {
+    const mockNote = mockTransactionNotesArray[0];
+    const mockResponse = {
+      ok: true,
+      status: 204,
+    } as unknown as Response;
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse);
+
+    const result = await deleteTransactionNote(mockToken, mockNote.transactionId, mockNote.noteId);
+
+    expect(result).toEqual(mockResponse);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/${mockNote.transactionId}/notes/${mockNote.noteId}`,
+      {
+        method: "DELETE",
+        headers: {  Authorization: `Bearer ${mockToken}` },
+      }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    const mockNote = mockTransactionNotesArray[0];
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error(`Failed to delete note with id: ${mockNote.noteId} for transaction with id: ${mockNote.transactionId}`);
+
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const result = await deleteTransactionNote(mockToken, mockNote.transactionId, mockNote.noteId);
+
+    expect(result).toBeNull();
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);
   });
 });

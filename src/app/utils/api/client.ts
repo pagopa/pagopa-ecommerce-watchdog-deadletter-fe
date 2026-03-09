@@ -1,6 +1,7 @@
 import { ActionType, DeadletterAction } from "@/app/types/DeadletterAction";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authentication";
+import { TransactionNote, TransactionNotes } from "@/app/types/TransactionNotes";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST}/authenticate`, {
@@ -87,5 +88,79 @@ export const fetchActions = async (token: string): Promise<ActionType[]> => {
   } catch (e) {
     console.error(e);
     return [];
+  }
+};
+
+export const fetchNotesByTransactionIds = async (token: string, transactionIds: string[]): Promise<TransactionNotes[]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/notes`, {
+      method: "POST", // GET with body payload
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ "transactionIds": transactionIds }),
+    });
+
+    if (!res.ok) throw new Error(`Failed to fetch transaction notes for transactionIds: ${transactionIds.join(", ")}`);
+    return res.json();
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
+export const addNoteToTransaction = async (token: string, transactionId: string, note: string): Promise<TransactionNote | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/${transactionId}/notes`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ "note": note }),
+    });
+
+    if (!res.ok) throw new Error(`Failed to add note to transaction with id: ${transactionId}`);
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const updateTransactionNote = async (token: string, transactionId: string, noteId: string, note: string): Promise<Response | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/${transactionId}/notes/${noteId}`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ "note": note }),
+    });
+
+    if (!res.ok) throw new Error(`Failed to update note with id: ${noteId} for transaction with id: ${transactionId}`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const deleteTransactionNote = async (token: string, transactionId: string, noteId: string): Promise<Response | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/${transactionId}/notes/${noteId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+
+    if (!res.ok) throw new Error(`Failed to delete note with id: ${noteId} for transaction with id: ${transactionId}`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
   }
 };

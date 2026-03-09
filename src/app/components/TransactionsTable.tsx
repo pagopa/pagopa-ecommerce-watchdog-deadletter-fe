@@ -1,23 +1,47 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
-import { Box, Button, Chip, Divider, MenuItem, Select } from "@mui/material";
+import { Box, Button, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
-import { dateTimeLocale, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
+import { dateTimeLocale, extendedMonthDateFormatOptions, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
+import { TransactionNote } from "../types/TransactionNotes";
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import AddCommentIcon from '@mui/icons-material/AddComment';
+import { useState } from "react";
+import TransactionNotesDrawer from "./TransactionNotesDrawer";
 
 export function TransactionsTable(
   props: Readonly<{
     transactions: Transaction[];
+    notesMap: Map<string, TransactionNote[]>;
     actionsMap: Map<string, Map<string, DeadletterAction>>;
     actions: ActionType[];
+    userId: string;
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
+    handleAddNote: (transactionId: string, text: string) => void;
+    handleEditNote: (currentNote: TransactionNote, newText: string) => void;
+    handleDeleteNote: (note: TransactionNote) => void;
     rowCount?: number;
     paginationMode?: "client" | "server";
     paginationModel?: { page: number; pageSize: number };
     onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
+  
+  const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
+    open: false,
+    transactionId: null,
+  });
+
+  const handleOpenDrawer = (transactionId: string) => {
+    setDrawerConfig({ open: true, transactionId });
+  };
+
+  const handleCloseDrawer = () => {
+    setDrawerConfig((prev) => ({ ...prev, open: false }));
+  };
+
   const columns: GridColDef[] = [
     {
       field: "rowNumber",
@@ -101,7 +125,7 @@ export function TransactionsTable(
     {
       field: "authorizationRequestId",
       headerName: "authorizationRequestId",
-      flex: 1,
+      flex: 0.8,
       filterable: true,
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
@@ -210,9 +234,9 @@ export function TransactionsTable(
             {/* Storico azioni */}
             {transactionActions.length > 0 && (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-                {transactionActions.map((deadletterAction, idx) => (
+                {transactionActions.map((deadletterAction) => (
                   <Chip
-                    key={idx}
+                    key={deadletterAction.id}
                     label={getDeadletterActionAsString(deadletterAction)}
                     size="small"
                     color={
@@ -245,6 +269,80 @@ export function TransactionsTable(
         );
       },
     },
+    {
+      field: 'notes',
+      headerName: 'Note',
+      flex: 1,
+      minWidth: 250,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => {
+        const id = params.row.transactionId; 
+        const transactionNotes = props.notesMap.get(id) || [];
+        
+        const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
+        const latestNote = hasNotes ? transactionNotes.at(- 1) : null;
+
+        const tooltipContent = latestNote ? (
+          <Box sx={{ p: 0.5 }}>
+            {/* Tooltip header: userId + date */}
+            <Typography variant="caption" sx={{ color: 'secondary.light', display: 'block', mb: 1, fontWeight: 'bold' }}>
+              Scritto da {latestNote.userId} • {new Date(latestNote.createdAt).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}
+            </Typography>
+            {/* Complete note text */}
+            <Typography variant="body2" sx={{ color: 'common.white' }}>
+              {latestNote.note}
+            </Typography>
+          </Box>
+        ) : null;
+
+        return (
+          <Stack 
+            direction="row" 
+            alignItems="center" 
+            justifyContent="space-between" 
+            sx={{ width: '100%', height: '100%', pr: 1 }}
+          >
+            <Tooltip 
+              title={tooltipContent} 
+              placement="bottom-start" 
+              arrow 
+              enterDelay={400}
+            >
+              <Box sx={{ flexGrow: 1, overflow: 'hidden', mr: 1, cursor: 'pointer' }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: hasNotes ? 'text.primary' : 'text.disabled',
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2, // Max visible rows
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'normal'
+                  }}
+                >
+                  {latestNote?.note}
+                </Typography>
+              </Box>
+            </Tooltip>
+            <IconButton 
+              size="small" 
+              onClick={() => handleOpenDrawer(id)}
+              sx={{ flexShrink: 0 }}
+            >
+              {hasNotes ? (
+                <Badge data-testid="transaction-notes-badge" badgeContent={transactionNotes.length} color="primary">
+                  <ChatBubbleOutlineIcon data-testid="transaction-notes-icon" fontSize="small" />
+                </Badge>
+              ) : (
+                <AddCommentIcon data-testid="transaction-add-note-icon" fontSize="small" color="primary" />
+              )}
+            </IconButton>
+          </Stack>
+        );
+      }
+    },
   ];
 
   return (
@@ -261,6 +359,14 @@ export function TransactionsTable(
       <DataGrid
         rows={props.transactions}
         columns={columns}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              paymentEndToEndId: false,
+              Amount: false,
+            },
+          },
+        }}
         getRowId={(row) => row.transactionId + row.insertionDate}
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
@@ -312,6 +418,16 @@ export function TransactionsTable(
         paginationMode={props.paginationMode}
         paginationModel={props.paginationModel}
         onPaginationModelChange={props.onPaginationModelChange}
+      />
+      <TransactionNotesDrawer
+        open={drawerConfig.open}
+        onClose={handleCloseDrawer}
+        transactionId={drawerConfig.transactionId}
+        notes={drawerConfig.transactionId ? props.notesMap.get(drawerConfig.transactionId) : []}
+        userId={props.userId}
+        onAddNote={props.handleAddNote}
+        onEditNote={props.handleEditNote}
+        onDeleteNote={props.handleDeleteNote}
       />
     </Box>
   );

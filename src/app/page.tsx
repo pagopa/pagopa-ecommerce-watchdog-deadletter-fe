@@ -13,7 +13,11 @@ import {
   fetchActions,
   fetchActionsByTransactionId,
   fetchAddActionToDeadletterTransaction,
-  fetchDeadletterTransactionsV2
+  fetchDeadletterTransactionsV2,
+  fetchNotesByTransactionIds,
+  addNoteToTransaction,
+  updateTransactionNote,
+  deleteTransactionNote,
 } from "./utils/api/client";
 import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
@@ -27,6 +31,7 @@ import SectionHeader from "./components/SectionHeader";
 import TransactionsListSection from "./components/TransactionListSection";
 import LoginDialog from "./components/LoginDialog";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
+import { TransactionNote } from "./types/TransactionNotes";
 
 
 
@@ -37,6 +42,7 @@ export default function Home() {
 
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
   const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
+  const [notesMap, setNotesMap] = useState<Map<string, TransactionNote[]>>(new Map());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
@@ -139,6 +145,16 @@ export default function Home() {
       setTransactions(transactionsList);
       setTotalResults((data?.page?.total ?? 0) * pageSize);
 
+      const transactionIds = new Set(transactionsList.map(t => t.transactionId));
+      if(transactionIds.size > 0) {
+        const notesData = await fetchNotesByTransactionIds(token.current, Array.from(transactionIds));
+        const notesMap: Map<string, TransactionNote[]> = new Map();
+        for (const note of notesData) {
+          notesMap.set(note.transactionId, note.notesList);
+        }
+        setNotesMap(notesMap);
+      }
+
       const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       await Promise.all(
         transactionsList.map(async (transaction) => {
@@ -188,6 +204,66 @@ export default function Home() {
       console.error("Error fetching all for export", e);
       return [];
     }
+  };
+
+
+  const handleAddNote = (transactionId: string, text: string) => {
+    if(!token.current) return;
+
+    addNoteToTransaction(token.current, transactionId, text).then((newNote) => {
+      if (!newNote) return;
+      setNotesMap((prev) => {
+        const newMap = new Map(prev);
+        const transactionNotes = newMap.get(transactionId) || [];
+        newMap.set(transactionId, [...transactionNotes, newNote]);
+        return newMap;
+      });
+    });
+  };
+
+  const handleEditNote = (currentNote: TransactionNote, newText: string) => {
+    if(!token.current) return;
+
+    const transactionId = currentNote.transactionId;
+    const noteId = currentNote.noteId;
+
+    updateTransactionNote(token.current, currentNote.transactionId, currentNote.noteId, newText).then((res) => {
+      if (!res) return;
+      const newMap = new Map(notesMap);
+      const transactionNotes = newMap.get(transactionId)!;
+
+      const updatedNotes = transactionNotes.map((note) => {
+        if (note.noteId === noteId) {
+          return { ...note, note: newText };
+        }
+        return note;
+      });
+
+      newMap.set(transactionId, updatedNotes);
+      setNotesMap(newMap);
+    });
+  };
+
+  const handleDeleteNote = (noteToDelete: TransactionNote) => {
+    if(!token.current) return;
+
+    const transactionId = noteToDelete.transactionId;
+    const noteId = noteToDelete.noteId;
+
+    deleteTransactionNote(token.current, transactionId, noteId).then((res) => {
+      if (!res) return;
+      const newMap = new Map(notesMap);
+      const transactionNotes = newMap.get(transactionId)!;
+
+      const updatedNotes = transactionNotes.filter((note) => note.noteId !== noteId);
+      if (updatedNotes.length === 0) {
+        newMap.delete(transactionId);
+      } else {
+        newMap.set(transactionId, updatedNotes);
+      }
+
+      setNotesMap(newMap);
+    });
   };
 
   const handleLogout = () => {
@@ -288,10 +364,15 @@ export default function Home() {
 
             <TransactionsListSection
               transactions={transactions}
+              notesMap={notesMap}
               actionsMap={actionsMap}
               actions={actions}
+              userId={jwtUser?.id || ""}
               handleOpenDialog={handleOpenDialog}
               handleAddActionToTransaction={handleAddActionToTransaction}
+              handleAddNote={handleAddNote}
+              handleEditNote={handleEditNote}
+              handleDeleteNote={handleDeleteNote}
               rowCount={totalResults}
               paginationMode="server"
               paginationModel={paginationModel}
