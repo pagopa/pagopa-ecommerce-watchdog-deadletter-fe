@@ -75,14 +75,18 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     label: "Tutte le transazioni",
     description: "Tutte le transazioni nel range selezionato",
     filter: () => true,
-    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'paymentEndToEndId'],
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'paymentEndToEndId', 'authorizationRequestId', "Amount"],
     getColumnValue: (transaction, column) => {
       if (column === 'insertionDate') {
         const date = transaction.insertionDate;
         if (!date) return '';
         const dateObj = new Date(date);
-        return dateObj.toISOString().split('T')[0];
-      }
+        return dateObj.toISOString().split('.')[0];
+      } else if (column === 'authorizationRequestId') {
+        return transaction.eCommerceDetails?.transactionInfo?.authorizationRequestId || '';
+      } else if (column === 'Amount') {
+        return transaction.eCommerceDetails?.transactionInfo?.grandTotal.toString() || '';
+      } 
       return transaction[column as keyof Transaction] as string || '';
     },
     fileNamePrefix: 'Tutte_Transazioni'

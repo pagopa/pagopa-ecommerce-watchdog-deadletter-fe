@@ -166,7 +166,7 @@ describe('csvExportConfig', () => {
   describe('getColumnValue function', () => {
     const mockTransaction: Transaction = {
       transactionId: 'tx-123',
-      insertionDate: '2024-12-06T15:30:00Z',
+      insertionDate: '2024-12-06T15:30:00.025745261Z',
       paymentToken: 'token-abc',
       paymentEndToEndId: 'e2e-xyz',
       gatewayAuthorizationStatus: 'PENDING',
@@ -234,7 +234,7 @@ describe('csvExportConfig', () => {
     describe('for all_range', () => {
       it('should format insertionDate to YYYY-MM-DD', () => {
         const result = exportConfigs.all_range.getColumnValue(mockTransaction, 'insertionDate');
-        expect(result).toBe('2024-12-06');
+        expect(result).toBe('2024-12-06T15:30:00');
       });
 
       it('should return all requested columns correctly', () => {
@@ -281,7 +281,9 @@ describe('csvExportConfig', () => {
         'pspId',
         'eCommerceStatus',
         'gatewayAuthorizationStatus',
-        'paymentEndToEndId'
+        'paymentEndToEndId',
+        'authorizationRequestId',
+        'Amount'
       ]);
     });
   });
