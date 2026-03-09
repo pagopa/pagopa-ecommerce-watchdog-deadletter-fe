@@ -7,6 +7,8 @@ import { dateTimeLocale, extendedMonthDateFormatOptions, utcDateTimeFormatOption
 import { TransactionNote } from "../types/TransactionNotes";
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AddCommentIcon from '@mui/icons-material/AddComment';
+import { useState } from "react";
+import TransactionNotesDrawer from "./TransactionNotesDrawer";
 
 export function TransactionsTable(
   props: Readonly<{
@@ -14,14 +16,32 @@ export function TransactionsTable(
     notesMap: Map<string, TransactionNote[]>;
     actionsMap: Map<string, Map<string, DeadletterAction>>;
     actions: ActionType[];
+    userId: string;
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
+    handleAddNote: (transactionId: string, text: string) => void;
+    handleEditNote: (currentNote: TransactionNote, newText: string) => void;
+    handleDeleteNote: (note: TransactionNote) => void;
     rowCount?: number;
     paginationMode?: "client" | "server";
     paginationModel?: { page: number; pageSize: number };
     onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
+  
+  const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
+    open: false,
+    transactionId: null,
+  });
+
+  const handleOpenDrawer = (transactionId: string) => {
+    setDrawerConfig({ open: true, transactionId });
+  };
+
+  const handleCloseDrawer = () => {
+    setDrawerConfig((prev) => ({ ...prev, open: false }));
+  };
+
   const columns: GridColDef[] = [
     {
       field: "rowNumber",
@@ -308,6 +328,7 @@ export function TransactionsTable(
             </Tooltip>
             <IconButton 
               size="small" 
+              onClick={() => handleOpenDrawer(id)}
               sx={{ flexShrink: 0 }}
             >
               {hasNotes ? (
@@ -397,6 +418,16 @@ export function TransactionsTable(
         paginationMode={props.paginationMode}
         paginationModel={props.paginationModel}
         onPaginationModelChange={props.onPaginationModelChange}
+      />
+      <TransactionNotesDrawer
+        open={drawerConfig.open}
+        onClose={handleCloseDrawer}
+        transactionId={drawerConfig.transactionId}
+        notes={drawerConfig.transactionId ? props.notesMap.get(drawerConfig.transactionId) : []}
+        userId={props.userId}
+        onAddNote={props.handleAddNote}
+        onEditNote={props.handleEditNote}
+        onDeleteNote={props.handleDeleteNote}
       />
     </Box>
   );

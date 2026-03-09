@@ -13,6 +13,9 @@ jest.mock("@/app/utils/types/DeadletterActionUtils", () => ({
 
 const mockHandleOpenDialog = jest.fn();
 const mockHandleAddActionToTransaction = jest.fn();
+const mockHandleAddNote = jest.fn();
+const mockHandleEditNote = jest.fn();
+const mockHandleDeleteNote = jest.fn();
 
 const finalAction: ActionType = {
   value: "Stornata",
@@ -234,6 +237,10 @@ const defaultProps = {
   actions: mockActionTypes,
   handleOpenDialog: mockHandleOpenDialog,
   handleAddActionToTransaction: mockHandleAddActionToTransaction,
+  handleAddNote: mockHandleAddNote,
+  handleEditNote: mockHandleEditNote,
+  handleDeleteNote: mockHandleDeleteNote,
+  userId: "test.user",
 };
 
 const renderComponent = (props = {}) => {
