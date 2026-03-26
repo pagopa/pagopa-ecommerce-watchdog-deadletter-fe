@@ -28,7 +28,7 @@ export function TransactionsTable(
     onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
-  
+
   const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
     open: false,
     transactionId: null,
@@ -277,9 +277,9 @@ export function TransactionsTable(
       sortable: false,
       filterable: false,
       renderCell: (params) => {
-        const id = params.row.transactionId; 
+        const id = params.row.transactionId;
         const transactionNotes = props.notesMap.get(id) || [];
-        
+
         const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
         const latestNote = hasNotes ? transactionNotes.at(- 1) : null;
 
@@ -297,22 +297,22 @@ export function TransactionsTable(
         ) : null;
 
         return (
-          <Stack 
-            direction="row" 
-            alignItems="center" 
-            justifyContent="space-between" 
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
             sx={{ width: '100%', height: '100%', pr: 1 }}
           >
-            <Tooltip 
-              title={tooltipContent} 
-              placement="bottom-start" 
-              arrow 
+            <Tooltip
+              title={tooltipContent}
+              placement="bottom-start"
+              arrow
               enterDelay={400}
             >
               <Box sx={{ flexGrow: 1, overflow: 'hidden', mr: 1, cursor: 'pointer' }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     color: hasNotes ? 'text.primary' : 'text.disabled',
                     display: '-webkit-box',
                     WebkitBoxOrient: 'vertical',
@@ -326,8 +326,8 @@ export function TransactionsTable(
                 </Typography>
               </Box>
             </Tooltip>
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => handleOpenDrawer(id)}
               sx={{ flexShrink: 0 }}
             >
@@ -418,6 +418,7 @@ export function TransactionsTable(
         paginationMode={props.paginationMode}
         paginationModel={props.paginationModel}
         onPaginationModelChange={props.onPaginationModelChange}
+        sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
       <TransactionNotesDrawer
         open={drawerConfig.open}
