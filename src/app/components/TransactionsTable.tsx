@@ -416,6 +416,7 @@ export function TransactionsTable(
         rowCount={props.rowCount}
         paginationMode={props.paginationMode}
         paginationModel={props.paginationModel}
+        pageSizeOptions={[20]}
         onPaginationModelChange={props.onPaginationModelChange}
         sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
