@@ -72,6 +72,7 @@ export function TransactionsTable(
       field: "transactionId",
       headerName: "transactionId",
       resizable: false,
+      sortable: false,
       width: 260,
       filterable: true,
       renderCell: (params) => (
@@ -87,6 +88,7 @@ export function TransactionsTable(
     {
       field: "insertionDate",
       headerName: "insertionDate (UTC)",
+      sortable: false,
       flex: 0.6,
       valueFormatter: (value) => {
         if (!value) return "";
@@ -97,6 +99,7 @@ export function TransactionsTable(
       field: "paymentToken",
       headerName: "paymentToken",
       flex: 0.8,
+      sortable: false,
       filterable: true,
       renderCell: (params) => (
         <Box sx={{
@@ -112,6 +115,7 @@ export function TransactionsTable(
       field: "paymentEndToEndId",
       headerName: "paymentEndToEndId",
       flex: 0.8,
+      sortable: false,
       filterable: true,
       renderCell: (params) => (
         <Box sx={{
@@ -127,6 +131,7 @@ export function TransactionsTable(
       field: "authorizationRequestId",
       headerName: "authorizationRequestId",
       flex: 0.8,
+      sortable: false,
       filterable: true,
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
@@ -145,6 +150,7 @@ export function TransactionsTable(
       field: "Amount",
       headerName: "Amount",
       flex: 0.5,
+      sortable: false,
       filterable: true,
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.grandTotal || "";
@@ -154,18 +160,21 @@ export function TransactionsTable(
       field: "paymentMethodName",
       headerName: "methodName",
       flex: 0.6,
+      sortable: false,
       filterable: true,
     },
     {
       field: "pspId",
       headerName: "pspId",
       flex: 0.5,
+      sortable: false,
     },
-    { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7 },
+    { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7, sortable: false },
     {
       field: "gatewayAuthorizationStatus",
       headerName: "gatewayStatus",
       flex: 0.5,
+      sortable: false,
     },
     {
       field: "details",
