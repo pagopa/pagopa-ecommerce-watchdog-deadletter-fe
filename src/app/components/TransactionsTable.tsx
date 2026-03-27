@@ -349,10 +349,9 @@ export function TransactionsTable(
   return (
     <Box
       sx={{
-        height: 'calc(100vh - 150px)',
         width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
+        overflowX: 'auto',
+        overflowY: 'hidden',
       }}
     >
       <DataGrid
@@ -367,6 +366,7 @@ export function TransactionsTable(
           },
         }}
         getRowId={(row) => row.transactionId + row.insertionDate}
+        autoHeight
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
         sx={{
