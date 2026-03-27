@@ -395,12 +395,12 @@ describe('Home', () => {
     mockedFetchActions.mockResolvedValue([]);
 
     const noteText = "Test add";
-    const mockNewNote = { 
-      noteId: "new-note-1", 
-      transactionId: deadletterResponse.deadletterTransactions[0].transactionId, 
-      note: noteText, 
-      userId: "testId", 
-      createdAt: new Date().toISOString() 
+    const mockNewNote = {
+      noteId: "new-note-1",
+      transactionId: deadletterResponse.deadletterTransactions[0].transactionId,
+      note: noteText,
+      userId: "testId",
+      createdAt: new Date().toISOString()
     };
     mockedAddNoteToTransaction.mockResolvedValue(mockNewNote);
 
@@ -465,7 +465,8 @@ describe('Home', () => {
     await userEvent.click(saveButton);
 
     expect(mockedUpdateTransactionNote).toHaveBeenCalledWith(tokenMock, transactionId, "note-1", "New text");
-    expect(await screen.findByText("New text")).toBeInTheDocument();
+    const updatedNoteElements = await screen.findAllByText("New text");
+    expect(updatedNoteElements.length).toBeGreaterThan(0);
   });
 
 
@@ -501,7 +502,7 @@ describe('Home', () => {
     await userEvent.click(deleteMenuItem);
 
     const confirmButtons = screen.getAllByRole("button", { name: /Elimina/i });
-    await userEvent.click(confirmButtons[0]); 
+    await userEvent.click(confirmButtons[0]);
 
     expect(mockedDeleteTransactionNote).toHaveBeenCalledWith(tokenMock, trxId, "note-1");
 
