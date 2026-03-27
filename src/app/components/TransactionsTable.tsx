@@ -55,13 +55,15 @@ export function TransactionsTable(
       renderCell: (params) => {
         const sortedIds = params.api.getSortedRowIds();
         const index = sortedIds.indexOf(params.id);
+        const page = props.paginationModel?.page ?? 0;
+        const pageSize = props.paginationModel?.pageSize ?? 20;
         return (
           <Box sx={{
             fontWeight: 600,
             color: "#6b7280",
             fontSize: "0.85rem"
           }}>
-            {index + 1}
+            {page * pageSize + index + 1}
           </Box>
         );
       },
@@ -349,8 +351,6 @@ export function TransactionsTable(
       sx={{
         height: 'calc(100vh - 150px)',
         width: '100%',
-        overflowX: 'auto',
-        overflowY: 'hidden',
         display: 'flex',
         flexDirection: 'column',
       }}
