@@ -53,9 +53,8 @@ export function TransactionsTable(
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
-        const index = props.transactions.findIndex(
-          (t) => t.transactionId + t.insertionDate === params.id
-        );
+        const sortedIds = params.api.getSortedRowIds();
+        const index = sortedIds.indexOf(params.id);
         return (
           <Box sx={{
             fontWeight: 600,
