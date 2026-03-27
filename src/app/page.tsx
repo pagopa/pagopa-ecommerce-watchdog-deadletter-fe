@@ -49,7 +49,7 @@ export default function Home() {
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [actions, setActions] = useState<ActionType[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 20 });
   const [totalResults, setTotalResults] = useState(0);
 
   const token = useRef<string | null>();
@@ -119,7 +119,7 @@ export default function Home() {
     }
   }
 
-  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 10) => {
+  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 20) => {
     if (!start || !end || !token.current) {
       setTransactions([]);
       return;
@@ -146,7 +146,7 @@ export default function Home() {
       setTotalResults((data?.page?.total ?? 0) * pageSize);
 
       const transactionIds = new Set(transactionsList.map(t => t.transactionId));
-      if(transactionIds.size > 0) {
+      if (transactionIds.size > 0) {
         const notesData = await fetchNotesByTransactionIds(token.current, Array.from(transactionIds));
         const notesMap: Map<string, TransactionNote[]> = new Map();
         for (const note of notesData) {
@@ -208,7 +208,7 @@ export default function Home() {
 
 
   const handleAddNote = (transactionId: string, text: string) => {
-    if(!token.current) return;
+    if (!token.current) return;
 
     addNoteToTransaction(token.current, transactionId, text).then((newNote) => {
       if (!newNote) return;
@@ -222,7 +222,7 @@ export default function Home() {
   };
 
   const handleEditNote = (currentNote: TransactionNote, newText: string) => {
-    if(!token.current) return;
+    if (!token.current) return;
 
     const transactionId = currentNote.transactionId;
     const noteId = currentNote.noteId;
@@ -245,7 +245,7 @@ export default function Home() {
   };
 
   const handleDeleteNote = (noteToDelete: TransactionNote) => {
-    if(!token.current) return;
+    if (!token.current) return;
 
     const transactionId = noteToDelete.transactionId;
     const noteId = noteToDelete.noteId;
