@@ -28,7 +28,7 @@ export function TransactionsTable(
     onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
-  
+
   const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
     open: false,
     transactionId: null,
@@ -53,16 +53,17 @@ export function TransactionsTable(
       headerAlign: "center",
       align: "center",
       renderCell: (params) => {
-        const index = props.transactions.findIndex(
-          (t) => t.transactionId + t.insertionDate === params.id
-        );
+        const sortedIds = params.api.getSortedRowIds();
+        const index = sortedIds.indexOf(params.id);
+        const page = props.paginationModel?.page ?? 0;
+        const pageSize = props.paginationModel?.pageSize ?? 20;
         return (
           <Box sx={{
             fontWeight: 600,
             color: "#6b7280",
             fontSize: "0.85rem"
           }}>
-            {index + 1}
+            {page * pageSize + index + 1}
           </Box>
         );
       },
@@ -71,6 +72,7 @@ export function TransactionsTable(
       field: "transactionId",
       headerName: "transactionId",
       resizable: false,
+      sortable: false,
       width: 260,
       filterable: true,
       renderCell: (params) => (
@@ -86,6 +88,7 @@ export function TransactionsTable(
     {
       field: "insertionDate",
       headerName: "insertionDate (UTC)",
+      sortable: false,
       flex: 0.6,
       valueFormatter: (value) => {
         if (!value) return "";
@@ -96,6 +99,7 @@ export function TransactionsTable(
       field: "paymentToken",
       headerName: "paymentToken",
       flex: 0.8,
+      sortable: false,
       filterable: true,
       renderCell: (params) => (
         <Box sx={{
@@ -111,6 +115,7 @@ export function TransactionsTable(
       field: "paymentEndToEndId",
       headerName: "paymentEndToEndId",
       flex: 0.8,
+      sortable: false,
       filterable: true,
       renderCell: (params) => (
         <Box sx={{
@@ -126,6 +131,7 @@ export function TransactionsTable(
       field: "authorizationRequestId",
       headerName: "authorizationRequestId",
       flex: 0.8,
+      sortable: false,
       filterable: true,
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
@@ -144,6 +150,7 @@ export function TransactionsTable(
       field: "Amount",
       headerName: "Amount",
       flex: 0.5,
+      sortable: false,
       filterable: true,
       valueGetter: (_value, row) => {
         return row.eCommerceDetails?.transactionInfo?.grandTotal || "";
@@ -153,18 +160,21 @@ export function TransactionsTable(
       field: "paymentMethodName",
       headerName: "methodName",
       flex: 0.6,
+      sortable: false,
       filterable: true,
     },
     {
       field: "pspId",
       headerName: "pspId",
       flex: 0.5,
+      sortable: false,
     },
-    { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7 },
+    { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7, sortable: false },
     {
       field: "gatewayAuthorizationStatus",
       headerName: "gatewayStatus",
       flex: 0.5,
+      sortable: false,
     },
     {
       field: "details",
@@ -277,9 +287,9 @@ export function TransactionsTable(
       sortable: false,
       filterable: false,
       renderCell: (params) => {
-        const id = params.row.transactionId; 
+        const id = params.row.transactionId;
         const transactionNotes = props.notesMap.get(id) || [];
-        
+
         const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
         const latestNote = hasNotes ? transactionNotes.at(- 1) : null;
 
@@ -297,22 +307,22 @@ export function TransactionsTable(
         ) : null;
 
         return (
-          <Stack 
-            direction="row" 
-            alignItems="center" 
-            justifyContent="space-between" 
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
             sx={{ width: '100%', height: '100%', pr: 1 }}
           >
-            <Tooltip 
-              title={tooltipContent} 
-              placement="bottom-start" 
-              arrow 
+            <Tooltip
+              title={tooltipContent}
+              placement="bottom-start"
+              arrow
               enterDelay={400}
             >
               <Box sx={{ flexGrow: 1, overflow: 'hidden', mr: 1, cursor: 'pointer' }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     color: hasNotes ? 'text.primary' : 'text.disabled',
                     display: '-webkit-box',
                     WebkitBoxOrient: 'vertical',
@@ -326,8 +336,8 @@ export function TransactionsTable(
                 </Typography>
               </Box>
             </Tooltip>
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => handleOpenDrawer(id)}
               sx={{ flexShrink: 0 }}
             >
@@ -348,12 +358,9 @@ export function TransactionsTable(
   return (
     <Box
       sx={{
-        height: 'calc(100vh - 150px)',
         width: '100%',
         overflowX: 'auto',
         overflowY: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
       }}
     >
       <DataGrid
@@ -368,6 +375,7 @@ export function TransactionsTable(
           },
         }}
         getRowId={(row) => row.transactionId + row.insertionDate}
+        autoHeight
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
         sx={{
@@ -417,7 +425,9 @@ export function TransactionsTable(
         rowCount={props.rowCount}
         paginationMode={props.paginationMode}
         paginationModel={props.paginationModel}
+        pageSizeOptions={[20]}
         onPaginationModelChange={props.onPaginationModelChange}
+        sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
       <TransactionNotesDrawer
         open={drawerConfig.open}
