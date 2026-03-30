@@ -1148,6 +1148,7 @@
         "pspId": "CIPBITMM",
         "eCommerceStatus": "REFUND_ERROR",
         "gatewayAuthorizationStatus": "null",
+        "nodoStatus": "NOTIFIED",
         "paymentEndToEndId": null,
         "operationId": "321055056922651839",
         "deadletterTransactionDetails": {
@@ -1228,9 +1229,17 @@
           "product": "ECOMMERCE"
         },
         "nodoDetails": {
-          "dateFrom": "2025-07-02",
-          "dateTo": "2025-07-02",
-          "data": []
+          "id": 30355582454,
+          "pa_fiscal_code": "77777777777",
+          "notice_id": "302000007777777777",
+          "creditor_reference_id": "020000077777777777",
+          "payment_token": "6535d0c28c67448f9936bad26aeb9743",
+          "status": "NOTIFIED",
+          "inserted_timestamp": "2026-03-27T20:32:03.760456Z",
+          "updated_timestamp": "2026-03-28T01:30:41.587145Z",
+          "fk_position_payment": 3035262454,
+          "inserted_by": "activatePaymentNoticeV2",
+          "updated_by": "paSendRt"
         },
         "npgDetails": {
           "operations": [
@@ -2331,7 +2340,7 @@
   "notes-list": [
     {
       "transactionId": "6438d77a7fa3448da8baffe420acae77",
-      "notesList":[
+      "notesList": [
         {
           "noteId": "69a565036aa9daa75d16a0f9",
           "transactionId": "6438d77a7fa3448da8baffe420acae77",
@@ -2348,11 +2357,11 @@
           "createdAt": "2026-03-02T13:35:42.244Z",
           "updatedAt": "2026-03-02T13:35:42.244Z"
         }
-      ]      
-    }, 
+      ]
+    },
     {
       "transactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
-      "notesList":[
+      "notesList": [
         {
           "noteId": "69a566a3cdba2e59fd7594ec",
           "transactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
@@ -2365,7 +2374,7 @@
     },
     {
       "transactionId": "aabe94d6f8b34482a323045704ce522b",
-      "notesList":[
+      "notesList": [
         {
           "noteId": "26b658bc-e33e-445f-be80-8f9e1ec69807",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2389,7 +2398,7 @@
           "note": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in rererit.",
           "createdAt": "2026-01-06T19:50:43Z",
           "updatedAt": "2026-02-03T15:43:02Z"
-        }, 
+        },
         {
           "noteId": "47ec84bc-d168-4e34-b04b-d79707d731df",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2397,7 +2406,7 @@
           "note": "Excepteur sint occaecat cupidatat non pro.",
           "createdAt": "2026-02-12T14:40:41Z",
           "updatedAt": "2026-01-10T01:42:14Z"
-        }, 
+        },
         {
           "noteId": "f3c54c67-9782-4064-bf45-7f3b2a8adf0f",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2405,7 +2414,7 @@
           "note": "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia con.",
           "createdAt": "2026-02-17T13:59:28Z",
           "updatedAt": "2026-01-02T00:33:06Z"
-        }, 
+        },
         {
           "noteId": "1827caf3-775b-43b6-a15d-0eec0301110c",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2413,7 +2422,7 @@
           "note": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt.",
           "createdAt": "2026-02-28T09:34:59Z",
           "updatedAt": "2026-02-06T06:01:54Z"
-        }, 
+        },
         {
           "noteId": "5abfa697-db69-4811-94c5-a6c447027392",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2421,7 +2430,7 @@
           "note": "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque.",
           "createdAt": "2026-03-02T14:15:44Z",
           "updatedAt": "2026-02-25T03:01:42Z"
-        }, 
+        },
         {
           "noteId": "7738fbac-5eec-454a-a4ff-5edea74a50e7",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2429,7 +2438,7 @@
           "note": "Temporibus autem quibusdam et aut officiis debitis aut rerum nec.",
           "createdAt": "2026-03-14T14:33:01Z",
           "updatedAt": "2026-01-13T04:56:45Z"
-        }, 
+        },
         {
           "noteId": "c0d7faf9-0dfc-41a3-a3ee-faf6e80cdb4a",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",
@@ -2437,7 +2446,7 @@
           "note": "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora.",
           "createdAt": "2026-03-29T22:30:28Z",
           "updatedAt": "2026-01-23T22:39:58Z"
-        }, 
+        },
         {
           "noteId": "ba51629d-c2e1-4350-be91-da6465e6b5e9",
           "transactionId": "aabe94d6f8b34482a323045704ce522b",

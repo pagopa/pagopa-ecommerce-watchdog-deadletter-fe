@@ -177,6 +177,12 @@ export function TransactionsTable(
       sortable: false,
     },
     {
+      field: "nodoStatus",
+      headerName: "nodoStatus",
+      flex: 0.5,
+      sortable: false,
+    },
+    {
       field: "details",
       headerName: "Details",
       flex: 0.5,

@@ -1,4 +1,4 @@
-export interface DeadletterResponse { 
+export interface DeadletterResponse {
   deadletterTransactions: Transaction[],
   page: Page
 }
@@ -11,6 +11,7 @@ export interface Transaction {
   pspId: string;
   eCommerceStatus: string;
   gatewayAuthorizationStatus: string | null;
+  nodoStatus: string | null;
   paymentEndToEndId: string | null;
   operationId: string;
   deadletterTransactionDetails: TransactionDetails;
