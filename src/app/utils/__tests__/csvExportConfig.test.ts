@@ -281,6 +281,7 @@ describe('csvExportConfig', () => {
         'pspId',
         'eCommerceStatus',
         'gatewayAuthorizationStatus',
+        'nodoStatus',
         'paymentEndToEndId',
         'authorizationRequestId',
         'Amount'
