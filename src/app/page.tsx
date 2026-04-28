@@ -198,7 +198,7 @@ export default function Home() {
   const handleFetchAllForExport = async (): Promise<Transaction[]> => {
     if (!rangeStart || !rangeEnd || !token.current) return [];
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, 0, 500);
+      const data = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, 0, 1000);
       return data ? data.deadletterTransactions : [];
     } catch (e) {
       console.error("Error fetching all for export", e);
