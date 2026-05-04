@@ -197,9 +197,35 @@ export default function Home() {
 
   const handleFetchAllForExport = async (): Promise<Transaction[]> => {
     if (!rangeStart || !rangeEnd || !token.current) return [];
+
+    const chunkSize = 500;
+    const maxTransactions = 5000;
+    const delayMs = 2000;
+
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, 0, 1000);
-      return data ? data.deadletterTransactions : [];
+
+      const firstPage = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, 0, chunkSize);
+
+      if (!firstPage) return [];
+
+      if (firstPage.page.total * chunkSize > maxTransactions) {
+        throw new Error(`Transaction count exceeds the maximum limit of ${maxTransactions}. Please reduce the date range and try again.`);
+      }
+
+      const allTransactions: Transaction[] = [...firstPage.deadletterTransactions];
+      let currentPage = 1;
+      let hasMorePages = firstPage.page.current < firstPage.page.total - 1;
+
+      while (hasMorePages) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        const data = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, currentPage, chunkSize);
+        const chunk = data ? data.deadletterTransactions : [];
+        allTransactions.push(...chunk);
+        hasMorePages = data ? data.page.current < data.page.total - 1 : false;
+        currentPage++;
+      }
+
+      return allTransactions;
     } catch (e) {
       console.error("Error fetching all for export", e);
       return [];
