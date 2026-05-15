@@ -47,11 +47,14 @@ export default function Home() {
   const [dialogContent, setDialogContent] = useState({});
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const [actions, setActions] = useState<ActionType[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 20 });
   const [totalResults, setTotalResults] = useState(0);
 
+  const observerTarget = useRef<HTMLDivElement>(null);
   const token = useRef<string | null>();
 
   useEffect(() => {
@@ -137,61 +140,101 @@ export default function Home() {
     }
     setErrorMsg(null);
 
-    setLoadingData(true);
+    if (page === 0) {
+      setLoadingData(true);
+    } else {
+      setIsLoadingMore(true);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
 
     try {
       const data = await fetchDeadletterTransactionsV2(token.current!, start, end, page, pageSize);
       const transactionsList = data ? data.deadletterTransactions : [];
-      setTransactions(transactionsList);
+
+      if (page === 0) {
+        setTransactions(transactionsList);
+      } else {
+        setTransactions((prev) => [...prev, ...transactionsList]);
+      }
+
       setTotalResults((data?.page?.total ?? 0) * pageSize);
+      setHasMore((data?.page?.current ?? 0) < (data?.page?.total ?? 0) - 1);
 
       const transactionIds = new Set(transactionsList.map(t => t.transactionId));
       if (transactionIds.size > 0) {
         const notesData = await fetchNotesByTransactionIds(token.current, Array.from(transactionIds));
-        const notesMap: Map<string, TransactionNote[]> = new Map();
+        const newNotesMap: Map<string, TransactionNote[]> = new Map();
         for (const note of notesData) {
-          notesMap.set(note.transactionId, note.notesList);
+          newNotesMap.set(note.transactionId, note.notesList);
         }
-        setNotesMap(notesMap);
+        setNotesMap((prev) => {
+          if (page === 0) return newNotesMap;
+          const map = new Map(prev);
+          for (const [key, val] of newNotesMap) {
+            map.set(key, val);
+          }
+          return map;
+        });
+      } else if (page === 0) {
+        setNotesMap(new Map());
       }
 
-      const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
+      const newActionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       await Promise.all(
         transactionsList.map(async (transaction) => {
           if (token.current) {
-            const actions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
+            const fileActions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
             const singleActionMap: Map<string, DeadletterAction> = new Map();
-            for (const act of actions) {
+            for (const act of fileActions) {
               singleActionMap.set(act.action.value, act);
             }
-            actionsMap.set(transaction.transactionId, singleActionMap);
+            newActionsMap.set(transaction.transactionId, singleActionMap);
           }
         })
       );
-      setActionsMap(actionsMap);
+      setActionsMap((prev) => {
+        if (page === 0) return newActionsMap;
+        const map = new Map(prev);
+        for (const [key, val] of newActionsMap) {
+          map.set(key, val);
+        }
+        return map;
+      });
 
     } catch (error) {
       console.error("Error loading range data", error);
     } finally {
-      setLoadingData(false);
+      if (page === 0) setLoadingData(false);
+      setIsLoadingMore(false);
     }
   };
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (hasMore && !isLoadingMore && !loadingData && rangeStart && rangeEnd) {
+      // Initiate next fetch after a small delay (the 2s delay is inside loadDataForRange but we can do it here too, however we already do `await new Promise` in loadDataForRange)
+      timeoutId = setTimeout(() => {
+        setPaginationModel((prev) => {
+          const nextModel = { ...prev, page: prev.page + 1 };
+          if (rangeStart && rangeEnd) {
+            loadDataForRange(rangeStart, rangeEnd, nextModel.page, nextModel.pageSize);
+          }
+          return nextModel;
+        });
+      }, 100);
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [hasMore, isLoadingMore, loadingData, rangeStart, rangeEnd, paginationModel.pageSize]);
 
   const handleRangeChange = (start: string, end: string) => {
     setRangeStart(start);
     setRangeEnd(end);
-    setPaginationModel({ ...paginationModel, page: 0 });
+    setPaginationModel({ page: 0, pageSize: 20 });
 
     if (start && end) {
-      loadDataForRange(start, end, 0, paginationModel.pageSize);
-    }
-  };
-
-
-  const handlePaginationModelChange = (model: { page: number; pageSize: number }) => {
-    setPaginationModel(model);
-    if (rangeStart && rangeEnd) {
-      loadDataForRange(rangeStart, rangeEnd, model.page, model.pageSize);
+      loadDataForRange(start, end, 0, 20);
     }
   };
 
@@ -374,10 +417,11 @@ export default function Home() {
               handleEditNote={handleEditNote}
               handleDeleteNote={handleDeleteNote}
               rowCount={totalResults}
-              paginationMode="server"
-              paginationModel={paginationModel}
-              onPaginationModelChange={handlePaginationModelChange}
             />
+
+            <Box ref={observerTarget} display={'flex'} justifyContent={'center'} mt={3} mb={3}>
+              {isLoadingMore && <CircularProgress size={30} />}
+            </Box>
           </>
         )}
 

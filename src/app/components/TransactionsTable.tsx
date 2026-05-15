@@ -23,9 +23,6 @@ export function TransactionsTable(
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
     handleDeleteNote: (note: TransactionNote) => void;
     rowCount?: number;
-    paginationMode?: "client" | "server";
-    paginationModel?: { page: number; pageSize: number };
-    onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
 
@@ -55,15 +52,13 @@ export function TransactionsTable(
       renderCell: (params) => {
         const sortedIds = params.api.getSortedRowIds();
         const index = sortedIds.indexOf(params.id);
-        const page = props.paginationModel?.page ?? 0;
-        const pageSize = props.paginationModel?.pageSize ?? 20;
         return (
           <Box sx={{
             fontWeight: 600,
             color: "#6b7280",
             fontSize: "0.85rem"
           }}>
-            {page * pageSize + index + 1}
+            {index + 1}
           </Box>
         );
       },
@@ -428,11 +423,7 @@ export function TransactionsTable(
           }
         }}
         showToolbar
-        rowCount={props.rowCount}
-        paginationMode={props.paginationMode}
-        paginationModel={props.paginationModel}
-        pageSizeOptions={[20]}
-        onPaginationModelChange={props.onPaginationModelChange}
+        hideFooterPagination
         sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
       <TransactionNotesDrawer

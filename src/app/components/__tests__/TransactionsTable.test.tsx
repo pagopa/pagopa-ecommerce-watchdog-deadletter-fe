@@ -167,6 +167,7 @@ const mockTransactions: Transaction[] = [
         },
       ],
     },
+    nodoStatus: null,
   },
   {
     transactionId: "429a7b69689c4e6197f4d4fd412ae355",
@@ -177,6 +178,7 @@ const mockTransactions: Transaction[] = [
     eCommerceStatus: "EXPIRED",
     gatewayAuthorizationStatus: "DECLINED",
     paymentEndToEndId: null,
+    nodoStatus: null,
     operationId: "533935788069251839",
     deadletterTransactionDetails: {
       queueName: "pagopa-u-weu-ecommerce-transactions-dead-letter-queue",
