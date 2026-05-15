@@ -424,6 +424,7 @@ export function TransactionsTable(
         }}
         showToolbar
         hideFooterPagination
+        paginationMode="server"
         sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
       <TransactionNotesDrawer
