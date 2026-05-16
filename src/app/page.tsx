@@ -23,6 +23,8 @@ import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 import CsvExportSection from "./components/CsvExportSection";
 import WorkloadCalendar from "./components/WorkloadCalendar";
 import DateRangeSelector from "./components/DateRangeSelector";
@@ -144,7 +146,9 @@ export default function Home() {
       setLoadingData(true);
     } else {
       setIsLoadingMore(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (page >= 4) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
 
     try {
@@ -419,8 +423,36 @@ export default function Home() {
               rowCount={totalResults}
             />
 
-            <Box ref={observerTarget} display={'flex'} justifyContent={'center'} mt={3} mb={3}>
-              {isLoadingMore && <CircularProgress size={30} />}
+            <Box ref={observerTarget} mt={1} mb={3}>
+              {isLoadingMore && (
+                <Stack spacing={0.5}>
+                  {[...Array(3)].map((_, rowIdx) => (
+                    <Box
+                      key={rowIdx}
+                      display="flex"
+                      alignItems="center"
+                      gap={1}
+                      px={1}
+                      py={0.75}
+                      sx={{ borderBottom: '1px solid #f3f4f6', backgroundColor: rowIdx % 2 === 0 ? '#fff' : '#f9fafb' }}
+                    >
+                      <Skeleton variant="text" width={40} height={20} animation="wave" />
+                      <Skeleton variant="text" width={200} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.7 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.9 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.9 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.6 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.5 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.7 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.5 }} height={20} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 0.5 }} height={20} animation="wave" />
+                      <Skeleton variant="rounded" width={50} height={28} animation="wave" />
+                      <Skeleton variant="rounded" sx={{ flex: 1.25 }} height={28} animation="wave" />
+                      <Skeleton variant="text" sx={{ flex: 1, minWidth: 200 }} height={20} animation="wave" />
+                    </Box>
+                  ))}
+                </Stack>
+              )}
             </Box>
           </>
         )}

@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   preset: "ts-jest",
@@ -20,7 +20,7 @@ const config: Config = {
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testResultsProcessor: "jest-sonar-reporter",
-  testPathIgnorePatterns:[
+  testPathIgnorePatterns: [
     "/mock/"
   ],
   globals: {
