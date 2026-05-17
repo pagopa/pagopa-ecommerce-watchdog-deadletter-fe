@@ -1147,7 +1147,7 @@
         "paymentMethodName": "GOOGLEPAY",
         "pspId": "CIPBITMM",
         "eCommerceStatus": "REFUND_ERROR",
-        "gatewayAuthorizationStatus": "null",
+        "gatewayAuthorizationStatus": "EXECUTED",
         "nodoStatus": "NOTIFIED",
         "paymentEndToEndId": null,
         "operationId": "321055056922651839",

@@ -1,0 +1,202 @@
+[
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "CANCELED",
+        "paymentMethodName": "APPLEPAY",
+        "suggestedAction": "Se presente paymentEndToEndId aprire request al PSP per verificare se rilevano addebito. Se addebitato -> Da stornare eComm, altrimenti -> No Azioni",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "CANCELED",
+        "paymentMethodName": "GOOGLEPAY",
+        "suggestedAction": "Se presente paymentEndToEndId aprire request al PSP per verificare se rilevano addebito. Se addebitato -> Da stornare eComm, altrimenti -> No Azioni",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "CANCELED",
+        "paymentMethodName": "BANCOMATPAY",
+        "suggestedAction": "No Azioni",
+        "severity": "info"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "CANCELED",
+        "paymentMethodName": "CARDS",
+        "suggestedAction": "No Azioni",
+        "severity": "info"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "CANCELED",
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Se presente MyBankID (paymentEndToEndId) aprire request al PSP (Intesa/Unicredit) per verificare se rilevano addebito. Se addebitato devono effettuare lo storno, altrimenti -> No Azioni",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "CANCELED",
+        "paymentMethodName": "PAYPAL",
+        "suggestedAction": "No Azioni",
+        "severity": "info"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "APPLEPAY",
+        "suggestedAction": "Da stornare eComm",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "BANCOMATPAY",
+        "suggestedAction": "Da stornare eComm",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "CARDS",
+        "suggestedAction": "Da stornare eComm",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Da stornare PSP",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "PAYPAL",
+        "suggestedAction": "Da stornare eComm",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "SATISPAY",
+        "suggestedAction": "Aprire PPI per conferma sulla stornabilità della transazione",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "FAILED",
+        "paymentMethodName": "CARDS",
+        "suggestedAction": "Aprire PPI per chiedere ad NPG lo stato e nel caso la stornabilità della transazione. Se NPG EXECUTED -> Da stornare eComm",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "FAILED",
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Se presente MyBankID (paymentEndToEndId) aprire request al PSP (Intesa/Unicredit) per verificare se rilevano addebito. Se addebitato devono effettuare lo storno, altrimenti -> No Azioni",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "FAILED",
+        "paymentMethodName": "PAYPAL",
+        "suggestedAction": "Aprire PPI per chiedere ad NPG lo stato e nel caso la stornabilità della transazione. Se NPG EXECUTED -> Da stornare eComm",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": null,
+        "paymentMethodName": "BANCOMATPAY",
+        "suggestedAction": "Verificare stato con PPI. Se CANCELLED/REFUNDED -> No Azioni. Se EXECUTED -> Da stornare",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": null,
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Verificare stato con PPI. Se CANCELLED/REFUNDED -> No Azioni. Se EXECUTED -> Da stornare",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "PENDING",
+        "paymentMethodName": "BANCOMATPAY",
+        "suggestedAction": "Verificare stato con PPI. Se CANCELLED/REFUNDED -> No Azioni. Se EXECUTED -> Da stornare",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "PENDING",
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Verificare stato con PPI. Se CANCELLED/REFUNDED -> No Azioni. Se EXECUTED -> Da stornare",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "THREEDS_FAILED",
+        "paymentMethodName": "CARDS",
+        "suggestedAction": "Aprire PPI per avere conferma che non ci sia stato addebito. Diversamente -> Da stornare eComm",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "VOIDED",
+        "paymentMethodName": "APPLEPAY",
+        "suggestedAction": "???che si fa???",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "",
+        "paymentMethodName": "BANCOMATPAY",
+        "suggestedAction": "Verificare stato con PPI. Se CANCELLED/REFUNDED -> No Azioni. Se EXECUTED -> Da stornare",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "CANCELLED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "",
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Verificare stato con PPI. Se CANCELLED/REFUNDED -> No Azioni. Se EXECUTED -> Da stornare",
+        "severity": "warning"
+    },
+    {
+        "nodoStatus": "NOTIFIED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "MYBANK",
+        "suggestedAction": "Da stornare PSP",
+        "severity": "error"
+    },
+    {
+        "nodoStatus": "NOTIFIED",
+        "eCommerceStatus": "REFUND_ERROR",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "paymentMethodName": "PAYPAL",
+        "suggestedAction": "Da stornare eComm",
+        "severity": "error"
+    }
+]
