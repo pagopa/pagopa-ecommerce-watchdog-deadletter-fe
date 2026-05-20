@@ -312,24 +312,28 @@ describe("TransactionsTable", () => {
     expect(screen.queryByText("Amount")).not.toBeInTheDocument();
 
     //Check transaction row
+    const row1 = screen
+      .getByText(mockTransactions[0].transactionId)
+      .closest('div[role="row"]');
+    expect(row1).toBeInTheDocument();
+
+    const row1Element = row1 as HTMLElement;
+
     expect(
-      screen.getByText(mockTransactions[0].transactionId)
+      within(row1Element).getByText(mockTransactions[0].paymentToken)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(mockTransactions[0].paymentToken)
+      within(row1Element).getByText(mockTransactions[0].paymentMethodName)
+    ).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].pspId)).toBeInTheDocument();
+    expect(
+      within(row1Element).getByText(mockTransactions[0].eCommerceStatus)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(mockTransactions[0].paymentMethodName)
+      within(row1Element).getByText(mockTransactions[0].gatewayAuthorizationStatus!)
     ).toBeInTheDocument();
-    expect(screen.getByText(mockTransactions[0].pspId)).toBeInTheDocument();
-    expect(
-      screen.getByText(mockTransactions[0].eCommerceStatus)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(mockTransactions[0].gatewayAuthorizationStatus!)
-    ).toBeInTheDocument();
-    expect(screen.getByText(mockAction1.action.value)).toBeInTheDocument();
-    expect(screen.getByText(mockAction2.action.value)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockAction1.action.value)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockAction2.action.value)).toBeInTheDocument();
   });
 
   it('renders "N/A" for Detail cell with no data', () => {
