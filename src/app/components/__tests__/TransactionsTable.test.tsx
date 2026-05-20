@@ -282,6 +282,7 @@ const defaultProps = {
   handleEditNote: mockHandleEditNote,
   handleDeleteNote: mockHandleDeleteNote,
   userId: "test.user",
+  paginationModel: { page: 0, pageSize: 20 },
 };
 
 const renderComponent = (props = {}) => {
