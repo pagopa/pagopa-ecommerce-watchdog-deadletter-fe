@@ -65,6 +65,7 @@ const mockTransactions: Transaction[] = [
     pspId: "UNCRITMM",
     eCommerceStatus: "NOTIFIED_OK",
     gatewayAuthorizationStatus: "EXECUTED",
+    nodoStatus: null,
     paymentEndToEndId: "113147082357551839",
     operationId: "123147082357551839",
     deadletterTransactionDetails: {
@@ -177,6 +178,7 @@ const mockTransactions: Transaction[] = [
     pspId: "CIPBITMM",
     eCommerceStatus: "EXPIRED",
     gatewayAuthorizationStatus: "DECLINED",
+    nodoStatus: null,
     paymentEndToEndId: null,
     nodoStatus: null,
     operationId: "533935788069251839",
@@ -201,6 +203,45 @@ const mockTransactions: Transaction[] = [
           correlationId: "e8695c15-d5b6-458f-ad0d-ecd9ff62ae9d",
           paymentEndToEndId: null,
           outcome: null,
+        },
+      },
+    },
+    eCommerceDetails: null,
+    nodoDetails: null,
+    npgDetails: null,
+  },
+  {
+    transactionId: "333a7b69689c4e6197f4d4fd412ae355",
+    insertionDate: "2025-07-03T10:00:00Z",
+    paymentToken: "token3",
+    paymentMethodName: "APPLEPAY",
+    pspId: "PSP3",
+    eCommerceStatus: "REFUND_ERROR",
+    gatewayAuthorizationStatus: "EXECUTED",
+    nodoStatus: "CANCELLED",
+    paymentEndToEndId: "e2e3",
+    operationId: "op3",
+    deadletterTransactionDetails: {
+      queueName: "queue3",
+      data: "{}",
+      timestamp: "2025-07-03T10:00:00Z",
+      transactionInfo: {
+        transactionId: "333a7b69689c4e6197f4d4fd412ae355",
+        authorizationRequestId: "req3",
+        eCommerceStatus: "REFUND_ERROR",
+        paymentGateway: "NPG",
+        paymentTokens: ["token3"],
+        pspId: "PSP3",
+        paymentMethodName: "APPLEPAY",
+        grandTotal: 100,
+        rrn: "rrn3",
+        details: {
+          type: "NPG",
+          operationResult: "EXECUTED",
+          operationId: "op3",
+          correlationId: "corr3",
+          paymentEndToEndId: "e2e3",
+          outcome: "OK",
         },
       },
     },
@@ -243,6 +284,7 @@ const defaultProps = {
   handleEditNote: mockHandleEditNote,
   handleDeleteNote: mockHandleDeleteNote,
   userId: "test.user",
+  paginationModel: { page: 0, pageSize: 20 },
 };
 
 const renderComponent = (props = {}) => {
@@ -265,8 +307,7 @@ describe("TransactionsTable", () => {
     expect(screen.getByText("methodName")).toBeInTheDocument();
     expect(screen.getByText("pspId")).toBeInTheDocument();
     expect(screen.getByText("statoEcommerce")).toBeInTheDocument();
-    expect(screen.getByText("gatewayStatus")).toBeInTheDocument();
-    expect(screen.getByText("Details")).toBeInTheDocument();
+    expect(screen.getByText("nodoStatus")).toBeInTheDocument();
     expect(screen.getByText("Azioni")).toBeInTheDocument();
 
     // Columns that should not be rendered (disabled in the default view)
@@ -274,25 +315,28 @@ describe("TransactionsTable", () => {
     expect(screen.queryByText("Amount")).not.toBeInTheDocument();
 
     //Check transaction row
+    const row1 = screen
+      .getByText(mockTransactions[0].transactionId)
+      .closest('div[role="row"]');
+    expect(row1).toBeInTheDocument();
+
+    const row1Element = row1 as HTMLElement;
+
     expect(
-      screen.getByText(mockTransactions[0].transactionId)
+      within(row1Element).getByText(mockTransactions[0].paymentToken)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(mockTransactions[0].paymentToken)
+      within(row1Element).getByText(mockTransactions[0].paymentMethodName)
+    ).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].pspId)).toBeInTheDocument();
+    expect(
+      within(row1Element).getByText(mockTransactions[0].eCommerceStatus)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(mockTransactions[0].paymentMethodName)
+      within(row1Element).getByText(mockTransactions[0].gatewayAuthorizationStatus!)
     ).toBeInTheDocument();
-    expect(screen.getByText(mockTransactions[0].pspId)).toBeInTheDocument();
-    expect(
-      screen.getByText(mockTransactions[0].eCommerceStatus)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(mockTransactions[0].gatewayAuthorizationStatus!)
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: "View" })).toHaveLength(1); // nodoDetails, npgDetails, eCommerceDetails
-    expect(screen.getByText(mockAction1.action.value)).toBeInTheDocument();
-    expect(screen.getByText(mockAction2.action.value)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockAction1.action.value)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockAction2.action.value)).toBeInTheDocument();
   });
 
   it('renders "N/A" for Detail cell with no data', () => {
@@ -303,10 +347,10 @@ describe("TransactionsTable", () => {
       .closest('div[role="row"]');
 
     expect(row2).toBeInTheDocument();
-    expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(2);
+    expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(1);
   });
 
-  it('renders "View" button for Detail cell with data and calls handleOpenDialog on click', async () => {
+  it('calls handleOpenDialog on click of transactionId', async () => {
     const combinedDetails = {
       nodoDetails: mockTransactions[0].nodoDetails,
       npgDetails: mockTransactions[0].npgDetails,
@@ -316,19 +360,11 @@ describe("TransactionsTable", () => {
     const user = userEvent.setup();
     renderComponent();
 
-    const row1 = screen
-      .getByText(mockTransactions[0].transactionId)
-      .closest('div[role="row"]');
-    expect(row1).toBeInTheDocument();
+    const transactionIdCell = screen.getByText(mockTransactions[0].transactionId);
+    expect(transactionIdCell).toBeInTheDocument();
 
-    const detailsViewButton = within(row1 as HTMLElement).getAllByRole(
-      "button",
-      { name: "View" }
-    );
-    expect(detailsViewButton).toHaveLength(1);
-
-    //Click on Details "View" button
-    await user.click(detailsViewButton[0]);
+    //Click on transactionId
+    await user.click(transactionIdCell);
     expect(mockHandleOpenDialog).toHaveBeenCalledWith(combinedDetails);
 
     expect(mockHandleOpenDialog).toHaveBeenCalledTimes(1);
@@ -423,16 +459,38 @@ describe("TransactionsTable", () => {
     expect(icon).toBeInTheDocument();
   });
 
-  it("should render the add note icon for a transaction with no notes", () => {
+  it("renders suggested action with tooltip and correct severity styles", async () => {
     renderComponent();
-    const transactionId = mockTransactions[1].transactionId;
+
+    // mockTransactions[2] matches Rule 57: CANCELLED, REFUND_ERROR, EXECUTED, APPLEPAY
+    // Suggested Action: "Da stornare eComm", severity: "error"
+    const row3 = screen
+      .getByText(mockTransactions[2].transactionId)
+      .closest('div[role="row"]');
+    expect(row3).toBeInTheDocument();
+
+    const suggestedActionLabel = within(row3 as HTMLElement).getByText("Da stornare eComm");
+    expect(suggestedActionLabel).toBeInTheDocument();
+
+    // Check style (error severity usually has specific colors, here #b91c1c for text and #fef2f2 for bg)
+    const box = suggestedActionLabel.closest('.MuiBox-root');
+    expect(box).toHaveStyle({
+      backgroundColor: 'rgb(254, 242, 242)', // #fef2f2 in RGB
+    });
+
+    expect(suggestedActionLabel).toHaveStyle({
+      color: 'rgb(185, 28, 28)', // #b91c1c in RGB
+    });
+  });
+
+  it("renders 'Nessuna azione suggerita' when getSuggestedAction returns null", () => {
+    renderComponent();
 
     const row2 = screen
-      .getByText(transactionId)
+      .getByText(mockTransactions[1].transactionId)
       .closest('div[role="row"]');
     expect(row2).toBeInTheDocument();
 
-    const addNoteIcon = within(row2 as HTMLElement).getByTestId("transaction-add-note-icon");
-    expect(addNoteIcon).toBeInTheDocument();
+    expect(within(row2 as HTMLElement).getByText("Nessuna azione suggerita")).toBeInTheDocument();
   });
 });
