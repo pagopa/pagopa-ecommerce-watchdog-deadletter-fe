@@ -72,15 +72,12 @@ describe("SuggestedActionsRules", () => {
     });
 
     it("should match rules with empty gatewayAuthorizationStatus in config correctly", () => {
-        // In config, rule 173 has "gatewayAuthorizationStatus": ""
         const result = getSuggestedAction(
             "CANCELLED",
             "REFUND_ERROR",
-            null, // Should match empty string in ruleValue
+            null,
             "BANCOMATPAY"
         );
-        // Wait, rule 125 also matches this if we consider null and "" as equivalent for the rule's null?
-        // Actually, rule 125 has null, rule 173 has "". Both should match null/empty inputs.
         expect(result).not.toBeNull();
     });
 
