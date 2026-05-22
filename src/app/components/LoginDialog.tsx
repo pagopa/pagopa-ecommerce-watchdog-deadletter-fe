@@ -11,7 +11,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { IconButton, Grid, TextField, Alert, FormHelperText } from "@mui/material";
 import { fetchAuthentication } from "../utils/api/client";
 import { AuthenticationCredential, AuthenticationOk } from "../types/Authentication";
-import { getTokenFromUrl } from "../utils/utils";
+import { getTokenFromUrl, navigateTo } from "../utils/utils";
 import { JwtUser } from "@pagopa/mui-italia";
 import { LoadingButton } from "@mui/lab";
 import { decodeJwt } from "jose";
@@ -81,7 +81,7 @@ export default function LoginDialog(props:
                     props.setIsLoginDialogOpen(false);
                     // Save the user in the sessionStore
                     sessionStorage.setItem('jwtUser', JSON.stringify(jwtUser))
-                    window.location.href = authResult.urlRedirect;
+                    navigateTo(authResult.urlRedirect);
                 } else {
                     // Generate a error message
                     console.error("No token acquired...");

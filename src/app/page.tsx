@@ -19,6 +19,7 @@ import {
   updateTransactionNote,
   deleteTransactionNote,
 } from "./utils/api/client";
+import { navigateTo } from "./utils/utils";
 import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
 import CircularProgress from '@mui/material/CircularProgress';
@@ -34,6 +35,7 @@ import TransactionsListSection from "./components/TransactionListSection";
 import LoginDialog from "./components/LoginDialog";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 import { TransactionNote } from "./types/TransactionNotes";
+import LinearProgress from '@mui/material/LinearProgress';
 
 
 
@@ -55,6 +57,7 @@ export default function Home() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 20 });
   const [totalResults, setTotalResults] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const observerTarget = useRef<HTMLDivElement>(null);
   const token = useRef<string | null>();
@@ -162,6 +165,7 @@ export default function Home() {
       }
 
       setTotalResults((data?.page?.total ?? 0) * pageSize);
+      setTotalPages(data?.page?.total ?? 0);
       setHasMore((data?.page?.current ?? 0) < (data?.page?.total ?? 0) - 1);
 
       const transactionIds = new Set(transactionsList.map(t => t.transactionId));
@@ -316,7 +320,7 @@ export default function Home() {
   const handleLogout = () => {
     setJwtUser(null);
     setTransactions([]);
-    globalThis.location.href = process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/";
+    navigateTo(process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "/");
     sessionStorage.clear();
   }
 
@@ -408,6 +412,15 @@ export default function Home() {
               title="Lista Transazioni"
               subtitle={`Tutte le transazioni deadletter dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
             />
+
+            {(loadingData || hasMore) && (
+              <Box sx={{ width: '100%', mb: 2 }}>
+                <LinearProgress
+                  variant={totalPages > 0 ? "determinate" : "indeterminate"}
+                  value={totalPages > 0 ? ((paginationModel.page + 1) / totalPages) * 100 : 0}
+                />
+              </Box>
+            )}
 
             <TransactionsListSection
               transactions={transactions}
