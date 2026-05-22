@@ -208,7 +208,17 @@ export function TransactionsTable(
       headerName: "Azione Suggerita",
       flex: 0.5,
       sortable: false,
-      filterable: false,
+      filterable: true,
+      valueGetter: (_value, row) => {
+        const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = row;
+        const result = getSuggestedAction(
+          nodoStatus,
+          eCommerceStatus,
+          gatewayAuthorizationStatus,
+          paymentMethodName
+        );
+        return result?.suggestedAction || "";
+      },
       renderCell: (params) => {
         const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = params.row;
 
