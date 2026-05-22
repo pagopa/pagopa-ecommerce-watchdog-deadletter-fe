@@ -44,6 +44,22 @@ const mockSessionStorage = (() => {
 })();
 Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
 
+// @ts-ignore
+delete window.location;
+window.location = {
+  href: '',
+  assign: jest.fn(),
+  replace: jest.fn(),
+  reload: jest.fn(),
+  origin: '',
+  pathname: '',
+  search: '',
+  hash: '',
+} as any;
+
+jest.spyOn(console, 'log').mockImplementation(() => { });
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 
 
 describe('LoginDialog', () => {

@@ -77,7 +77,6 @@ export default function LoginDialog(props:
                     sessionStorage.setItem('authToken', token);
                     // Decode the token
                     const jwtUser = decodeJwt<JwtUser>(token);
-                    console.log("DEBUG TOKEN DEC: ", jwtUser);
                     props.setJwtUser(jwtUser);
                     props.setIsLoginDialogOpen(false);
                     // Save the user in the sessionStore
