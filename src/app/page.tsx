@@ -415,10 +415,19 @@ export default function Home() {
 
             {(loadingData || hasMore) && (
               <Box sx={{ width: '100%', mb: 2 }}>
-                <LinearProgress
-                  variant={totalPages > 0 ? "determinate" : "indeterminate"}
-                  value={totalPages > 0 ? ((paginationModel.page + 1) / totalPages) * 100 : 0}
-                />
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Box sx={{ width: '100%' }}>
+                    <LinearProgress
+                      variant={totalPages > 0 ? "determinate" : "indeterminate"}
+                      value={totalPages > 0 ? ((paginationModel.page + 1) / totalPages) * 100 : 0}
+                    />
+                  </Box>
+                  {totalPages > 0 && (
+                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 60 }}>
+                      {`${paginationModel.page + 1} / ${totalPages}`}
+                    </Typography>
+                  )}
+                </Box>
               </Box>
             )}
 
