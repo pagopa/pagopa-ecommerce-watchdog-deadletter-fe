@@ -16,9 +16,6 @@ interface TransactionsListSectionProps {
   handleEditNote: (currentNote: TransactionNote, newText: string) => void;
   handleDeleteNote: (note: TransactionNote) => void;
   rowCount?: number;
-  paginationMode?: "client" | "server";
-  paginationModel?: { page: number; pageSize: number };
-  onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
 }
 
 export default function TransactionsListSection(props: Readonly<TransactionsListSectionProps>) {
@@ -49,9 +46,6 @@ export default function TransactionsListSection(props: Readonly<TransactionsList
           handleEditNote={handleEditNote}
           handleDeleteNote={handleDeleteNote}
           rowCount={props.rowCount}
-          paginationMode={props.paginationMode}
-          paginationModel={props.paginationModel}
-          onPaginationModelChange={props.onPaginationModelChange}
         />
       </Paper>
     </Grid>

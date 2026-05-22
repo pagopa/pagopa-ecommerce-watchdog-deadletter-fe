@@ -1,5 +1,5 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
-import { Box, Button, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
+import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
@@ -24,9 +24,6 @@ export function TransactionsTable(
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
     handleDeleteNote: (note: TransactionNote) => void;
     rowCount?: number;
-    paginationMode?: "client" | "server";
-    paginationModel?: { page: number; pageSize: number };
-    onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
 
@@ -56,15 +53,13 @@ export function TransactionsTable(
       renderCell: (params) => {
         const sortedIds = params.api.getSortedRowIds();
         const index = sortedIds.indexOf(params.id);
-        const page = props.paginationModel?.page ?? 0;
-        const pageSize = props.paginationModel?.pageSize ?? 20;
         return (
           <Box sx={{
             fontWeight: 600,
             color: "#6b7280",
             fontSize: "0.85rem"
           }}>
-            {page * pageSize + index + 1}
+            {index + 1}
           </Box>
         );
       },
@@ -213,7 +208,17 @@ export function TransactionsTable(
       headerName: "Azione Suggerita",
       flex: 0.5,
       sortable: false,
-      filterable: false,
+      filterable: true,
+      valueGetter: (_value, row) => {
+        const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = row;
+        const result = getSuggestedAction(
+          nodoStatus,
+          eCommerceStatus,
+          gatewayAuthorizationStatus,
+          paymentMethodName
+        );
+        return result?.suggestedAction || "";
+      },
       renderCell: (params) => {
         const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = params.row;
 
@@ -418,6 +423,11 @@ export function TransactionsTable(
     },
   ];
 
+  const rowsWithId = props.transactions.map((row, index) => ({
+    ...row,
+    id: `${row.transactionId}-${row.insertionDate}-${index}`,
+  }));
+
   return (
     <Box
       sx={{
@@ -427,7 +437,7 @@ export function TransactionsTable(
       }}
     >
       <DataGrid
-        rows={props.transactions}
+        rows={rowsWithId}
         columns={columns}
         initialState={{
           columns: {
@@ -437,7 +447,7 @@ export function TransactionsTable(
             },
           },
         }}
-        getRowId={(row) => row.transactionId + row.insertionDate}
+        getRowId={(row) => row.id}
         autoHeight
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
@@ -485,11 +495,8 @@ export function TransactionsTable(
           }
         }}
         showToolbar
-        rowCount={props.rowCount}
-        paginationMode={props.paginationMode}
-        paginationModel={props.paginationModel}
-        pageSizeOptions={[20]}
-        onPaginationModelChange={props.onPaginationModelChange}
+        hideFooterPagination
+        filterMode="client"
         sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
       <TransactionNotesDrawer

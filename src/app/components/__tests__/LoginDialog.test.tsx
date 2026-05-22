@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { AuthenticationOk } from '../../types/Authentication';
 import { JwtUser } from "@pagopa/mui-italia";
-import { getTokenFromUrl } from "../../utils/utils";
+import { getTokenFromUrl, navigateTo } from "../../utils/utils";
 
 
 jest.mock('../../utils/api/client', () => ({
@@ -20,6 +20,7 @@ jest.mock('jose', () => ({
 
 jest.mock('../../utils/utils', () => ({
   getTokenFromUrl: jest.fn(),
+  navigateTo: jest.fn(),
 }));
 
 const mockedFetchAuthentication = fetchAuthentication as jest.Mock;
@@ -43,6 +44,10 @@ const mockSessionStorage = (() => {
   };
 })();
 Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage });
+
+// Mock console methods to avoid messy logs in tests
+jest.spyOn(console, 'log').mockImplementation(() => { });
+jest.spyOn(console, 'error').mockImplementation(() => { });
 
 
 

@@ -254,6 +254,7 @@ describe('CsvExportSection', () => {
 
   it('should show alert and stop loading if onFetchAllForExport fails', async () => {
     const user = userEvent.setup();
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
     const mockOnFetchAll = jest.fn().mockRejectedValue(new Error('Fetch failed'));
 
     renderComponent(mockTransactionsIntesa, '2024-12-06', '2024-12-06', mockOnFetchAll);
@@ -264,6 +265,7 @@ describe('CsvExportSection', () => {
     await waitFor(() => {
       expect(global.alert).toHaveBeenCalledWith("Errore durante il recupero dei dati per l'export.");
     });
+    errorSpy.mockRestore();
   });
 
   it('should escape CSV values containing special characters', async () => {
