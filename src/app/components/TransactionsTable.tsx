@@ -423,6 +423,11 @@ export function TransactionsTable(
     },
   ];
 
+  const rowsWithId = props.transactions.map((row, index) => ({
+    ...row,
+    id: `${row.transactionId}-${row.insertionDate}-${index}`,
+  }));
+
   return (
     <Box
       sx={{
@@ -432,7 +437,7 @@ export function TransactionsTable(
       }}
     >
       <DataGrid
-        rows={props.transactions}
+        rows={rowsWithId}
         columns={columns}
         initialState={{
           columns: {
@@ -442,7 +447,7 @@ export function TransactionsTable(
             },
           },
         }}
-        getRowId={(row) => row.transactionId + row.insertionDate}
+        getRowId={(row) => row.id}
         autoHeight
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
