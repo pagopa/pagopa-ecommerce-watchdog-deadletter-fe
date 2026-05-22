@@ -422,9 +422,9 @@ export default function Home() {
                       value={totalPages > 0 ? ((paginationModel.page + 1) / totalPages) * 100 : 0}
                     />
                   </Box>
-                  {totalPages > 0 && (
-                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 60 }}>
-                      {`${paginationModel.page + 1} / ${totalPages}`}
+                  {totalResults > 0 && (
+                    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>
+                      {`${transactions.length} / ${totalResults}`}
                     </Typography>
                   )}
                 </Box>
