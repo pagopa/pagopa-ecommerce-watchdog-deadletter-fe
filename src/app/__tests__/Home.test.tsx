@@ -37,6 +37,7 @@ jest.mock('jose', () => ({
 
 jest.mock('../utils/utils', () => ({
   getTokenFromUrl: jest.fn(),
+  navigateTo: jest.fn(),
 }));
 
 const mockedFetchAuthentication = fetchAuthentication as jest.Mock;

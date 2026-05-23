@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   preset: "ts-jest",
@@ -16,11 +16,19 @@ const config: Config = {
     "^.+.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
   },
   transform: {
+    "^.+\\.(t|j)sx?$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          jsx: "react-jsx",
+        },
+      },
+    ],
     ".+\\.(svg|css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testResultsProcessor: "jest-sonar-reporter",
-  testPathIgnorePatterns:[
+  testPathIgnorePatterns: [
     "/mock/"
   ],
   globals: {

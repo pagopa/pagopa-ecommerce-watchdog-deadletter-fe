@@ -5,3 +5,6 @@ export const getTokenFromUrl = (url: string): string | null => {
   else
     return null
 };
+export const navigateTo = (url: string) => {
+  window.location.assign(url);
+};

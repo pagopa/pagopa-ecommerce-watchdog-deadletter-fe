@@ -1,5 +1,5 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
-import { Box, Button, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
+import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
@@ -9,6 +9,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import { useState } from "react";
 import TransactionNotesDrawer from "./TransactionNotesDrawer";
+import { getSuggestedAction } from "../utils/SuggestedActionsRules";
 
 export function TransactionsTable(
   props: Readonly<{
@@ -23,9 +24,6 @@ export function TransactionsTable(
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
     handleDeleteNote: (note: TransactionNote) => void;
     rowCount?: number;
-    paginationMode?: "client" | "server";
-    paginationModel?: { page: number; pageSize: number };
-    onPaginationModelChange?: (model: { page: number; pageSize: number }) => void;
   }>
 ) {
 
@@ -55,15 +53,13 @@ export function TransactionsTable(
       renderCell: (params) => {
         const sortedIds = params.api.getSortedRowIds();
         const index = sortedIds.indexOf(params.id);
-        const page = props.paginationModel?.page ?? 0;
-        const pageSize = props.paginationModel?.pageSize ?? 20;
         return (
           <Box sx={{
             fontWeight: 600,
             color: "#6b7280",
             fontSize: "0.85rem"
           }}>
-            {page * pageSize + index + 1}
+            {index + 1}
           </Box>
         );
       },
@@ -75,15 +71,40 @@ export function TransactionsTable(
       sortable: false,
       width: 260,
       filterable: true,
-      renderCell: (params) => (
-        <Box sx={{
-          fontFamily: "monospace",
-          fontSize: "0.8rem",
-          color: "#1f2937"
-        }}>
-          {params.value}
-        </Box>
-      ),
+      renderCell: (params) => {
+        const nodo = params.row.nodoDetails;
+        const npg = params.row.npgDetails;
+        const ecommerce = params.row.eCommerceDetails;
+        const hasContent = nodo || npg || ecommerce;
+
+        const combined = {
+          nodoDetails: nodo || null,
+          npgDetails: npg || null,
+          eCommerceDetails: ecommerce || null,
+        };
+
+        return (
+          <Box
+            sx={{
+              fontFamily: "monospace",
+              fontSize: "0.8rem",
+              color: hasContent ? "#2563eb" : "#1f2937",
+              textDecoration: hasContent ? "underline" : "none",
+              textDecorationStyle: "dotted",
+              textUnderlineOffset: "3px",
+              cursor: hasContent ? "pointer" : "default",
+              "&:hover": hasContent ? {
+                color: "#1d4ed8",
+                textDecoration: "underline",
+                textDecorationStyle: "solid",
+              } : {},
+            }}
+            onClick={() => hasContent && props.handleOpenDialog(combined)}
+          >
+            {params.value}
+          </Box>
+        );
+      },
     },
     {
       field: "insertionDate",
@@ -183,45 +204,86 @@ export function TransactionsTable(
       sortable: false,
     },
     {
-      field: "details",
-      headerName: "Details",
+      field: "suggestedAction",
+      headerName: "Azione Suggerita",
       flex: 0.5,
-      resizable: false,
+      sortable: false,
+      filterable: true,
+      valueGetter: (_value, row) => {
+        const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = row;
+        const result = getSuggestedAction(
+          nodoStatus,
+          eCommerceStatus,
+          gatewayAuthorizationStatus,
+          paymentMethodName
+        );
+        return result?.suggestedAction || "";
+      },
       renderCell: (params) => {
-        const nodo = params.row.nodoDetails;
-        const npg = params.row.npgDetails;
-        const ecommerce = params.row.eCommerceDetails;
+        const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = params.row;
 
-        const combined = {
-          nodoDetails: nodo || null,
-          npgDetails: npg || null,
-          eCommerceDetails: ecommerce || null,
-        };
+        const result = getSuggestedAction(
+          nodoStatus,
+          eCommerceStatus,
+          gatewayAuthorizationStatus,
+          paymentMethodName
+        );
 
-        const hasContent = nodo || npg || ecommerce;
-
-        if (!hasContent) {
-          return <span style={{ color: "#9ca3af" }}>N/A</span>;
+        if (!result) {
+          return (
+            <Box sx={{ color: "#9ca3af", fontSize: "0.75rem", fontStyle: "italic" }}>
+              Nessuna azione suggerita
+            </Box>
+          );
         }
 
+        const colorMap: Record<string, { bg: string; color: string; border: string }> = {
+          info: { bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
+          warning: { bg: "#fffbeb", color: "#b45309", border: "#fde68a" },
+          error: { bg: "#fef2f2", color: "#b91c1c", border: "#fecaca" },
+        };
+
+        const palette = colorMap[result.severity] ?? colorMap.info;
+
         return (
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => props.handleOpenDialog(combined)}
-            sx={{
-              textTransform: "none",
-              fontSize: "0.75rem",
-              borderColor: "#3b82f6",
-              color: "#3b82f6",
-              "&:hover": {
-                borderColor: "#2563eb",
-                backgroundColor: "#eff6ff"
-              }
-            }}
+          <Tooltip
+            title={
+              <Typography variant="body2" sx={{ color: "common.white", whiteSpace: "pre-line", p: 0.5 }}>
+                {result.suggestedAction}
+              </Typography>
+            }
+            placement="bottom-start"
+            arrow
+            enterDelay={300}
           >
-            View
-          </Button>
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                px: 1,
+                py: 0.4,
+                borderRadius: 1,
+                border: `1px solid ${palette.border}`,
+                backgroundColor: palette.bg,
+                cursor: "default",
+                maxWidth: "100%",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: palette.color,
+                  fontWeight: 600,
+                  fontSize: "0.72rem",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {result.suggestedAction}
+              </Typography>
+            </Box>
+          </Tooltip>
         );
       },
     },
@@ -289,7 +351,7 @@ export function TransactionsTable(
       field: 'notes',
       headerName: 'Note',
       flex: 1,
-      minWidth: 250,
+      minWidth: 150,
       sortable: false,
       filterable: false,
       renderCell: (params) => {
@@ -361,6 +423,11 @@ export function TransactionsTable(
     },
   ];
 
+  const rowsWithId = props.transactions.map((row, index) => ({
+    ...row,
+    id: `${row.transactionId}-${row.insertionDate}-${index}`,
+  }));
+
   return (
     <Box
       sx={{
@@ -370,7 +437,7 @@ export function TransactionsTable(
       }}
     >
       <DataGrid
-        rows={props.transactions}
+        rows={rowsWithId}
         columns={columns}
         initialState={{
           columns: {
@@ -380,7 +447,7 @@ export function TransactionsTable(
             },
           },
         }}
-        getRowId={(row) => row.transactionId + row.insertionDate}
+        getRowId={(row) => row.id}
         autoHeight
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
@@ -428,11 +495,8 @@ export function TransactionsTable(
           }
         }}
         showToolbar
-        rowCount={props.rowCount}
-        paginationMode={props.paginationMode}
-        paginationModel={props.paginationModel}
-        pageSizeOptions={[20]}
-        onPaginationModelChange={props.onPaginationModelChange}
+        hideFooterPagination
+        filterMode="client"
         sortModel={[{ field: "insertionDate", sort: "desc" }]}
       />
       <TransactionNotesDrawer
