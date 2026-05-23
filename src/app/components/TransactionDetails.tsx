@@ -1,7 +1,9 @@
-import { Box, Typography, Paper, Tooltip, IconButton, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import { Box, Typography, Tooltip, IconButton, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+// TODO: Remove usage of `any` once the transaction detail view model is properly defined with typed interfaces.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
     return Object.keys(obj || {}).reduce((acc: Record<string, any>, k: string) => {
         const innermostKey = k;
@@ -16,7 +18,7 @@ const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
                 acc[innermostKey] = JSON.stringify(obj[k]);
             }
         } else {
-            let val = obj[k];
+            const val = obj[k];
             let finalKey = innermostKey;
 
             if (!isNaN(Number(k)) && prefix) {
