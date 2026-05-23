@@ -1325,7 +1325,41 @@
             "paymentGateway": "NPG",
             "correlationId": "7bda91d2-a1e1-45ac-b57b-03d0d1d1a061",
             "gatewayAuthorizationStatus": null,
-            "gatewayErrorCode": null
+            "gatewayErrorCode": null,
+            "events": [
+              {
+                "creationDate": "2026-05-22T08:59:16.502345509Z",
+                "eventCode": "TRANSACTION_ACTIVATED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T08:59:34.83185049Z",
+                "eventCode": "TRANSACTION_AUTHORIZATION_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T09:02:39.242042341Z",
+                "eventCode": "TRANSACTION_AUTHORIZATION_COMPLETED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T09:02:39.252114235Z",
+                "eventCode": "TRANSACTION_CLOSURE_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T09:02:39.670825317Z",
+                "eventCode": "TRANSACTION_CLOSED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T10:07:40.271917098Z",
+                "eventCode": "TRANSACTION_EXPIRED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T23:00:39.908088978Z",
+                "eventCode": "TRANSACTION_USER_RECEIPT_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2026-05-22T23:00:40.688209504Z",
+                "eventCode": "TRANSACTION_USER_RECEIPT_ADDED_EVENT"
+              }
+            ]
           },
           "paymentInfo": {
             "origin": "CHECKOUT",
