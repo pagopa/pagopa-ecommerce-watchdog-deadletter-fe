@@ -33,6 +33,7 @@ import SectionDivider from "./components/SectionDivider";
 import SectionHeader from "./components/SectionHeader";
 import TransactionsListSection from "./components/TransactionListSection";
 import LoginDialog from "./components/LoginDialog";
+import { TransactionDetails } from "./components/TransactionDetails";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
@@ -494,9 +495,7 @@ export default function Home() {
         <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
           <DialogTitle>Dettaglio</DialogTitle>
           <DialogContent>
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-              {JSON.stringify(dialogContent, null, 2)}
-            </pre>
+            <TransactionDetails content={dialogContent} />
           </DialogContent>
         </Dialog>
 
