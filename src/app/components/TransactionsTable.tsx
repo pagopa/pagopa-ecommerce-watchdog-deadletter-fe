@@ -438,6 +438,7 @@ export function TransactionsTable(
     >
       <DataGrid
         rows={rowsWithId}
+        rowCount={rowsWithId.length}
         columns={columns}
         initialState={{
           columns: {
@@ -448,7 +449,6 @@ export function TransactionsTable(
           },
         }}
         getRowId={(row) => row.id}
-        autoHeight
         getRowHeight={() => "auto"}
         disableRowSelectionOnClick
         sx={{
