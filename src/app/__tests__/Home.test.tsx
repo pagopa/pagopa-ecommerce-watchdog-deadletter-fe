@@ -376,8 +376,8 @@ describe('Home', () => {
     expect(mockedFetchActions).toHaveBeenCalled();
 
     // Add the action test to the transaction
-    const actionSelection = within(table).getByRole("combobox");
-    await userEvent.click(actionSelection);
+    const actionSelection = within(table).getAllByRole("combobox");
+    await userEvent.click(actionSelection[0]);
     const option = await screen.findByRole('option', { name: 'testAction' });
     await userEvent.click(option);
 

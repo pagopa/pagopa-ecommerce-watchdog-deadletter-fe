@@ -2342,6 +2342,42 @@
       "timestamp": "2025-08-10T10:35:00Z"
     }
   ],
+  "deadletter-transactions-actions-v2": [
+    [
+      {
+        "id": "e7cbf442-4f3f-4d91-bb6e-3c1fabc3a42e",
+        "deadletterTransactionId": "b202ea99a53643c4bb1d73114a06ea21",
+        "userId": "luigi.verdi",
+        "action": {
+          "value": "Nessuna azione richiesta",
+          "type": "FINAL"
+        },
+        "timestamp": "2025-08-10T08:20:00Z"
+      }
+    ],
+    [
+      {
+        "id": "f4f3d2b1-5c6e-4d2a-9f7e-8b9c6d5e4a3b",
+        "deadletterTransactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
+        "userId": "luigi.verdi",
+        "action": {
+          "value": "Presa in carico",
+          "type": "NOT_FINAL"
+        },
+        "timestamp": "2025-08-10T10:35:00Z"
+      },
+      {
+        "id": "z4f3d2b1-5c6e-4d2a-9f7e-8b9c6d5e4a3c",
+        "deadletterTransactionId": "6460dc3e61ba4ed6bfea2c4468b2862c",
+        "userId": "luigi.verdi",
+        "action": {
+          "value": "Nessuna azione richiesta",
+          "type": "FINAL"
+        },
+        "timestamp": "2025-08-10T11:35:00Z"
+      }
+    ]
+  ],
   "authenticate": {
     "urlRedirect": "http://localhost:3000/#token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1hcmlvLnJvc3NpIiwibmFtZSI6Ik1hcmlvIiwic3VybmFtZSI6IlJvc3NpIiwiZW1haWwiOiJtYXJpby5yb3NzaUBtb2NrLmNvbSIsImlhdCI6MTc1OTc1Mjg3NCwiZXhwIjoxNzU5OTMxOTMzLCJhdWQiOiJ3YXRjaGRvZyIsImlzcyI6IndhdGNoZG9nLWRlYWRsZXR0ZXItc2VydmljZSJ9.kRkBix0RQYeCHR_GlsL4lAt3cALLAzwYENsTB5gOaK8"
   },
