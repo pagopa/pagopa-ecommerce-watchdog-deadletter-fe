@@ -39,7 +39,23 @@ export const fetchActionsByTransactionId = async (token: string, transactionId: 
   }
 };
 
-
+export const fetchActionsByMultipleTransactionIds = async (token: string, transactionIds: Set<string>): Promise<DeadletterAction[][]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/v2/deadletter-transactions/actions`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({transactionIds: Array.from(transactionIds)})
+    });
+    if (!res.ok) throw new Error(`Failed to fetch actions for ${transactionIds}`);
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
 
 export const fetchDeadletterTransactionsV2 = async (token: string, fromDate: string, toDate: string, pageNumber: number = 0, pageSize: number = 2): Promise<DeadletterResponse | null> => {
   try {

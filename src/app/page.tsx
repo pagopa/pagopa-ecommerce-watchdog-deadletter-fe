@@ -11,7 +11,7 @@ import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
 import {
   fetchActions,
-  fetchActionsByTransactionId,
+  fetchActionsByMultipleTransactionIds,
   fetchAddActionToDeadletterTransaction,
   fetchDeadletterTransactionsV2,
   fetchNotesByTransactionIds,
@@ -189,18 +189,17 @@ export default function Home() {
       }
 
       const newActionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
-      await Promise.all(
-        transactionsList.map(async (transaction) => {
-          if (token.current) {
-            const fileActions = await fetchActionsByTransactionId(token.current, transaction.transactionId);
-            const singleActionMap: Map<string, DeadletterAction> = new Map();
-            for (const act of fileActions) {
-              singleActionMap.set(act.action.value, act);
-            }
-            newActionsMap.set(transaction.transactionId, singleActionMap);
-          }
-        })
-      );
+      if (token.current && transactionIds?.size > 0) {
+        const nestedActionsList = await fetchActionsByMultipleTransactionIds(token.current, transactionIds)
+        for (const actions of nestedActionsList) {
+          const singleActionMap: Map<string, DeadletterAction> = actions.reduce(
+            (acc, item) => {acc.set(item.action.value, item); return acc},
+            new Map()
+          );
+          newActionsMap.set(actions[0]?.deadletterTransactionId, singleActionMap);
+        }
+      }
+
       setActionsMap((prev) => {
         if (page === 0) return newActionsMap;
         const map = new Map(prev);

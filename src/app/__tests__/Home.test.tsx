@@ -1,13 +1,13 @@
 import Home from "../page"
 import { render, screen, within, waitFor } from '@testing-library/react';
-import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2, fetchNotesByTransactionIds, addNoteToTransaction, updateTransactionNote, deleteTransactionNote } from '../utils/api/client';
+import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchActionsByMultipleTransactionIds, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2, fetchNotesByTransactionIds, addNoteToTransaction, updateTransactionNote, deleteTransactionNote } from '../utils/api/client';
 import React from "react";
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { JwtUser } from "@pagopa/mui-italia";
 import { getTokenFromUrl } from "../utils/utils";
-import { deadletterResponse } from "./mock/DataMocks";
+import { deadletterResponse, multipleTransactionIdsActions } from "./mock/DataMocks";
 
 
 // Mocks
@@ -15,6 +15,7 @@ jest.mock('../utils/api/client', () => ({
   fetchAuthentication: jest.fn(),
   fetchActions: jest.fn(),
   fetchActionsByTransactionId: jest.fn(),
+  fetchActionsByMultipleTransactionIds: jest.fn(),
   fetchAddActionToDeadletterTransaction: jest.fn(),
   fetchDeadletterTransactionsV2: jest.fn(),
   fetchNotesByTransactionIds: jest.fn(),
@@ -43,6 +44,7 @@ jest.mock('../utils/utils', () => ({
 const mockedFetchAuthentication = fetchAuthentication as jest.Mock;
 const mockedFetchActions = fetchActions as jest.Mock;
 const mockedFetchActionsByTransactionId = fetchActionsByTransactionId as jest.Mock;
+const mockedFetchActionsByMultipleTransactionIds = fetchActionsByMultipleTransactionIds as jest.Mock;
 const mockedFetchAddActionToDeadletterTransaction = fetchAddActionToDeadletterTransaction as jest.Mock;
 const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
 const mockedFetchNotesByTransactionIds = fetchNotesByTransactionIds as jest.Mock;
@@ -80,6 +82,7 @@ describe('Home', () => {
     mockedFetchAuthentication.mockReset();
     mockedFetchActions.mockReset();
     mockedFetchActionsByTransactionId.mockReset();
+    mockedFetchActionsByMultipleTransactionIds.mockReset();
     mockedFetchAddActionToDeadletterTransaction.mockReset();
     mockedFetchDeadletterTransactionsV2.mockReset();
     mockedFetchNotesByTransactionIds.mockReset();
@@ -215,7 +218,7 @@ describe('Home', () => {
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
     mockedFetchNotesByTransactionIds.mockResolvedValue([]);
-    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActionsByMultipleTransactionIds.mockResolvedValue(multipleTransactionIdsActions);
     mockedFetchActions.mockResolvedValue([]);
 
     renderComponent();
@@ -246,7 +249,7 @@ describe('Home', () => {
 
     expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
     expect(mockedFetchNotesByTransactionIds).toHaveBeenCalled();
-    expect(mockedFetchActionsByTransactionId).toHaveBeenCalled();
+    expect(mockedFetchActionsByMultipleTransactionIds).toHaveBeenCalled();
 
   });
 
@@ -265,7 +268,7 @@ describe('Home', () => {
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(null);
     mockedFetchNotesByTransactionIds.mockResolvedValue([]);
-    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActionsByMultipleTransactionIds.mockResolvedValue(multipleTransactionIdsActions);
     mockedFetchActions.mockResolvedValue([]);
 
     renderComponent();
@@ -298,14 +301,14 @@ describe('Home', () => {
 
     expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
     expect(mockedFetchNotesByTransactionIds).not.toHaveBeenCalled();
-    expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
+    expect(mockedFetchActionsByMultipleTransactionIds).not.toHaveBeenCalled();
   });
 
   it('check if not logged no table or charts is showed', async () => {
     // Mock the api
     mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
     mockedFetchNotesByTransactionIds.mockResolvedValue([]);
-    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActionsByMultipleTransactionIds.mockResolvedValue(multipleTransactionIdsActions);
     mockedFetchActions.mockResolvedValue([]);
 
     renderComponent();
@@ -329,7 +332,7 @@ describe('Home', () => {
 
     expect(mockedFetchDeadletterTransactionsV2).not.toHaveBeenCalled();
     expect(mockedFetchNotesByTransactionIds).not.toHaveBeenCalled();
-    expect(mockedFetchActionsByTransactionId).not.toHaveBeenCalled();
+    expect(mockedFetchActionsByMultipleTransactionIds).not.toHaveBeenCalled();
 
   });
 
