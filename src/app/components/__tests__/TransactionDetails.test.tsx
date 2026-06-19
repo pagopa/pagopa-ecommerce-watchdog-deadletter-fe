@@ -11,9 +11,9 @@ import { TransactionDetails } from '../TransactionDetails';
 const isObjectArray = (val: unknown): val is Record<string, unknown>[] =>
     Array.isArray(val) && val.length > 0 && typeof val[0] === 'object' && val[0] !== null;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     return Object.keys(obj || {}).reduce((acc: Record<string, any>, k: string) => {
         const val = obj[k];
         const label = prefix ? `${prefix}.${k}` : k;
