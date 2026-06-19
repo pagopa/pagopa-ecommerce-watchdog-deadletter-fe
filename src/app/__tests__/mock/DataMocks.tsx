@@ -1,3 +1,4 @@
+import { DeadletterAction } from "@/app/types/DeadletterAction";
 import { DeadletterResponse } from "../../types/DeadletterResponse";
 
 
@@ -131,3 +132,18 @@ export const emptyDeadletterResponse: DeadletterResponse = {
     results: 0
   }
 }
+
+export const multipleTransactionIdsActions: DeadletterAction[][] = [
+  [
+    {
+      id: "mockId",
+      deadletterTransactionId: "mockTransactionId",
+      userId: "mockUserId",
+      action: {
+        value: "mockAction",
+        type: "FINAL"
+      },
+      timestamp: "2026-01-01T00:00:00Z"
+    }
+  ]
+]
