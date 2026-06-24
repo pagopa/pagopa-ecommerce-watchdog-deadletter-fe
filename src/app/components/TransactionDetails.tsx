@@ -3,7 +3,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 // TODO: Remove usage of `any` once the transaction detail view model is properly defined with typed interfaces.
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 const isObjectArray = (val: any): val is Record<string, any>[] =>
     Array.isArray(val) && val.length > 0 && typeof val[0] === 'object' && val[0] !== null;
