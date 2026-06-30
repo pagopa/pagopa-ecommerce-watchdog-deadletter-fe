@@ -1,4 +1,4 @@
-import { getTokenFromUrl } from "../utils";
+import { getTokenFromUrl, debounce } from "../utils";
 
 describe('getTokenFromUrl', () => {
   it('should return the token when a valid #token= fragment exists', () => {
@@ -19,5 +19,28 @@ describe('getTokenFromUrl', () => {
   it('should return null if #token= fragment exists but has no value', () => {
     const url = 'https://mock.com/app#token=';
     expect(getTokenFromUrl(url)).toBeNull();
+  });
+});
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+describe('delayed', () => {
+  const testFn = jest.fn();
+  afterEach(() => jest.clearAllMocks());
+
+  it('should call function if delay has passed', async () => {
+    const debouncedTestFn = debounce(testFn, 1000);
+    debouncedTestFn();
+    await sleep(1500);
+    expect(testFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('should NOT call function if delay has NOT passed and it should reset the timer', async () => {
+    const debouncedTestFn = debounce(testFn, 1000);
+    debouncedTestFn();
+    await sleep(100);
+    debouncedTestFn();
+    await sleep(1500);
+    expect(testFn).toHaveBeenCalledTimes(1);
   });
 });

@@ -12,13 +12,14 @@ import {
   addNoteToTransaction,
   addNoteToTransactions,
   updateTransactionNote,
-  deleteTransactionNote
+  deleteTransactionNote,
+  fetchCalendarStats
 } from '../utils/api/client';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { JwtUser } from "@pagopa/mui-italia";
-import { getTokenFromUrl } from "../utils/utils";
+import { getTokenFromUrl, debounce } from "../utils/utils";
 import { deadletterResponse, multipleTransactionIdsActions } from "./mock/DataMocks";
 
 
@@ -32,6 +33,7 @@ jest.mock('../utils/api/client', () => ({
   fetchAddActionToDeadletterTransactions: jest.fn(),
   fetchDeadletterTransactionsV2: jest.fn(),
   fetchNotesByTransactionIds: jest.fn(),
+  fetchCalendarStats: jest.fn(),
   addNoteToTransaction: jest.fn(),
   addNoteToTransactions: jest.fn(),
   updateTransactionNote: jest.fn(),
@@ -53,6 +55,7 @@ jest.mock('jose', () => ({
 jest.mock('../utils/utils', () => ({
   getTokenFromUrl: jest.fn(),
   navigateTo: jest.fn(),
+  debounce: jest.fn((f, _) => () => f())
 }));
 
 // when row / column virtualization is enabled (which uses react-virtual) we need to
@@ -81,6 +84,7 @@ const mockedFetchAddActionToDeadletterTransaction = fetchAddActionToDeadletterTr
 const mockedFetchAddActionToDeadletterTransactions = fetchAddActionToDeadletterTransactions as jest.Mock;
 const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
 const mockedFetchNotesByTransactionIds = fetchNotesByTransactionIds as jest.Mock;
+const mockedFetchCalendarStats = fetchCalendarStats as jest.Mock;
 const mockedAddNoteToTransaction = addNoteToTransaction as jest.Mock;
 const mockedAddNoteToTransactions = addNoteToTransactions as jest.Mock;
 const mockedUpdateTransactionNote = updateTransactionNote as jest.Mock;
@@ -107,7 +111,7 @@ const mockSessionStorage = (() => {
 })();
 Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage, writable: true, });
 
-
+const currentMonth = new Date().toLocaleString("it-IT", {month: "long"});
 
 describe('Home', () => {
 
@@ -121,6 +125,7 @@ describe('Home', () => {
     mockedFetchAddActionToDeadletterTransactions.mockReset();
     mockedFetchDeadletterTransactionsV2.mockReset();
     mockedFetchNotesByTransactionIds.mockReset();
+    mockedFetchCalendarStats.mockReset();
     mockGetTokenFromUrl.mockReset();
     mockedDecodeJwt.mockReset();
 
@@ -128,6 +133,7 @@ describe('Home', () => {
   });
 
   const renderComponent = () => {
+    mockedFetchCalendarStats.mockResolvedValue([])
     return render(<Home />)
   }
 
@@ -136,7 +142,6 @@ describe('Home', () => {
 
     // Check if the dialog and button components are visible
     expect(screen.getByRole('dialog', { name: "Login" })).toBeInTheDocument();
-
   });
 
   it('check that when the Home is rendered the Dialog is close if the user is logged', async () => {
@@ -261,18 +266,10 @@ describe('Home', () => {
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date pickers
-    const startDatePicker = await screen.findByLabelText("Data inizio");
-    const endDatePicker = await screen.findByLabelText("Data fine");
-    expect(startDatePicker).toBeInTheDocument();
-    expect(endDatePicker).toBeInTheDocument();
-
-    // click on the date pickers and select a range
-    await userEvent.type(startDatePicker, "2025-11-07");
-    await userEvent.type(endDatePicker, "2025-11-08");
-
-    expect(startDatePicker).toHaveValue("2025-11-07");
-    expect(endDatePicker).toHaveValue("2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
 
     // wait until the graphs and the table are in the document
     expect(await screen.findByText("Stato Ecommerce")).toBeInTheDocument();
@@ -311,18 +308,10 @@ describe('Home', () => {
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date pickers
-    const startDatePicker = await screen.findByLabelText("Data inizio");
-    const endDatePicker = await screen.findByLabelText("Data fine");
-    expect(startDatePicker).toBeInTheDocument();
-    expect(endDatePicker).toBeInTheDocument();
-
-    // click on the date pickers and select a range
-    await userEvent.type(startDatePicker, "2025-11-07");
-    await userEvent.type(endDatePicker, "2025-11-08");
-
-    expect(startDatePicker).toHaveValue("2025-11-07");
-    expect(endDatePicker).toHaveValue("2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
 
     // wait until the graphs and the table are in the document
     expect(screen.queryByText("Stato Ecommerce")).not.toBeInTheDocument();
@@ -352,18 +341,10 @@ describe('Home', () => {
     expect(screen.getByRole('dialog', { name: "Login" })).toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
 
-    // check the presence of the date pickers
-    const startDatePicker = await screen.findByLabelText("Data inizio");
-    const endDatePicker = await screen.findByLabelText("Data fine");
-    expect(startDatePicker).toBeInTheDocument();
-    expect(endDatePicker).toBeInTheDocument();
-
-    // click on the date pickers and select a range
-    await userEvent.type(startDatePicker, "2025-11-07");
-    await userEvent.type(endDatePicker, "2025-11-08");
-
-    expect(startDatePicker).toHaveValue("2025-11-07");
-    expect(endDatePicker).toHaveValue("2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
 
     expect(mockedFetchDeadletterTransactionsV2).not.toHaveBeenCalled();
     expect(mockedFetchNotesByTransactionIds).not.toHaveBeenCalled();
@@ -396,18 +377,10 @@ describe('Home', () => {
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date pickers
-    const startDatePicker = await screen.findByLabelText("Data inizio");
-    const endDatePicker = await screen.findByLabelText("Data fine");
-    expect(startDatePicker).toBeInTheDocument();
-    expect(endDatePicker).toBeInTheDocument();
-
-    // click on the date pickers and select a range
-    await userEvent.type(startDatePicker, "2025-11-07");
-    await userEvent.type(endDatePicker, "2025-11-08");
-
-    expect(startDatePicker).toHaveValue("2025-11-07");
-    expect(endDatePicker).toHaveValue("2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
 
     // wait until the graphs and the table are in the document
     const table = await screen.findByRole("table");
@@ -447,18 +420,10 @@ describe('Home', () => {
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date pickers
-    const startDatePicker = await screen.findByLabelText("Data inizio");
-    const endDatePicker = await screen.findByLabelText("Data fine");
-    expect(startDatePicker).toBeInTheDocument();
-    expect(endDatePicker).toBeInTheDocument();
-
-    // click on the date pickers and select a range
-    await userEvent.type(startDatePicker, "2025-11-07");
-    await userEvent.type(endDatePicker, "2025-11-08");
-
-    expect(startDatePicker).toHaveValue("2025-11-07");
-    expect(endDatePicker).toHaveValue("2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
 
     // wait until the graphs and the table are in the document
     const table = await screen.findByRole("table");
@@ -520,18 +485,10 @@ describe('Home', () => {
     // wait until the user is logged
     expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
 
-    // check the presence of the date pickers
-    const startDatePicker = await screen.findByLabelText("Data inizio");
-    const endDatePicker = await screen.findByLabelText("Data fine");
-    expect(startDatePicker).toBeInTheDocument();
-    expect(endDatePicker).toBeInTheDocument();
-
-    // click on the date pickers and select a range
-    await userEvent.type(startDatePicker, "2025-11-07");
-    await userEvent.type(endDatePicker, "2025-11-08");
-
-    expect(startDatePicker).toHaveValue("2025-11-07");
-    expect(endDatePicker).toHaveValue("2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
 
     // wait until the graphs and the table are in the document
     const table = await screen.findByRole("table");
@@ -588,8 +545,11 @@ describe('Home', () => {
 
     renderComponent();
 
-    await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
-    await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
+
     await screen.findByRole("table");
 
     const openDrawerButton = screen.getAllByTestId("transaction-add-note-icon")[0];
@@ -626,8 +586,11 @@ describe('Home', () => {
 
     renderComponent();
 
-    await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
-    await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
+
     await screen.findByRole("table");
 
     const openDrawerButton = screen.getAllByTestId("transaction-notes-icon")[0];
@@ -670,8 +633,11 @@ describe('Home', () => {
 
     renderComponent();
 
-    await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
-    await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
+    // Select date range
+    const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+    await userEvent.click(day1Cell);
+    await userEvent.click(day1Cell);
+
     const table = await screen.findByRole("table");
 
     expect(within(table).queryAllByText("Test delete")).toHaveLength(1);

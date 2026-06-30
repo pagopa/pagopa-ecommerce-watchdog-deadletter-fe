@@ -5,7 +5,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { HeaderAccount, HeaderProduct, JwtUser, RootLinkType } from "@pagopa/mui-italia";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 import { Transaction } from "./types/DeadletterResponse";
@@ -20,8 +19,9 @@ import {
   deleteTransactionNote,
   fetchAddActionToDeadletterTransactions,
   addNoteToTransactions,
+  fetchCalendarStats
 } from "./utils/api/client";
-import { navigateTo } from "./utils/utils";
+import { navigateTo, debounce } from "./utils/utils";
 import ChartsStatistics from "./components/ChartsStatistics";
 import { ActionType, DeadletterAction } from "./types/DeadletterAction";
 import CircularProgress from '@mui/material/CircularProgress';
@@ -29,8 +29,6 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import CsvExportSection from "./components/CsvExportSection";
-import WorkloadCalendar from "./components/WorkloadCalendar";
-import DateRangeSelector from "./components/DateRangeSelector";
 import SectionDivider from "./components/SectionDivider";
 import SectionHeader from "./components/SectionHeader";
 import LoginDialog from "./components/LoginDialog";
@@ -38,15 +36,17 @@ import { TransactionDetails } from "./components/TransactionDetails";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
-import { Chip, Paper } from "@mui/material";
+import { DateRange } from "@daypicker/react";
+import WorkloadCalendar from "./components/WorkloadCalendar";
+import { Chip, Grid, Paper } from "@mui/material";
 import { TransactionsTable } from "./components/TransactionsTable";
+import { CalendarStats } from "./types/CalendarStatsResponse";
 
 
 
 export default function Home() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [rangeStart, setRangeStart] = useState("");
-  const [rangeEnd, setRangeEnd] = useState("");
+  const [range, setRange] = useState<DateRange | undefined>();
 
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
   const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
@@ -62,6 +62,10 @@ export default function Home() {
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 100 });
   const [totalResults, setTotalResults] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  const [date, setDate] = useState<Date>(new Date());
+  const [calendarStats, setCalendarStats] = useState<CalendarStats[]>([]);
+  const [fetchedYearMonths, setFetchedYearMonths] = useState<string[]>([]);
 
   const observerTarget = useRef<HTMLDivElement>(null);
   const token = useRef<string | null>();
@@ -86,12 +90,25 @@ export default function Home() {
     }
   }, [jwtUser]);
 
+  useEffect(debounce(() => {
+    token.current = sessionStorage.getItem("authToken");
+    const year = date.getFullYear();
+    const month = date.getMonth()+1;
+    const key = `${year}${month}`;
+
+    if (token.current && jwtUser && !fetchedYearMonths.includes(key)) {
+      fetchCalendarStats(token.current, year, month)
+        .then((stats) => {
+          setCalendarStats(calendarStats.concat(stats))
+          setFetchedYearMonths(fetchedYearMonths.concat(key));
+        })
+    }
+  }, 700), [jwtUser, date]);
+
   useEffect(() => {
     token.current = sessionStorage.getItem("authToken");
     if (token.current && jwtUser) {
-      fetchActions(token.current).then((fetchedActions) => {
-        setActions(fetchedActions);
-      });
+      fetchActions(token.current).then((fetchedActions) => setActions(fetchedActions));
     }
   }, [jwtUser]);
 
@@ -177,14 +194,14 @@ export default function Home() {
     }
   }
 
-  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 100) => {
-    if (!start || !end || !token.current) {
+  const loadDataForRange = async (range: DateRange, page: number = 0, pageSize: number = 20) => {
+    if (!range.from || !range.to || !token.current) {
       setTransactions([]);
       return;
     }
 
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    const startDate = range.from!;
+    const endDate = range.to!;
     const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -205,7 +222,7 @@ export default function Home() {
     }
 
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current!, start, end, page, pageSize);
+      const data = await fetchDeadletterTransactionsV2(token.current!, range?.from?.toISOString(), range?.to?.toISOString(), page, pageSize);
       const transactionsList = data?.deadletterTransactions
         .sort((a, b) => new Date(a.insertionDate).valueOf() - new Date(b.insertionDate).valueOf())
         || [];
@@ -275,36 +292,35 @@ export default function Home() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
-    if (hasMore && !isLoadingMore && !loadingData && rangeStart && rangeEnd) {
-      // Initiate next fetch after a small delay (the 1s delay is inside loadDataForRange but we can do it here too, however we already do `await new Promise` in loadDataForRange)
+    if (hasMore && !isLoadingMore && !loadingData && range) {
+      // Initiate next fetch after a small delay (the 2s delay is inside loadDataForRange but we can do it here too, however we already do `await new Promise` in loadDataForRange)
       timeoutId = setTimeout(() => {
         setPaginationModel((prev) => {
           const nextModel = { ...prev, page: prev.page + 1 };
-          if (rangeStart && rangeEnd) {
-            loadDataForRange(rangeStart, rangeEnd, nextModel.page, nextModel.pageSize);
-          }
+          loadDataForRange(range, nextModel.page, nextModel.pageSize);
           return nextModel;
         });
       }, 100);
     }
 
     return () => clearTimeout(timeoutId);
-  }, [hasMore, isLoadingMore, loadingData, rangeStart, rangeEnd, paginationModel.pageSize]);
+  }, [hasMore, isLoadingMore, loadingData, range, paginationModel.pageSize]);
 
-  const handleRangeChange = (start: string, end: string) => {
-    setRangeStart(start);
-    setRangeEnd(end);
+  const handleRangeChange = (range: DateRange | undefined) => {
     setPaginationModel({ page: 0, pageSize: 100 });
+    setRange(range);
 
-    if (start && end) {
-      loadDataForRange(start, end, 0, 100);
+    if (range?.from && range?.to) {
+      loadDataForRange(range, 0, 100);
+    } else {
+      setTransactions([])
     }
   };
 
   const handleFetchAllForExport = async (): Promise<Transaction[]> => {
-    if (!rangeStart || !rangeEnd || !token.current) return [];
+    if (!range?.from || !range?.to || !token.current) return [];
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current, rangeStart, rangeEnd, 0, 1000);
+      const data = await fetchDeadletterTransactionsV2(token.current, range.from.toISOString(), range.to.toISOString(), 0, 1000);
       return data ? data.deadletterTransactions : [];
     } catch (e) {
       console.error("Error fetching all for export", e);
@@ -431,14 +447,7 @@ export default function Home() {
         ]}
       />
       <main className={styles.main}>
-        <Grid container spacing={3} alignItems="stretch" sx={{ mb: 3 }}>
-          <Grid item xs={12} md={6}>
-            <WorkloadCalendar />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <DateRangeSelector startDate={rangeStart} endDate={rangeEnd} onDateRangeChange={handleRangeChange} />
-          </Grid>
-        </Grid>
+        <WorkloadCalendar range={range} setRange={handleRangeChange} date={date} setDate={setDate} stats={calendarStats} />
 
         {errorMsg && (
           <Box mt={2} mb={2} textAlign="center" color="error.main">
@@ -463,8 +472,8 @@ export default function Home() {
 
             <CsvExportSection
               transactions={transactions}
-              startDate={rangeStart}
-              endDate={rangeEnd}
+              startDate={range?.from?.toISOString()}
+              endDate={range?.to?.toISOString()}
               onFetchAllForExport={handleFetchAllForExport}
             />
 
@@ -473,7 +482,7 @@ export default function Home() {
             <SectionHeader
               icon="📊"
               title="Metriche e Statistiche"
-              subtitle={`Panoramica delle transazioni dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
+              subtitle={`Panoramica delle transazioni dal ${range?.from?.toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${range?.to?.toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
             />
 
             <ChartsStatistics transactions={transactions} actionsMap={actionsMap} />
@@ -483,7 +492,7 @@ export default function Home() {
             <SectionHeader
               icon="📋"
               title="Lista Transazioni"
-              subtitle={`Tutte le transazioni deadletter dal ${new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
+              subtitle={`Tutte le transazioni deadletter dal ${range?.from?.toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al ${range?.to?.toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}`}
             />
 
             {(loadingData || hasMore) && (
@@ -513,8 +522,8 @@ export default function Home() {
                   actionsMap={actionsMap}
                   actions={actions}
                   userId={jwtUser?.id || ""}
-                  startDate={rangeStart}
-                  endDate={rangeEnd}
+                  startDate={range?.from?.toISOString()}
+                  endDate={range?.to?.toISOString()}
                   isLoadingData={loadingData || hasMore}
                   handleOpenDialog={handleOpenDialog}
                   handleAddActionToTransaction={handleAddActionToTransaction}
@@ -562,9 +571,9 @@ export default function Home() {
           </>
         )}
 
-        {!loadingData && transactions.length === 0 && (rangeStart && rangeEnd) && (
+        {!loadingData && transactions.length === 0 && (range?.from && range?.to) && (
           <Box mt={4} textAlign="center">
-            <h3>Nessuna transazione deadletter trovata dal {new Date(rangeStart).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al {new Date(rangeEnd).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}</h3>
+            <h3>Nessuna transazione deadletter trovata dal {range?.from?.toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)} al {range?.to?.toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}</h3>
           </Box>
         )}
 
