@@ -244,7 +244,7 @@ describe('Home', () => {
     expect(await screen.findByText("Stato NPG")).toBeInTheDocument();
     expect(await screen.findByText("Metodi di pagamento")).toBeInTheDocument();
     expect(await screen.findByText("Stato analisi")).toBeInTheDocument();
-    expect(await screen.findByRole("grid")).toBeInTheDocument();
+    expect(await screen.findByRole("table")).toBeInTheDocument();
 
 
     expect(mockedFetchDeadletterTransactionsV2).toHaveBeenCalled();
@@ -375,7 +375,7 @@ describe('Home', () => {
     expect(endDatePicker).toHaveValue("2025-11-08");
 
     // wait until the graphs and the table are in the document
-    const table = await screen.findByRole("grid");
+    const table = await screen.findByRole("table");
     expect(mockedFetchActions).toHaveBeenCalled();
 
     // Add the action test to the transaction
@@ -412,7 +412,7 @@ describe('Home', () => {
 
     await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
     await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
-    await screen.findByRole("grid");
+    await screen.findByRole("table");
 
     const openDrawerButton = screen.getAllByTestId("transaction-add-note-icon")[0];
     await userEvent.click(openDrawerButton);
@@ -450,7 +450,7 @@ describe('Home', () => {
 
     await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
     await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
-    await screen.findByRole("grid");
+    await screen.findByRole("table");
 
     const openDrawerButton = screen.getAllByTestId("transaction-notes-icon")[0];
     await userEvent.click(openDrawerButton);
@@ -494,7 +494,9 @@ describe('Home', () => {
 
     await userEvent.type(await screen.findByLabelText("Data inizio"), "2025-11-07");
     await userEvent.type(await screen.findByLabelText("Data fine"), "2025-11-08");
-    await screen.findByRole("grid");
+    const table = await screen.findByRole("table");
+
+    expect(within(table).queryAllByText("Test delete")).toHaveLength(1);
 
     const openDrawerButton = screen.getAllByTestId("transaction-notes-icon")[0];
     await userEvent.click(openDrawerButton);

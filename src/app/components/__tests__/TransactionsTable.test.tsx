@@ -45,7 +45,7 @@ const mockAction2: DeadletterAction = {
   timestamp: "2025-08-10T08:20:00Z",
 };
 
-const mockActionsMap = new Map([
+const mockActionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
   [
     "505db4c0c7be4f4582868fd0780359f4",
     new Map([
@@ -300,12 +300,13 @@ describe("TransactionsTable", () => {
     // Check column headers
     expect(screen.getByText("transactionId")).toBeInTheDocument();
     expect(screen.getByText("insertionDate (UTC)")).toBeInTheDocument();
-    expect(screen.getByText("paymentToken")).toBeInTheDocument();
-    expect(screen.getByText("authorizationRequestId")).toBeInTheDocument();
-    expect(screen.getByText("methodName")).toBeInTheDocument();
+    expect(screen.getByText(/PaymentToken/i)).toBeInTheDocument();
+    expect(screen.getByText(/AuthorizationRequestId/i)).toBeInTheDocument();
+    expect(screen.getByText(/MethodName/i)).toBeInTheDocument();
     expect(screen.getByText("pspId")).toBeInTheDocument();
     expect(screen.getByText("statoEcommerce")).toBeInTheDocument();
     expect(screen.getByText("nodoStatus")).toBeInTheDocument();
+    expect(screen.getByText("gatewayStatus")).toBeInTheDocument();
     expect(screen.getByText("Azioni")).toBeInTheDocument();
 
     // Columns that should not be rendered (disabled in the default view)
@@ -315,24 +316,17 @@ describe("TransactionsTable", () => {
     //Check transaction row
     const row1 = screen
       .getByText(mockTransactions[0].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
+
     expect(row1).toBeInTheDocument();
 
     const row1Element = row1 as HTMLElement;
 
-    expect(
-      within(row1Element).getByText(mockTransactions[0].paymentToken)
-    ).toBeInTheDocument();
-    expect(
-      within(row1Element).getByText(mockTransactions[0].paymentMethodName)
-    ).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].paymentToken)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].paymentMethodName)).toBeInTheDocument();
     expect(within(row1Element).getByText(mockTransactions[0].pspId)).toBeInTheDocument();
-    expect(
-      within(row1Element).getByText(mockTransactions[0].eCommerceStatus)
-    ).toBeInTheDocument();
-    expect(
-      within(row1Element).getByText(mockTransactions[0].gatewayAuthorizationStatus!)
-    ).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].eCommerceStatus)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].gatewayAuthorizationStatus!)).toBeInTheDocument();
     expect(within(row1Element).getByText(mockAction1.action.value)).toBeInTheDocument();
     expect(within(row1Element).getByText(mockAction2.action.value)).toBeInTheDocument();
   });
@@ -342,7 +336,7 @@ describe("TransactionsTable", () => {
 
     const row2 = screen
       .getByText(mockTransactions[1].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
 
     expect(row2).toBeInTheDocument();
     expect(within(row2 as HTMLElement).getAllByText("N/A")).toHaveLength(1);
@@ -373,7 +367,7 @@ describe("TransactionsTable", () => {
 
     const row1 = screen
       .getByText(mockTransactions[0].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
     expect(row1).toBeInTheDocument();
 
     const action1Div = within(row1 as HTMLElement)
@@ -395,7 +389,7 @@ describe("TransactionsTable", () => {
 
     const row2 = screen
       .getByText(mockTransactions[1].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
     expect(row2).toBeInTheDocument();
 
     expect(
@@ -406,7 +400,7 @@ describe("TransactionsTable", () => {
     ).not.toBeInTheDocument();
 
     expect(
-      within(row2 as HTMLElement).getByText("➕ Aggiungi azione")
+      within(row2 as HTMLElement).getByTestId("action-button-1")
     ).toBeInTheDocument();
   });
 
@@ -416,17 +410,13 @@ describe("TransactionsTable", () => {
 
     const row1 = screen
       .getByText(mockTransactions[0].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
     expect(row1).toBeInTheDocument();
 
-    const addActionButton = within(row1 as HTMLElement).getByText(
-      "➕ Aggiungi azione"
-    );
-    await user.click(addActionButton);
+    const addActionButton = within(row1 as HTMLElement).getByTestId("action-button-0");
+    await user.click(addActionButton.firstChild as HTMLElement);
 
-    const actionMenuItem = screen.getByRole("option", {
-      name: finalAction.value,
-    });
+    const actionMenuItem = screen.getByRole("option", { name: finalAction.value });
     await user.click(actionMenuItem);
 
     expect(mockHandleAddActionToTransaction).toHaveBeenCalledTimes(1);
@@ -442,7 +432,7 @@ describe("TransactionsTable", () => {
 
     const row1 = screen
       .getByText(transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
     expect(row1).toBeInTheDocument();
 
     expect(
@@ -464,7 +454,7 @@ describe("TransactionsTable", () => {
     // Suggested Action: "Da stornare eComm", severity: "error"
     const row3 = screen
       .getByText(mockTransactions[2].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
     expect(row3).toBeInTheDocument();
 
     const suggestedActionLabel = within(row3 as HTMLElement).getByText("Da stornare eComm");
@@ -486,9 +476,68 @@ describe("TransactionsTable", () => {
 
     const row2 = screen
       .getByText(mockTransactions[1].transactionId)
-      .closest('div[role="row"]');
+      .closest('tr');
     expect(row2).toBeInTheDocument();
 
     expect(within(row2 as HTMLElement).getByText("Nessuna azione suggerita")).toBeInTheDocument();
+  });
+
+  it("renders table correctly with all columns", async () => {
+    renderComponent();
+    const user = userEvent.setup();
+
+    // Find filter button
+    const columnButton = screen.getByLabelText("Show/Hide columns");
+    expect(columnButton).toBeInTheDocument();
+    await user.click(columnButton);
+
+    // Show hidden columns
+    const amountMenu = screen.getByText("Amount").parentElement as HTMLElement;
+    const paymente2eMenu = screen.getByText("PaymentEndToEndId").parentElement as HTMLElement;
+
+    const amountButton = within(amountMenu).getByRole("checkbox");
+    const paymente2eButton = within(paymente2eMenu).getByRole("checkbox");
+
+    expect(amountButton).toBeInTheDocument();
+    expect(paymente2eButton).toBeInTheDocument();
+    await user.click(amountButton);
+    await user.click(paymente2eButton);
+
+    // Close column visibility menu
+    const closeDiv = screen.getByRole("presentation");
+    await user.click(closeDiv.children[0]);
+
+    // Check column headers
+    expect(screen.getByText("transactionId")).toBeInTheDocument();
+    expect(screen.getByText("insertionDate (UTC)")).toBeInTheDocument();
+    expect(screen.getByText(/PaymentToken/i)).toBeInTheDocument();
+    expect(screen.getByText(/AuthorizationRequestId/i)).toBeInTheDocument();
+    expect(screen.getByText(/MethodName/i)).toBeInTheDocument();
+    expect(screen.getByText("pspId")).toBeInTheDocument();
+    expect(screen.getByText("statoEcommerce")).toBeInTheDocument();
+    expect(screen.getByText("nodoStatus")).toBeInTheDocument();
+    expect(screen.getByText("gatewayStatus")).toBeInTheDocument();
+    expect(screen.getByText("Azioni")).toBeInTheDocument();
+    expect(screen.queryByText("PaymentEndToEndId")).toBeInTheDocument();
+    expect(screen.queryByText("Amount")).toBeInTheDocument();
+
+    //Check transaction row
+    const row1 = screen
+      .getByText(mockTransactions[0].transactionId)
+      .closest('tr');
+
+    expect(row1).toBeInTheDocument();
+
+    const row1Element = row1 as HTMLElement;
+
+    expect(within(row1Element).getByText(mockTransactions[0].paymentToken)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].paymentMethodName)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].pspId)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].eCommerceStatus)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].gatewayAuthorizationStatus!)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].paymentEndToEndId!)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockTransactions[0].eCommerceDetails?.transactionInfo?.grandTotal || "")).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockAction1.action.value)).toBeInTheDocument();
+    expect(within(row1Element).getByText(mockAction2.action.value)).toBeInTheDocument();
   });
 });
