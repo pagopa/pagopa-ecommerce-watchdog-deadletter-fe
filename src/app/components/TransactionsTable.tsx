@@ -43,7 +43,7 @@ export function TransactionsTable(
   type TransactionWithNotes = Transaction & { notes: TransactionNote[] }
 
   const transactionsWithNotes: TransactionWithNotes[] = useMemo(() =>
-     props.transactions.map((v) => {
+    props.transactions.map((v) => {
       return {
         ...v,
         notes: props.notesMap.get(v.transactionId) ?? []
@@ -107,7 +107,7 @@ export function TransactionsTable(
         size: 120,
         Cell: ({ cell }) => (
           <Typography sx={{ fontFamily: "monospace", fontSize: "0.75rem", overflowWrap: "anywhere" }}>
-            { cell.getValue<string>() }
+            {cell.getValue<string>()}
           </Typography>
         )
       },
@@ -126,7 +126,7 @@ export function TransactionsTable(
             fontSize: "0.75rem",
             color: cell.getValue<string>() ? "#4b5563" : "#9ca3af"
           }}>
-            { cell.getValue<string>() || "N/A" }
+            {cell.getValue<string>() || "N/A"}
           </Typography>
         )
       },
@@ -250,24 +250,8 @@ export function TransactionsTable(
         header: "Azioni",
         accessorKey: "azioni",
         size: 140,
-        sortingFn: (rowA, rowB) => {
-          const idA = rowA.original.transactionId;
-          const idB = rowB.original.transactionId;
-          const actionsA = props.actionsMap.get(idA) || new Map();
-          const actionsB = props.actionsMap.get(idB) || new Map();
-          return actionsA.size - actionsB.size
-        },
-        filterFn: (row, _id, filterValue) => {
-          const tId = row.original.transactionId;
-          const transactionActions = props.actionsMap.get(tId)
-            ? Array.from(props.actionsMap.get(tId)!.values())
-            : [];
-
-          return transactionActions.some(a => 
-            a.action.value.toLowerCase().includes(filterValue.toLowerCase()) ||
-            a.userId.toLowerCase().includes(filterValue.toLowerCase())
-          )
-        },
+        sortingFn: (rowA, rowB) => azioniSortingFn(rowA, rowB, props.actionsMap),
+        filterFn: (row, _id, filterValue) => azioniFilterFn(row, filterValue, props.actionsMap),
         accessorFn: (value) => {
           const id = value.transactionId;
           const actions = props.actionsMap.get(id);
@@ -332,7 +316,7 @@ export function TransactionsTable(
           const tId = row.original.transactionId;
           const transactionNotes = props.notesMap.get(tId) || [];
 
-          return transactionNotes.some(a => 
+          return transactionNotes.some(a =>
             a.note.toLowerCase().includes(filterValue.toLowerCase()) ||
             a.userId.toLowerCase().includes(filterValue.toLowerCase())
           )
@@ -429,7 +413,7 @@ export function TransactionsTable(
     layoutMode: 'grid-no-grow',
     initialState: {
       sorting: [{ id: 'insertionDate', desc: true, }],
-      columnPinning: { left: ['mrt-row-select', 'mrt-row-numbers', 'transactionId']},
+      columnPinning: { left: ['mrt-row-select', 'mrt-row-numbers', 'transactionId'] },
       density: 'compact',
       columnVisibility: {
         paymentEndToEndId: false,
@@ -504,3 +488,31 @@ export function TransactionsTable(
     </Box>
   );
 }
+
+export const azioniSortingFn = (
+  rowA: { original: { transactionId: string } },
+  rowB: { original: { transactionId: string } },
+  actionsMap: Map<string, Map<string, DeadletterAction>>
+): number => {
+  const idA = rowA.original.transactionId;
+  const idB = rowB.original.transactionId;
+  const actionsA = actionsMap.get(idA) || new Map();
+  const actionsB = actionsMap.get(idB) || new Map();
+  return actionsA.size - actionsB.size;
+};
+
+export const azioniFilterFn = (
+  row: { original: { transactionId: string } },
+  filterValue: string,
+  actionsMap: Map<string, Map<string, DeadletterAction>>
+): boolean => {
+  const tId = row.original.transactionId;
+  const transactionActions = actionsMap.get(tId)
+    ? Array.from(actionsMap.get(tId)!.values())
+    : [];
+
+  return transactionActions.some((a) =>
+    a.action.value.toLowerCase().includes(filterValue.toLowerCase()) ||
+    a.userId.toLowerCase().includes(filterValue.toLowerCase())
+  );
+};
