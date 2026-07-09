@@ -119,7 +119,7 @@ export const deadletterResponse: DeadletterResponse = {
   ],
   "page": {
     "current": 0,
-    "total": 3,
+    "total": 1,
     "results": 10
   }
 };
