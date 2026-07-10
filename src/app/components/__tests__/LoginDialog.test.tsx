@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
 import { AuthenticationOk } from '../../types/Authentication';
 import { JwtUser } from "@pagopa/mui-italia";
-import { getTokenFromUrl, navigateTo } from "../../utils/utils";
+import { getTokenFromUrl } from "../../utils/utils";
 
 
 jest.mock('../../utils/api/client', () => ({

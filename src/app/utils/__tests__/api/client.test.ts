@@ -5,6 +5,7 @@ import { ActionType, DeadletterAction } from "@/app/types/DeadletterAction";
 import {
   fetchActions,
   fetchActionsByTransactionId,
+  fetchActionsByMultipleTransactionIds,
   fetchAddActionToDeadletterTransaction,
   fetchAuthentication,
   fetchDeadletterTransactionsV2,
@@ -172,6 +173,52 @@ describe("fetchActionsByTransactionId", () => {
     const result = await fetchActionsByTransactionId(
       mockToken,
       mockTransactionId
+    );
+
+    expect(result).toEqual([]);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("fetchActionsByMultipleTransactionIds", () => {
+  it("should return DeadletterAction[][] on a successful fetch (200)", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue([mockDeadletterActionArray]),
+    } as unknown as Response);
+
+    const mockTransactionIds = new Set([mockTransactionId]);
+    const result = await fetchActionsByMultipleTransactionIds(
+      mockToken,
+      mockTransactionIds
+    );
+
+    expect(result).toEqual([mockDeadletterActionArray]);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/v2/deadletter-transactions/actions`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${mockToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({transactionIds: Array.from(mockTransactionIds)})
+      }
+    );
+  });
+
+  it("should return an empty array on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error(`Failed to fetch actions for ${new Set([mockTransactionId])}`);
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const mockTransactionIds = new Set([mockTransactionId]);
+    const result = await fetchActionsByMultipleTransactionIds(
+      mockToken,
+      mockTransactionIds
     );
 
     expect(result).toEqual([]);
