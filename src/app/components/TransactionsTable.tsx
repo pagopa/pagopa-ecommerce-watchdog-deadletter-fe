@@ -451,7 +451,7 @@ export function TransactionsTable(
       sx: {
         fontFamily: "monospace",
         fontSize: "0.7rem",
-        border: "1px solid #e5e7eb",
+        borderTop: "1px solid #e5e7eb",
         backgroundColor: "#fff",
         whiteSpace: "normal",
         wordWrap: "break-word"
