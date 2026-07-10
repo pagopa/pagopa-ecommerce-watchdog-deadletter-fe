@@ -31,12 +31,13 @@ import WorkloadCalendar from "./components/WorkloadCalendar";
 import DateRangeSelector from "./components/DateRangeSelector";
 import SectionDivider from "./components/SectionDivider";
 import SectionHeader from "./components/SectionHeader";
-import TransactionsListSection from "./components/TransactionListSection";
 import LoginDialog from "./components/LoginDialog";
 import { TransactionDetails } from "./components/TransactionDetails";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
+import { Paper } from "@mui/material";
+import { TransactionsTable } from "./components/TransactionsTable";
 
 
 
@@ -157,7 +158,9 @@ export default function Home() {
 
     try {
       const data = await fetchDeadletterTransactionsV2(token.current!, start, end, page, pageSize);
-      const transactionsList = data ? data.deadletterTransactions : [];
+      const transactionsList = data?.deadletterTransactions
+            .sort((a, b) => new Date(a.insertionDate).valueOf() - new Date(b.insertionDate).valueOf())
+            || [];
 
       if (page === 0) {
         setTransactions(transactionsList);
@@ -191,7 +194,7 @@ export default function Home() {
       const newActionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
       if (token.current && transactionIds?.size > 0) {
         const nestedActionsList = await fetchActionsByMultipleTransactionIds(token.current, transactionIds)
-        for (const actions of nestedActionsList) {
+        for (const actions of nestedActionsList ?? []) {
           const singleActionMap: Map<string, DeadletterAction> = actions.reduce(
             (acc, item) => {acc.set(item.action.value, item); return acc},
             new Map()
@@ -340,10 +343,7 @@ export default function Home() {
         onAssistanceClick={() => {
           console.log("Clicked/Tapped on Assistance");
         }}
-        onLogin={() => {
-          console.log("User login");
-          setIsLoginDialogOpen(true);
-        }}
+        onLogin={() => setIsLoginDialogOpen(true)}
         userActions={[{
           id: "logout",
           label: "Esci",
@@ -431,19 +431,24 @@ export default function Home() {
               </Box>
             )}
 
-            <TransactionsListSection
-              transactions={transactions}
-              notesMap={notesMap}
-              actionsMap={actionsMap}
-              actions={actions}
-              userId={jwtUser?.id || ""}
-              handleOpenDialog={handleOpenDialog}
-              handleAddActionToTransaction={handleAddActionToTransaction}
-              handleAddNote={handleAddNote}
-              handleEditNote={handleEditNote}
-              handleDeleteNote={handleDeleteNote}
-              rowCount={totalResults}
-            />
+
+            <Grid item xs={12}>
+              <Paper sx={{ height: "100%", width: "100%" }}>
+                <TransactionsTable
+                  transactions={transactions}
+                  notesMap={notesMap}
+                  actionsMap={actionsMap}
+                  actions={actions}
+                  userId={jwtUser?.id || ""}
+                  handleOpenDialog={handleOpenDialog}
+                  handleAddActionToTransaction={handleAddActionToTransaction}
+                  handleAddNote={handleAddNote}
+                  handleEditNote={handleEditNote}
+                  handleDeleteNote={handleDeleteNote}
+                  rowCount={totalResults}
+                />
+              </Paper>
+            </Grid>
 
             <Box ref={observerTarget} mt={1} mb={3}>
               {isLoadingMore && (

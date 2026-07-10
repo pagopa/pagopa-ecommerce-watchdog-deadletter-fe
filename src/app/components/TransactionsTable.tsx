@@ -1,13 +1,13 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
 import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
 import { dateTimeLocale, extendedMonthDateFormatOptions, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
 import { TransactionNote } from "../types/TransactionNotes";
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import { MaterialReactTable, MRT_ColumnDef, useMaterialReactTable } from 'material-react-table';
 import AddCommentIcon from '@mui/icons-material/AddComment';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TransactionNotesDrawer from "./TransactionNotesDrawer";
 import { getSuggestedAction } from "../utils/SuggestedActionsRules";
 
@@ -40,393 +40,431 @@ export function TransactionsTable(
     setDrawerConfig((prev) => ({ ...prev, open: false }));
   };
 
-  const columns: GridColDef[] = [
-    {
-      field: "rowNumber",
-      headerName: "#",
-      width: 60,
-      resizable: false,
-      sortable: false,
-      filterable: false,
-      headerAlign: "center",
-      align: "center",
-      renderCell: (params) => {
-        const sortedIds = params.api.getSortedRowIds();
-        const index = sortedIds.indexOf(params.id);
-        return (
-          <Box sx={{
-            fontWeight: 600,
-            color: "#6b7280",
-            fontSize: "0.85rem"
-          }}>
-            {index + 1}
-          </Box>
-        );
-      },
-    },
-    {
-      field: "transactionId",
-      headerName: "transactionId",
-      resizable: false,
-      sortable: false,
-      width: 260,
-      filterable: true,
-      renderCell: (params) => {
-        const nodo = params.row.nodoDetails;
-        const npg = params.row.npgDetails;
-        const ecommerce = params.row.eCommerceDetails;
-        const hasContent = nodo || npg || ecommerce;
+  type TransactionWithNotes = Transaction & { notes: TransactionNote[] }
 
-        const combined = {
-          nodoDetails: nodo || null,
-          npgDetails: npg || null,
-          eCommerceDetails: ecommerce || null,
-        };
-
-        return (
-          <Box
-            sx={{
-              fontFamily: "monospace",
-              fontSize: "0.8rem",
-              color: hasContent ? "#2563eb" : "#1f2937",
-              textDecoration: hasContent ? "underline" : "none",
-              textDecorationStyle: "dotted",
-              textUnderlineOffset: "3px",
-              cursor: hasContent ? "pointer" : "default",
-              "&:hover": hasContent ? {
-                color: "#1d4ed8",
-                textDecoration: "underline",
-                textDecorationStyle: "solid",
-              } : {},
-            }}
-            onClick={() => hasContent && props.handleOpenDialog(combined)}
-          >
-            {params.value}
-          </Box>
-        );
-      },
-    },
-    {
-      field: "insertionDate",
-      headerName: "insertionDate (UTC)",
-      sortable: false,
-      flex: 0.6,
-      valueFormatter: (value) => {
-        if (!value) return "";
-        return new Date(value).toLocaleString(dateTimeLocale, utcDateTimeFormatOptions);
+  const transactionsWithNotes: TransactionWithNotes[] = useMemo(() =>
+    props.transactions.map((v) => {
+      return {
+        ...v,
+        notes: props.notesMap.get(v.transactionId) ?? []
       }
-    },
-    {
-      field: "paymentToken",
-      headerName: "paymentToken",
-      flex: 0.8,
-      sortable: false,
-      filterable: true,
-      renderCell: (params) => (
-        <Box sx={{
-          fontFamily: "monospace",
-          fontSize: "0.75rem",
-          color: "#4b5563"
-        }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: "paymentEndToEndId",
-      headerName: "paymentEndToEndId",
-      flex: 0.8,
-      sortable: false,
-      filterable: true,
-      renderCell: (params) => (
-        <Box sx={{
-          fontFamily: "monospace",
-          fontSize: "0.75rem",
-          color: "#4b5563"
-        }}>
-          {params.value}
-        </Box>
-      ),
-    },
-    {
-      field: "authorizationRequestId",
-      headerName: "authorizationRequestId",
-      flex: 0.8,
-      sortable: false,
-      filterable: true,
-      valueGetter: (_value, row) => {
-        return row.eCommerceDetails?.transactionInfo?.authorizationRequestId || "";
-      },
-      renderCell: (params) => (
-        <Box sx={{
-          fontFamily: "monospace",
-          fontSize: "0.75rem",
-          color: params.value ? "#4b5563" : "#9ca3af"
-        }}>
-          {params.value || "N/A"}
-        </Box>
-      ),
-    },
-    {
-      field: "Amount",
-      headerName: "Amount",
-      flex: 0.5,
-      sortable: false,
-      filterable: true,
-      valueGetter: (_value, row) => {
-        return row.eCommerceDetails?.transactionInfo?.grandTotal || "";
-      },
-    },
-    {
-      field: "paymentMethodName",
-      headerName: "methodName",
-      flex: 0.6,
-      sortable: false,
-      filterable: true,
-    },
-    {
-      field: "pspId",
-      headerName: "pspId",
-      flex: 0.5,
-      sortable: false,
-    },
-    { field: "eCommerceStatus", headerName: "statoEcommerce", flex: 0.7, sortable: false },
-    {
-      field: "gatewayAuthorizationStatus",
-      headerName: "gatewayStatus",
-      flex: 0.5,
-      sortable: false,
-    },
-    {
-      field: "nodoStatus",
-      headerName: "nodoStatus",
-      flex: 0.5,
-      sortable: false,
-    },
-    {
-      field: "suggestedAction",
-      headerName: "Azione Suggerita",
-      flex: 0.5,
-      sortable: false,
-      filterable: true,
-      valueGetter: (_value, row) => {
-        const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = row;
-        const result = getSuggestedAction(
-          nodoStatus,
-          eCommerceStatus,
-          gatewayAuthorizationStatus,
-          paymentMethodName
-        );
-        return result?.suggestedAction || "";
-      },
-      renderCell: (params) => {
-        const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = params.row;
+    }),
+    [props.notesMap]
+  );
 
-        const result = getSuggestedAction(
-          nodoStatus,
-          eCommerceStatus,
-          gatewayAuthorizationStatus,
-          paymentMethodName
-        );
 
-        if (!result) {
+  const columns = useMemo<MRT_ColumnDef<TransactionWithNotes>[]>(
+    () => [
+      {
+        header: 'transactionId',
+        accessorKey: 'transactionId',
+        size: 130,
+        Cell: ({ row, cell }) => {
+          const nodo = row.original.nodoDetails;
+          const npg = row.original.npgDetails;
+          const ecommerce = row.original.eCommerceDetails;
+          const hasContent = nodo || npg || ecommerce;
+
+          const combined = {
+            nodoDetails: nodo || null,
+            npgDetails: npg || null,
+            eCommerceDetails: ecommerce || null,
+          };
+
           return (
-            <Box sx={{ color: "#9ca3af", fontSize: "0.75rem", fontStyle: "italic" }}>
-              Nessuna azione suggerita
-            </Box>
+            <Typography
+              sx={{
+                fontFamily: "monospace",
+                fontSize: "0.8rem",
+                color: hasContent ? "#2563eb" : "#1f2937",
+                textDecoration: hasContent ? "underline" : "none",
+                textDecorationStyle: "dotted",
+                textUnderlineOffset: "3px",
+                cursor: hasContent ? "pointer" : "default",
+                "&:hover": hasContent ? {
+                  color: "#1d4ed8",
+                  textDecoration: "underline",
+                  textDecorationStyle: "solid",
+                } : {},
+                overflowWrap: "anywhere"
+              }}
+              onClick={() => hasContent && props.handleOpenDialog(combined)}
+            >
+              {cell.getValue<string>()}
+            </Typography>
           );
         }
+      },
+      {
+        header: "insertionDate (UTC)",
+        accessorKey: "insertionDate",
+        accessorFn: (value) => value.insertionDate ? new Date(value.insertionDate).toLocaleString(dateTimeLocale, utcDateTimeFormatOptions) : "",
+        size: 80
+      },
+      {
+        header: "PaymentToken",
+        accessorKey: "paymentToken",
+        size: 120,
+        Cell: ({ cell }) => (
+          <Typography sx={{ fontFamily: "monospace", fontSize: "0.75rem", overflowWrap: "anywhere" }}>
+            {cell.getValue<string>()}
+          </Typography>
+        )
+      },
+      {
+        header: "PaymentEndToEndId",
+        accessorKey: "paymentEndToEndId",
+      },
+      {
+        header: "AuthorizationRequestId",
+        accessorKey: "authorizationRequestId",
+        accessorFn: (value) => value.eCommerceDetails?.transactionInfo?.authorizationRequestId || "",
+        size: 130,
+        Cell: ({ cell }) => (
+          <Typography sx={{
+            fontFamily: "monospace",
+            fontSize: "0.75rem",
+            color: cell.getValue<string>() ? "#4b5563" : "#9ca3af"
+          }}>
+            {cell.getValue<string>() || "N/A"}
+          </Typography>
+        )
+      },
+      {
+        header: "Amount",
+        accessorKey: "amount",
+        accessorFn: (value) => value.eCommerceDetails?.transactionInfo?.grandTotal || "",
+      },
+      {
+        header: "MethodName",
+        accessorKey: "paymentMethodName",
+        filterVariant: "multi-select",
+        size: 70
+      },
+      {
+        header: "pspId",
+        accessorKey: "pspId",
+        filterVariant: "multi-select",
+        size: 70
+      },
+      {
+        header: "statoEcommerce",
+        accessorKey: "eCommerceStatus",
+        filterVariant: "multi-select",
+        size: 90
+      },
+      {
+        header: "gatewayStatus",
+        accessorKey: "gatewayAuthorizationStatus",
+        filterVariant: "multi-select",
+        size: 100
+      },
+      {
+        header: "nodoStatus",
+        accessorKey: "nodoStatus",
+        filterVariant: "multi-select",
+        size: 70
+      },
+      {
+        header: "Azione Suggerita",
+        accessorKey: "suggestedAction",
+        size: 60,
+        accessorFn: (value) => {
+          const result = getSuggestedAction(
+            value.nodoStatus,
+            value.eCommerceStatus,
+            value.gatewayAuthorizationStatus,
+            value.paymentMethodName
+          );
+          return result?.suggestedAction || "";
+        },
+        Cell: ({ row }) => {
+          const { nodoStatus, eCommerceStatus, gatewayAuthorizationStatus, paymentMethodName } = row.original;
 
-        const colorMap: Record<string, { bg: string; color: string; border: string }> = {
-          info: { bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
-          warning: { bg: "#fffbeb", color: "#b45309", border: "#fde68a" },
-          error: { bg: "#fef2f2", color: "#b91c1c", border: "#fecaca" },
-        };
+          const result = getSuggestedAction(
+            nodoStatus,
+            eCommerceStatus,
+            gatewayAuthorizationStatus,
+            paymentMethodName
+          );
 
-        const palette = colorMap[result.severity] ?? colorMap.info;
-
-        return (
-          <Tooltip
-            title={
-              <Typography variant="body2" sx={{ color: "common.white", whiteSpace: "pre-line", p: 0.5 }}>
-                {result.suggestedAction}
+          if (!result) {
+            return (
+              <Typography sx={{ color: "#9ca3af", fontSize: "0.75rem", fontStyle: "italic" }}>
+                Nessuna azione suggerita
               </Typography>
-            }
-            placement="bottom-start"
-            arrow
-            enterDelay={300}
-          >
-            <Box
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                px: 1,
-                py: 0.4,
-                borderRadius: 1,
-                border: `1px solid ${palette.border}`,
-                backgroundColor: palette.bg,
-                cursor: "default",
-                maxWidth: "100%",
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{
-                  color: palette.color,
-                  fontWeight: 600,
-                  fontSize: "0.72rem",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {result.suggestedAction}
-              </Typography>
-            </Box>
-          </Tooltip>
-        );
-      },
-    },
-    {
-      field: "azioni",
-      headerName: "Azioni",
-      flex: 1.25,
-      resizable: false,
-      sortable: false,
-      valueGetter: (_value, row) => {
-        const id = row.transactionId;
-        const actions = props.actionsMap.get(id);
-        const value = actions
-          ? Array.from(actions.values()).map(getDeadletterActionAsString)
-          : [];
-        return value.length > 0 ? value : null;
-      },
-      renderCell: (params) => {
-        const id = params.row.transactionId;
-        const transactionActions = props.actionsMap.get(id)
-          ? Array.from(props.actionsMap.get(id)!.values())
-          : [];
+            );
+          }
 
-        return (
-          <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-            {/* Storico azioni */}
-            {transactionActions.length > 0 && (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-                {transactionActions.map((deadletterAction) => (
-                  <Chip
-                    key={deadletterAction.id}
-                    label={getDeadletterActionAsString(deadletterAction)}
-                    size="small"
-                    color={
-                      deadletterAction.action.type === "FINAL"
-                        ? "success"
-                        : "primary"
-                    }
-                  />
-                ))}
-              </Box>
-            )}
+          const colorMap: Record<string, { bg: string; color: string; border: string }> = {
+            info: { bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe" },
+            warning: { bg: "#fffbeb", color: "#b45309", border: "#fde68a" },
+            error: { bg: "#fef2f2", color: "#b91c1c", border: "#fecaca" },
+          };
 
-            {transactionActions.length > 0 && <Divider sx={{ mb: 1 }} />}
-            <Select
-              size="small"
-              value=""
-              displayEmpty
-              fullWidth
-              sx={{ fontSize: "0.75rem" }}
-              onChange={(e) => props.handleAddActionToTransaction(e.target.value, id)}
-            >
-              <MenuItem value="">➕ Aggiungi azione</MenuItem>
-              {props.actions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
-        );
-      },
-    },
-    {
-      field: 'notes',
-      headerName: 'Note',
-      flex: 1,
-      minWidth: 150,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        const id = params.row.transactionId;
-        const transactionNotes = props.notesMap.get(id) || [];
+          const palette = colorMap[result.severity] ?? colorMap.info;
 
-        const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
-        const latestNote = hasNotes ? transactionNotes.at(- 1) : null;
-
-        const tooltipContent = latestNote ? (
-          <Box sx={{ p: 0.5 }}>
-            {/* Tooltip header: userId + date */}
-            <Typography variant="caption" sx={{ color: 'secondary.light', display: 'block', mb: 1, fontWeight: 'bold' }}>
-              Scritto da {latestNote.userId} • {new Date(latestNote.createdAt).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}
-            </Typography>
-            {/* Complete note text */}
-            <Typography variant="body2" sx={{ color: 'common.white' }}>
-              {latestNote.note}
-            </Typography>
-          </Box>
-        ) : null;
-
-        return (
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ width: '100%', height: '100%', pr: 1 }}
-          >
+          return (
             <Tooltip
-              title={tooltipContent}
+              title={
+                <Typography variant="body2" sx={{ color: "common.white", whiteSpace: "pre-line", p: 0.5 }}>
+                  {result.suggestedAction}
+                </Typography>
+              }
               placement="bottom-start"
               arrow
-              enterDelay={400}
+              enterDelay={300}
             >
-              <Box sx={{ flexGrow: 1, overflow: 'hidden', mr: 1, cursor: 'pointer' }}>
+              <Box
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  px: 1,
+                  py: 0.4,
+                  borderRadius: 1,
+                  border: `1px solid ${palette.border}`,
+                  backgroundColor: palette.bg,
+                  cursor: "default",
+                  maxWidth: "100%",
+                }}
+              >
                 <Typography
-                  variant="body2"
+                  variant="caption"
                   sx={{
-                    color: hasNotes ? 'text.primary' : 'text.disabled',
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: 2, // Max visible rows
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'normal'
+                    color: palette.color,
+                    fontWeight: 600,
+                    fontSize: "0.72rem",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  {latestNote?.note}
+                  {result.suggestedAction}
                 </Typography>
               </Box>
             </Tooltip>
-            <IconButton
-              size="small"
-              onClick={() => handleOpenDrawer(id)}
-              sx={{ flexShrink: 0 }}
-            >
-              {hasNotes ? (
-                <Badge data-testid="transaction-notes-badge" badgeContent={transactionNotes.length} color="primary">
-                  <ChatBubbleOutlineIcon data-testid="transaction-notes-icon" fontSize="small" />
-                </Badge>
-              ) : (
-                <AddCommentIcon data-testid="transaction-add-note-icon" fontSize="small" color="primary" />
+          );
+        }
+      },
+      {
+        header: "Azioni",
+        accessorKey: "azioni",
+        size: 140,
+        sortingFn: (rowA, rowB) => azioniSortingFn(rowA, rowB, props.actionsMap),
+        filterFn: (row, _id, filterValue) => azioniFilterFn(row, filterValue, props.actionsMap),
+        accessorFn: (value) => {
+          const id = value.transactionId;
+          const actions = props.actionsMap.get(id);
+          const actionList = actions
+            ? Array.from(actions.values()).map(getDeadletterActionAsString)
+            : [];
+          return actionList.length > 0 ? value : null;
+        },
+        Cell: ({ row }) => {
+          const id = row.original.transactionId;
+          const transactionActions = props.actionsMap.get(id)
+            ? Array.from(props.actionsMap.get(id)!.values())
+            : [];
+
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+              {/* Storico azioni */}
+              {transactionActions.length > 0 && (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
+                  {transactionActions.map((deadletterAction) => (
+                    <Chip
+                      key={deadletterAction.id}
+                      label={getDeadletterActionAsString(deadletterAction)}
+                      size="small"
+                      color={
+                        deadletterAction.action.type === "FINAL"
+                          ? "success"
+                          : "primary"
+                      }
+                    />
+                  ))}
+                </Box>
               )}
-            </IconButton>
-          </Stack>
-        );
+
+              {transactionActions.length > 0 && <Divider sx={{ mb: 1 }} />}
+              <Select
+                data-testid={`action-button-${row.index}`}
+                size="small"
+                value=""
+                displayEmpty
+                sx={{ fontSize: "0.75rem" }}
+                onChange={(e) => props.handleAddActionToTransaction(e.target.value, id)}
+              >
+                <MenuItem value="">➕ Agg. azione</MenuItem>
+                {props.actions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+          );
+        }
+      },
+      {
+        header: 'Note',
+        accessorKey: 'notes',
+        enableSorting: false,
+        enableColumnFilter: true,
+        enableClickToCopy: false,
+        filterFn: (row, _id, filterValue) => {
+          const tId = row.original.transactionId;
+          const transactionNotes = props.notesMap.get(tId) || [];
+
+          return transactionNotes.some(a =>
+            a.note.toLowerCase().includes(filterValue.toLowerCase()) ||
+            a.userId.toLowerCase().includes(filterValue.toLowerCase())
+          )
+        },
+        Cell: ({ row }) => {
+          const id = row.original.transactionId;
+          const transactionNotes = row.original.notes || [];
+
+          const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
+          const latestNote = hasNotes ? transactionNotes.at(- 1) ?? null : null;
+
+          const tooltipContent = latestNote ? (
+            <Box sx={{ p: 0.5 }}>
+              {/* Tooltip header: userId + date */}
+              <Typography variant="caption" sx={{ color: 'secondary.light', display: 'block', mb: 1, fontWeight: 'bold' }}>
+                Scritto da {latestNote.userId} • {new Date(latestNote.createdAt).toLocaleDateString(dateTimeLocale, extendedMonthDateFormatOptions)}
+              </Typography>
+              {/* Complete note text */}
+              <Typography variant="body2" sx={{ color: 'common.white' }}>
+                {latestNote.note}
+              </Typography>
+            </Box>
+          ) : null;
+
+          return (
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ width: '100%', height: '100%', pr: 1 }}
+            >
+              <Tooltip
+                title={tooltipContent}
+                placement="bottom-start"
+                arrow
+                enterDelay={400}
+              >
+                <Box sx={{ flexGrow: 1, overflow: 'hidden', mr: 1, cursor: 'pointer' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: hasNotes ? 'text.primary' : 'text.disabled',
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      WebkitLineClamp: 2, // Max visible rows
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'normal'
+                    }}
+                  >
+                    {latestNote?.note}
+                  </Typography>
+                </Box>
+              </Tooltip>
+              <IconButton
+                size="small"
+                onClick={() => handleOpenDrawer(id)}
+                sx={{ flexShrink: 0 }}
+              >
+                {hasNotes ? (
+                  <Badge data-testid="transaction-notes-badge" badgeContent={transactionNotes.length} color="primary">
+                    <ChatBubbleOutlineIcon data-testid="transaction-notes-icon" fontSize="small" />
+                  </Badge>
+                ) : (
+                  <AddCommentIcon data-testid="transaction-add-note-icon" fontSize="small" color="primary" />
+                )}
+              </IconButton>
+            </Stack>
+          );
+        }
+      }
+    ],
+    [],
+  );
+
+  const table = useMaterialReactTable<TransactionWithNotes>({
+    columns: columns,
+    data: transactionsWithNotes,
+    enableRowNumbers: true,
+    rowNumberDisplayMode: 'original',
+    enableSorting: true,
+    enableSortingRemoval: true,
+    enableMultiSort: true,
+    enableGlobalFilter: false,
+    rowCount: transactionsWithNotes.length,
+    isMultiSortEvent: () => true,
+    enableRowSelection: true,
+    enableBatchRowSelection: true,
+    positionToolbarAlertBanner: 'top',
+    enableStickyHeader: true,
+    enableColumnResizing: true,
+    enableColumnPinning: true,
+    enableFacetedValues: true,
+    layoutMode: 'grid-no-grow',
+    initialState: {
+      sorting: [{ id: 'insertionDate', desc: true, }],
+      columnPinning: { left: ['mrt-row-select', 'mrt-row-numbers', 'transactionId'] },
+      density: 'compact',
+      columnVisibility: {
+        paymentEndToEndId: false,
+        amount: false
       }
     },
-  ];
-
-  const rowsWithId = props.transactions.map((row, index) => ({
-    ...row,
-    id: `${row.transactionId}-${row.insertionDate}-${index}`,
-  }));
+    displayColumnDefOptions: {
+      'mrt-row-select': {
+        enableResizing: false,
+        size: 40,
+        minSize: 40
+      },
+      'mrt-row-numbers': {
+        enableResizing: false,
+        size: 30,
+        minSize: 30
+      },
+    },
+    muiTablePaperProps: ({ table }) => ({
+      style: {
+        zIndex: table.getState().isFullScreen ? 100 : undefined,
+        width: table.getState().isFullScreen ? "99.3vw" : undefined
+      },
+    }),
+    muiTableBodyProps: {
+      sx: {
+        "& tr:nth-of-type(odd) > td": {
+          backgroundColor: "#f9fafb",
+        },
+      }
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        fontFamily: "monospace",
+        fontSize: "0.7rem",
+        border: "1px solid #e5e7eb",
+        backgroundColor: "#fff",
+        whiteSpace: "normal",
+        wordWrap: "break-word"
+      }
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        fontSize: "0.8rem",
+        border: "1px solid #e5e7eb",
+        backgroundColor: "#f9fafb",
+        color: "#0d47a1",
+        fontWeight: "bold",
+      }
+    }
+  });
 
   return (
     <Box
@@ -436,70 +474,7 @@ export function TransactionsTable(
         overflowY: 'hidden',
       }}
     >
-      <DataGrid
-        rows={rowsWithId}
-        rowCount={rowsWithId.length}
-        columns={columns}
-        initialState={{
-          columns: {
-            columnVisibilityModel: {
-              paymentEndToEndId: false,
-              Amount: false,
-            },
-          },
-        }}
-        getRowId={(row) => row.id}
-        getRowHeight={() => "auto"}
-        disableRowSelectionOnClick
-        sx={{
-          fontSize: "0.85rem",
-          border: "1px solid #e5e7eb",
-          borderRadius: 2,
-          backgroundColor: "#fff",
-          "& .MuiDataGrid-cell": {
-            alignItems: "start",
-            py: 1.5,
-            borderColor: "#f3f4f6"
-          },
-          "& .MuiInputBase-input": {
-            fontSize: "0.75rem",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#f9fafb",
-            color: "#0d47a1",
-            fontWeight: "bold",
-            fontSize: "0.85rem",
-            borderBottom: "2px solid #e5e7eb"
-          },
-          "& .MuiDataGrid-row": {
-            "&:nth-of-type(even)": {
-              backgroundColor: "#f9fafb",
-            },
-            "&:nth-of-type(odd)": {
-              backgroundColor: "#ffffff",
-            },
-            "&:hover": {
-              backgroundColor: "#eff6ff",
-              transition: "background-color 0.2s ease"
-            }
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "2px solid #e5e7eb",
-            backgroundColor: "#f9fafb"
-          },
-          "& .MuiTablePagination-selectLabel": {
-            display: "none"
-          },
-          "& .MuiTablePagination-input": {
-            display: "none"
-          }
-        }}
-        showToolbar
-        hideFooterPagination
-        paginationMode="server"
-        filterMode="client"
-        sortModel={[{ field: "insertionDate", sort: "desc" }]}
-      />
+      <MaterialReactTable table={table} />
       <TransactionNotesDrawer
         open={drawerConfig.open}
         onClose={handleCloseDrawer}
@@ -513,3 +488,31 @@ export function TransactionsTable(
     </Box>
   );
 }
+
+export const azioniSortingFn = (
+  rowA: { original: { transactionId: string } },
+  rowB: { original: { transactionId: string } },
+  actionsMap: Map<string, Map<string, DeadletterAction>>
+): number => {
+  const idA = rowA.original.transactionId;
+  const idB = rowB.original.transactionId;
+  const actionsA = actionsMap.get(idA) || new Map();
+  const actionsB = actionsMap.get(idB) || new Map();
+  return actionsA.size - actionsB.size;
+};
+
+export const azioniFilterFn = (
+  row: { original: { transactionId: string } },
+  filterValue: string,
+  actionsMap: Map<string, Map<string, DeadletterAction>>
+): boolean => {
+  const tId = row.original.transactionId;
+  const transactionActions = actionsMap.get(tId)
+    ? Array.from(actionsMap.get(tId)!.values())
+    : [];
+
+  return transactionActions.some((a) =>
+    a.action.value.toLowerCase().includes(filterValue.toLowerCase()) ||
+    a.userId.toLowerCase().includes(filterValue.toLowerCase())
+  );
+};
