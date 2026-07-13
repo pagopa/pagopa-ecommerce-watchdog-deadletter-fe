@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
-import { TransactionsTable, azioniSortingFn, azioniFilterFn } from "../TransactionsTable";
+import { TransactionsTable, azioniSortingFn, azioniFilterFn, noteFilterFn } from "../TransactionsTable";
 import userEvent from "@testing-library/user-event";
 import { ActionType, DeadletterAction } from "../../types/DeadletterAction";
 import { Transaction } from "../../types/DeadletterResponse";
@@ -561,39 +561,24 @@ describe("TransactionsTable", () => {
 
   describe("azioniSortingFn", () => {
     it("should return the difference in the number of actions between two rows", () => {
-      const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
-        [
-          "tx-1",
-          new Map([
-            ["action1", {} as DeadletterAction],
-            ["action2", {} as DeadletterAction],
-          ]),
-        ],
-        [
-          "tx-2",
-          new Map([
-            ["action1", {} as DeadletterAction],
-          ]),
-        ],
-        ["tx-3", new Map()],
-      ]);
+      const rowA = { original: { transactionId: "tx-1", actions: new Map([
+        ["action1", {} as DeadletterAction],
+        ["action2", {} as DeadletterAction],
+      ])}};
+      const rowB = { original: { transactionId: "tx-2", actions: new Map([
+        ["action1", {} as DeadletterAction],
+      ])}};
+      const rowC = { original: { transactionId: "tx-3", actions: new Map() } };
 
-      const rowA = { original: { transactionId: "tx-1" } };
-      const rowB = { original: { transactionId: "tx-2" } };
-      const rowC = { original: { transactionId: "tx-3" } };
-      const rowD = { original: { transactionId: "tx-4" } }; // not in map
-
-      expect(azioniSortingFn(rowA, rowB, actionsMap)).toBe(1);
-      expect(azioniSortingFn(rowB, rowA, actionsMap)).toBe(-1);
-      expect(azioniSortingFn(rowB, rowC, actionsMap)).toBe(1);
-      expect(azioniSortingFn(rowC, rowD, actionsMap)).toBe(0);
+      expect(azioniSortingFn(rowA, rowB)).toBe(1);
+      expect(azioniSortingFn(rowB, rowA)).toBe(-1);
+      expect(azioniSortingFn(rowB, rowC)).toBe(1);
+      expect(azioniSortingFn(rowC, rowC)).toBe(0);
     });
   });
 
   describe("azioniFilterFn", () => {
-    const actionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
-      [
-        "tx-1",
+    const row1 = { original: { transactionId: "tx-1", actions: 
         new Map([
           [
             "Stornata",
@@ -610,34 +595,49 @@ describe("TransactionsTable", () => {
             } as DeadletterAction,
           ],
         ]),
-      ],
-      ["tx-2", new Map()],
-    ]);
-
-    const row1 = { original: { transactionId: "tx-1" } };
-    const row2 = { original: { transactionId: "tx-2" } };
-    const row3 = { original: { transactionId: "tx-3" } }; // not in map
+      }
+    };
+    const row2 = { original: { transactionId: "tx-2", actions: new Map() } };
 
     it("should return true when filter value matches action value case-insensitively", () => {
-      expect(azioniFilterFn(row1, "stornata", actionsMap)).toBe(true);
-      expect(azioniFilterFn(row1, "REFUND", actionsMap)).toBe(true);
+      expect(azioniFilterFn(row1, "stornata")).toBe(true);
+      expect(azioniFilterFn(row1, "REFUND")).toBe(true);
     });
 
     it("should return true when filter value matches userId case-insensitively", () => {
-      expect(azioniFilterFn(row1, "mario", actionsMap)).toBe(true);
-      expect(azioniFilterFn(row1, "VERDI", actionsMap)).toBe(true);
+      expect(azioniFilterFn(row1, "mario")).toBe(true);
+      expect(azioniFilterFn(row1, "VERDI")).toBe(true);
     });
 
     it("should return false when filter value does not match any action value or userId", () => {
-      expect(azioniFilterFn(row1, "unknown", actionsMap)).toBe(false);
+      expect(azioniFilterFn(row1, "unknown")).toBe(false);
     });
 
     it("should return false when the transaction has no actions", () => {
-      expect(azioniFilterFn(row2, "stornata", actionsMap)).toBe(false);
+      expect(azioniFilterFn(row2, "stornata")).toBe(false);
+    });
+  });
+
+  describe("noteFilterFn", () => {
+    const row1 = { original: { transactionId: "tx-1", notes: [{ userId: "Mario", note: "Nota test 1"}, { userId: "Luigi", note: "Nota test 2"}] } };
+    const row2 = { original: { transactionId: "tx-2", notes: [] } };
+
+    it("should return true when filter value matches note value case-insensitively", () => {
+      expect(noteFilterFn(row1, "TEST")).toBe(true);
+      expect(noteFilterFn(row1, "nota")).toBe(true);
     });
 
-    it("should return false when the transaction ID is not present in the map", () => {
-      expect(azioniFilterFn(row3, "stornata", actionsMap)).toBe(false);
+    it("should return true when filter value matches userId case-insensitively", () => {
+      expect(noteFilterFn(row1, "mario")).toBe(true);
+      expect(noteFilterFn(row1, "LUIGI")).toBe(true);
+    });
+
+    it("should return false when filter value does not match any note value or userId", () => {
+      expect(noteFilterFn(row1, "unknown")).toBe(false);
+    });
+
+    it("should return false when the transaction has no notes", () => {
+      expect(noteFilterFn(row2, "test")).toBe(false);
     });
   });
 });
