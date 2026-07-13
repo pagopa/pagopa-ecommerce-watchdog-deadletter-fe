@@ -11,6 +11,24 @@ jest.mock("@/app/utils/types/DeadletterActionUtils", () => ({
   ),
 }));
 
+// when row / column virtualization is enabled (which uses react-virtual) we need to
+// change the element size otherwise the table will be empty.
+// See here https://github.com/TanStack/virtual/issues/641#issuecomment-3374887542
+jest.mock<typeof import('@tanstack/react-virtual')>('@tanstack/react-virtual', () => {
+  const actual = jest.requireActual<typeof import('@tanstack/react-virtual')>('@tanstack/react-virtual')
+  return {
+    ...actual,
+    useVirtualizer(options) {
+      return actual.useVirtualizer({
+        ...options,
+        observeElementRect: (instance, callback) => {
+          if (instance.scrollElement) callback({ width: 10_000, height: 10_000 })
+        },
+      })
+    },
+  }
+})
+
 const mockHandleOpenDialog = jest.fn();
 const mockHandleAddActionToTransaction = jest.fn();
 const mockHandleAddNote = jest.fn();
