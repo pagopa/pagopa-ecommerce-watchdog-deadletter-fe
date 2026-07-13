@@ -40,20 +40,21 @@ export function TransactionsTable(
     setDrawerConfig((prev) => ({ ...prev, open: false }));
   };
 
-  type TransactionWithNotes = Transaction & { notes: TransactionNote[] }
+  type TransactionWithExtra = Transaction & { notes: TransactionNote[], actions: Map<string, DeadletterAction> }
 
-  const transactionsWithNotes: TransactionWithNotes[] = useMemo(() =>
+  const transactionsWithExtra: TransactionWithExtra[] = useMemo(() => 
     props.transactions.map((v) => {
       return {
         ...v,
-        notes: props.notesMap.get(v.transactionId) ?? []
+          notes: props.notesMap.get(v.transactionId) ?? [],
+          actions: props.actionsMap.get(v.transactionId) ?? new Map() 
       }
     }),
-    [props.notesMap]
+    [props.notesMap, props.actionsMap]
   );
 
 
-  const columns = useMemo<MRT_ColumnDef<TransactionWithNotes>[]>(
+  const columns = useMemo<MRT_ColumnDef<TransactionWithExtra>[]>(
     () => [
       {
         header: 'transactionId',
@@ -248,22 +249,13 @@ export function TransactionsTable(
       },
       {
         header: "Azioni",
-        accessorKey: "azioni",
+        accessorKey: "actions",
         size: 140,
-        sortingFn: (rowA, rowB) => azioniSortingFn(rowA, rowB, props.actionsMap),
-        filterFn: (row, _id, filterValue) => azioniFilterFn(row, filterValue, props.actionsMap),
-        accessorFn: (value) => {
-          const id = value.transactionId;
-          const actions = props.actionsMap.get(id);
-          const actionList = actions
-            ? Array.from(actions.values()).map(getDeadletterActionAsString)
-            : [];
-          return actionList.length > 0 ? value : null;
-        },
+        sortingFn: (rowA, rowB) => azioniSortingFn(rowA, rowB),
+        filterFn: (row, _id, filterValue) => azioniFilterFn(row, filterValue),
         Cell: ({ row }) => {
-          const id = row.original.transactionId;
-          const transactionActions = props.actionsMap.get(id)
-            ? Array.from(props.actionsMap.get(id)!.values())
+          const transactionActions = row.original.actions
+            ? Array.from(row.original.actions!.values())
             : [];
 
           return (
@@ -293,7 +285,7 @@ export function TransactionsTable(
                 value=""
                 displayEmpty
                 sx={{ fontSize: "0.75rem" }}
-                onChange={(e) => props.handleAddActionToTransaction(e.target.value, id)}
+                onChange={(e) => props.handleAddActionToTransaction(e.target.value, row.original.transactionId)}
               >
                 <MenuItem value="">➕ Agg. azione</MenuItem>
                 {props.actions.map((option) => (
@@ -312,17 +304,8 @@ export function TransactionsTable(
         enableSorting: false,
         enableColumnFilter: true,
         enableClickToCopy: false,
-        filterFn: (row, _id, filterValue) => {
-          const tId = row.original.transactionId;
-          const transactionNotes = props.notesMap.get(tId) || [];
-
-          return transactionNotes.some(a =>
-            a.note.toLowerCase().includes(filterValue.toLowerCase()) ||
-            a.userId.toLowerCase().includes(filterValue.toLowerCase())
-          )
-        },
+        filterFn: (row, _id, filterValue) => noteFilterFn(row, filterValue),
         Cell: ({ row }) => {
-          const id = row.original.transactionId;
           const transactionNotes = row.original.notes || [];
 
           const hasNotes = Array.isArray(transactionNotes) && transactionNotes.length > 0;
@@ -373,7 +356,7 @@ export function TransactionsTable(
               </Tooltip>
               <IconButton
                 size="small"
-                onClick={() => handleOpenDrawer(id)}
+                onClick={() => handleOpenDrawer(row.original.transactionId)}
                 sx={{ flexShrink: 0 }}
               >
                 {hasNotes ? (
@@ -392,18 +375,20 @@ export function TransactionsTable(
     [],
   );
 
-  const table = useMaterialReactTable<TransactionWithNotes>({
+  const table = useMaterialReactTable<TransactionWithExtra>({
     columns: columns,
-    data: transactionsWithNotes,
+    data: transactionsWithExtra,
     enableRowNumbers: true,
     rowNumberDisplayMode: 'original',
     enableSorting: true,
     enableSortingRemoval: true,
     enableMultiSort: true,
     enableGlobalFilter: false,
+    columnFilterDisplayMode: 'popover',
+    enableDensityToggle: false,
     enableRowVirtualization: true,
     enablePagination: false,
-    rowCount: transactionsWithNotes.length,
+    rowCount: transactionsWithExtra.length,
     isMultiSortEvent: () => true,
     enableRowSelection: true,
     enableBatchRowSelection: true,
@@ -414,7 +399,7 @@ export function TransactionsTable(
     enableFacetedValues: true,
     layoutMode: 'grid',
     initialState: {
-      sorting: [{ id: 'insertionDate', desc: true, }],
+      sorting: [{ id: 'insertionDate', desc: false, }],
       columnPinning: { left: ['mrt-row-select', 'mrt-row-numbers', 'transactionId'] },
       density: 'compact',
       columnVisibility: {
@@ -445,6 +430,7 @@ export function TransactionsTable(
         "& tr:nth-of-type(odd) > td": {
           backgroundColor: "#f9fafb",
         },
+        'td[data-pinned="true"]::before': { backgroundColor: 'inherit' },
       }
     },
     muiTableBodyCellProps: {
@@ -463,7 +449,7 @@ export function TransactionsTable(
         border: "1px solid #e5e7eb",
         backgroundColor: "#f9fafb",
         color: "#0d47a1",
-        fontWeight: "bold",
+        fontWeight: "bold"
       }
     }
   });
@@ -492,29 +478,32 @@ export function TransactionsTable(
 }
 
 export const azioniSortingFn = (
-  rowA: { original: { transactionId: string } },
-  rowB: { original: { transactionId: string } },
-  actionsMap: Map<string, Map<string, DeadletterAction>>
-): number => {
-  const idA = rowA.original.transactionId;
-  const idB = rowB.original.transactionId;
-  const actionsA = actionsMap.get(idA) || new Map();
-  const actionsB = actionsMap.get(idB) || new Map();
-  return actionsA.size - actionsB.size;
-};
+  rowA: { original: { transactionId: string, actions: Map<string, DeadletterAction> } },
+  rowB: { original: { transactionId: string, actions: Map<string, DeadletterAction> } }
+): number => rowA.original.actions.size - rowB.original.actions.size;
 
 export const azioniFilterFn = (
-  row: { original: { transactionId: string } },
-  filterValue: string,
-  actionsMap: Map<string, Map<string, DeadletterAction>>
+  row: { original: { transactionId: string, actions: Map<string, DeadletterAction> } },
+  filterValue: string
 ): boolean => {
-  const tId = row.original.transactionId;
-  const transactionActions = actionsMap.get(tId)
-    ? Array.from(actionsMap.get(tId)!.values())
+  const transactionActions = row.original.actions
+    ? Array.from(row.original.actions!.values())
     : [];
 
   return transactionActions.some((a) =>
     a.action.value.toLowerCase().includes(filterValue.toLowerCase()) ||
     a.userId.toLowerCase().includes(filterValue.toLowerCase())
   );
+};
+
+export const noteFilterFn = (
+  row: { original: { transactionId: string, notes: { userId: string, note: string }[] } },
+  filterValue: string
+): boolean => {
+  const transactionNotes = row.original.notes || [];
+
+  return transactionNotes.some(a =>
+    a.note.toLowerCase().includes(filterValue.toLowerCase()) ||
+    a.userId.toLowerCase().includes(filterValue.toLowerCase())
+  )
 };

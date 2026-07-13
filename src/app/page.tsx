@@ -105,13 +105,12 @@ export default function Home() {
 
   const handleAddActionToTransaction = (actionValue: string, id: string) => {
     if (!jwtUser || actionsMap.get(id)?.has(actionValue)) return;
-    const newMap = new Map(actionsMap);
 
     const actionType = actions.find(action => action.value === actionValue);
     if (!actionType) return;
 
     const newAction: DeadletterAction = {
-      id: "null",
+      id: self.crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       userId: jwtUser.id,
       deadletterTransactionId: id,
@@ -121,10 +120,14 @@ export default function Home() {
     if (token.current) {
       fetchAddActionToDeadletterTransaction(token.current, newAction).then((res) => {
         if (!res) return;
-        if (!newMap.get(id))
-          newMap.set(id, new Map());
-        newMap.get(id)?.set(actionType.value, newAction);
-        setActionsMap(newMap);
+        setActionsMap((prev) => {
+          const newMap = new Map(prev);
+          if (!newMap.get(id)) {
+            newMap.set(id, new Map());
+          }
+          newMap.get(id)?.set(actionType.value, newAction);
+          return newMap;
+        })
       });
     }
   }
