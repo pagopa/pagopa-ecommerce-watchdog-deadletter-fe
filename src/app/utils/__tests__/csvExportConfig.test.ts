@@ -284,7 +284,7 @@ describe('csvExportConfig', () => {
         'nodoStatus',
         'paymentEndToEndId',
         'authorizationRequestId',
-        'Amount'
+        'amount'
       ]);
     });
   });

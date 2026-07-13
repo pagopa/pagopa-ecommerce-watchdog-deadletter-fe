@@ -1,5 +1,5 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
-import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip } from "@mui/material";
+import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip, Button, ButtonGroup, FormControl, InputLabel, TextField, CircularProgress } from "@mui/material";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
 import { dateTimeLocale, extendedMonthDateFormatOptions, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
@@ -10,6 +10,9 @@ import AddCommentIcon from '@mui/icons-material/AddComment';
 import { useMemo, useState } from "react";
 import TransactionNotesDrawer from "./TransactionNotesDrawer";
 import { getSuggestedAction } from "../utils/SuggestedActionsRules";
+import { FileDownload } from "@mui/icons-material";
+import { exportConfigs, ExportType } from "../utils/csvExportConfig";
+import { stringify } from "csv-stringify/sync";
 
 export function TransactionsTable(
   props: Readonly<{
@@ -18,6 +21,9 @@ export function TransactionsTable(
     actionsMap: Map<string, Map<string, DeadletterAction>>;
     actions: ActionType[];
     userId: string;
+    startDate?: string;
+    endDate?: string;
+    isLoadingData: boolean;
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
     handleAddNote: (transactionId: string, text: string) => void;
@@ -26,6 +32,101 @@ export function TransactionsTable(
     rowCount?: number;
   }>
 ) {
+
+  const [filtroPredefinito, setFiltroPredefinito] = useState<ExportType>('all_range');
+  const [loadingExport, setLoadingExport] = useState(false);
+
+  const setVisibleColumns = (columns: string[]) => {
+    table.toggleAllColumnsVisible(false);
+    table.setColumnVisibility((prev) => Object.fromEntries(
+        Object.keys(prev).map((key) =>
+          ['mrt-row-select', 'mrt-row-numbers', ...columns,  'actions', 'notes'].includes(key) ? [key, true] : [key, false]
+        )
+      )
+    );
+  }
+
+  const handleTableFilterRule = (type: ExportType) => {
+    setFiltroPredefinito(type);
+    switch (type) {
+      case "all_range": {
+        table.resetColumnVisibility();
+        table.resetColumnFilters();
+        return;
+      }
+      case "bancomat_pay": {
+        setVisibleColumns(exportConfigs[type].columns);
+        table.setColumnFilters([
+          {id: 'gatewayAuthorizationStatus', value: ['PENDING', null, 'null']},
+          {id: 'paymentMethodName', value: ['BANCOMATPAY']}
+        ]);
+
+        return;
+      }
+      case "mybank_intesa": {
+        setVisibleColumns(exportConfigs[type].columns);
+        table.setColumnFilters([
+          {id: 'paymentMethodName', value: ['MYBANK']},
+          {id: 'eCommerceStatus', value: ['REFUND_ERROR']},
+          {id: 'pspId', value: ['BCITITMM']},
+        ]);
+        return;
+      }
+      case "mybank_unicredit": {
+        setVisibleColumns(exportConfigs[type].columns);
+        table.setColumnFilters([
+          {id: 'paymentMethodName', value: ['MYBANK']},
+          {id: 'eCommerceStatus', value: ['REFUND_ERROR']},
+          {id: 'pspId', value: ['UNCRITMM']},
+        ]);
+        return;
+      }
+    }
+  }
+
+  function handleExportCSV(type: ExportType): void;
+  function handleExportCSV(): void;
+  function handleExportCSV(type?: ExportType) {
+    setLoadingExport(true);
+    const onlySelected: boolean = type == undefined;
+    type = type ?? 'all_range';
+
+    const transformed_rows = (onlySelected ? table.getSelectedRowModel() : table.getRowModel())
+      .rows.map(
+        (row) => {
+          const r: Record<string, any> = {};
+          row.getAllCells()
+            .forEach(c => r[c.column.columnDef.accessorKey!] = c.getValue() ?? "")
+          return r;
+        }
+      )
+
+    const csvContent = stringify(
+      transformed_rows,
+      { header: true, columns: exportConfigs[type].columns }
+    )
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    const dateStr = (props.startDate && props.endDate) ?
+          `${props.startDate}_${props.endDate}` :
+          new Date().toISOString().split('T')[0];
+
+    link.setAttribute('href', url);
+    if (onlySelected) {
+      link.setAttribute('download', `Selezionati_${dateStr}.csv`);
+    } else {
+      link.setAttribute('download', `${exportConfigs[type].fileNamePrefix}_${dateStr}.csv`);
+    }
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setLoadingExport(false);
+  }
 
   const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
     open: false,
@@ -135,6 +236,7 @@ export function TransactionsTable(
         header: "Amount",
         accessorKey: "amount",
         accessorFn: (value) => value.eCommerceDetails?.transactionInfo?.grandTotal || "",
+        size: 120
       },
       {
         header: "MethodName",
@@ -425,6 +527,51 @@ export function TransactionsTable(
         width: table.getState().isFullScreen ? "99.3vw" : undefined
       },
     }),
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Box sx={{ display: 'flex', gap: '1rem', p: '4px' }}>
+        <TextField 
+          select 
+          size='small' 
+          label='Filtri predefiniti'
+          value={filtroPredefinito}
+          onChange={(event) => handleTableFilterRule(event.target.value as ExportType)}
+          sx={{
+            '& .MuiSelect-select': { paddingTop: 0.8 },
+            marginRight: '4px',
+            width: 200
+          }}
+        >
+          {(Object.keys(exportConfigs) as ExportType[]).map(key => {
+            return (
+              <MenuItem key={key} value={key} data-testid={key}>
+                {exportConfigs[key].label}
+              </MenuItem>
+            );
+          })}
+        </TextField>
+        <ButtonGroup size="small" variant="contained" aria-label="Export button group">
+            <Button
+              onClick={() => handleExportCSV(filtroPredefinito)}
+              startIcon={loadingExport || props.isLoadingData ? <CircularProgress size={20} color="inherit" /> : <FileDownload />}
+              disabled={
+                table.getFilteredRowModel().rows.length == 0 ||
+                loadingExport ||
+                props.isLoadingData
+              }
+              sx={{ width: 200 }}
+            >
+              Esporta intero range ({exportConfigs[filtroPredefinito].label})
+            </Button>
+          <Button
+            disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
+            onClick={() => handleExportCSV()}
+            startIcon={loadingExport ? <CircularProgress size={20} color="inherit" /> : <FileDownload />}
+          >
+            Esporta righe selezionate
+          </Button>
+        </ButtonGroup>
+      </Box>
+    ),
     muiTableBodyProps: {
       sx: {
         "& tr:nth-of-type(odd) > td": {

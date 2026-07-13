@@ -75,7 +75,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     label: "Tutte le transazioni",
     description: "Tutte le transazioni nel range selezionato",
     filter: () => true,
-    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'nodoStatus', 'paymentEndToEndId', 'authorizationRequestId', "Amount"],
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'nodoStatus', 'paymentEndToEndId', 'authorizationRequestId', "amount"],
     getColumnValue: (transaction, column) => {
       if (column === 'insertionDate') {
         const date = transaction.insertionDate;
@@ -84,7 +84,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
         return dateObj.toISOString().split('.')[0];
       } else if (column === 'authorizationRequestId') {
         return transaction.eCommerceDetails?.transactionInfo?.authorizationRequestId || '';
-      } else if (column === 'Amount') {
+      } else if (column === 'amount') {
         return transaction.eCommerceDetails?.transactionInfo?.grandTotal.toString() || '';
       }
       return transaction[column as keyof Transaction] as string || '';

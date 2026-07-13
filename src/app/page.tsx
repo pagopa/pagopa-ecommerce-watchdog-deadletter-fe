@@ -36,7 +36,7 @@ import { TransactionDetails } from "./components/TransactionDetails";
 import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetimeFormatConfig";
 import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
-import { Paper } from "@mui/material";
+import { Chip, Paper } from "@mui/material";
 import { TransactionsTable } from "./components/TransactionsTable";
 
 
@@ -132,7 +132,7 @@ export default function Home() {
     }
   }
 
-  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 20) => {
+  const loadDataForRange = async (start: string, end: string, page: number = 0, pageSize: number = 100) => {
     if (!start || !end || !token.current) {
       setTransactions([]);
       return;
@@ -155,7 +155,7 @@ export default function Home() {
     } else {
       setIsLoadingMore(true);
       if (page >= 4) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
@@ -227,7 +227,7 @@ export default function Home() {
     let timeoutId: NodeJS.Timeout;
 
     if (hasMore && !isLoadingMore && !loadingData && rangeStart && rangeEnd) {
-      // Initiate next fetch after a small delay (the 2s delay is inside loadDataForRange but we can do it here too, however we already do `await new Promise` in loadDataForRange)
+      // Initiate next fetch after a small delay (the 1s delay is inside loadDataForRange but we can do it here too, however we already do `await new Promise` in loadDataForRange)
       timeoutId = setTimeout(() => {
         setPaginationModel((prev) => {
           const nextModel = { ...prev, page: prev.page + 1 };
@@ -387,7 +387,12 @@ export default function Home() {
 
             <SectionHeader
               icon="⚡"
-              title="Azioni Rapide"
+              title={
+                <>
+                Azioni Rapide
+                <Chip label="⚠️ Discontinued" variant="outlined" color="error" sx={{ marginLeft: 12 }}/>
+                </>
+              }
               subtitle="Export CSV per gestione storni e tanto altro"
             />
 
@@ -436,13 +441,16 @@ export default function Home() {
 
 
             <Grid item xs={12}>
-              <Paper sx={{ height: "100%", width: "100%" }}>
+              <Paper sx={{ height: "100%", width: "100%", minHeight: "600px" }}>
                 <TransactionsTable
                   transactions={transactions}
                   notesMap={notesMap}
                   actionsMap={actionsMap}
                   actions={actions}
                   userId={jwtUser?.id || ""}
+                  startDate={rangeStart}
+                  endDate={rangeEnd}
+                  isLoadingData={loadingData || hasMore}
                   handleOpenDialog={handleOpenDialog}
                   handleAddActionToTransaction={handleAddActionToTransaction}
                   handleAddNote={handleAddNote}
