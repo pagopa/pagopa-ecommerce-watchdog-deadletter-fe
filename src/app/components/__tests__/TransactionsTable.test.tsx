@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { TransactionsTable, azioniSortingFn, azioniFilterFn, noteFilterFn } from "../TransactionsTable";
 import userEvent from "@testing-library/user-event";
 import { ActionType, DeadletterAction } from "../../types/DeadletterAction";
@@ -29,6 +29,44 @@ jest.mock<typeof import('@tanstack/react-virtual')>('@tanstack/react-virtual', (
   }
 })
 
+const setupDownloadMocks = () => {
+  const mockLink = {
+    setAttribute: jest.fn(),
+    click: jest.fn(),
+    style: {} as CSSStyleDeclaration,
+  } as unknown as HTMLAnchorElement & { setAttribute: jest.Mock; click: jest.Mock };
+
+  const createElementSpy = jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+    if (tagName === 'a') {
+      return mockLink;
+    }
+    return Document.prototype.createElement.call(document, tagName);
+  });
+
+  const appendChildSpy = jest.spyOn(document.body, 'appendChild').mockImplementation((node: Node) => {
+    if (node === mockLink) {
+      return mockLink;
+    }
+    return Node.prototype.appendChild.call(document.body, node);
+  });
+
+  const removeChildSpy = jest.spyOn(document.body, 'removeChild').mockImplementation((node: Node) => {
+    if (node === mockLink) {
+      return mockLink;
+    }
+    return Node.prototype.removeChild.call(document.body, node);
+  });
+
+  return {
+    mockLink,
+    createElementSpy,
+    appendChildSpy,
+    removeChildSpy,
+  };
+};
+
+global.URL.createObjectURL = jest.fn(() => 'mock-url');
+global.URL.revokeObjectURL = jest.fn();
 const mockHandleOpenDialog = jest.fn();
 const mockHandleAddActionToTransaction = jest.fn();
 const mockHandleAddNote = jest.fn();
@@ -294,6 +332,8 @@ const defaultProps = {
   notesMap: mockNotesMap,
   actionsMap: mockActionsMap,
   actions: mockActionTypes,
+  startDate: "2025-07-01",
+  endDate: "2025-07-03",
   handleOpenDialog: mockHandleOpenDialog,
   handleAddActionToTransaction: mockHandleAddActionToTransaction,
   handleAddNote: mockHandleAddNote,
@@ -557,6 +597,83 @@ describe("TransactionsTable", () => {
     expect(within(row1Element).getByText(mockTransactions[0].eCommerceDetails?.transactionInfo?.grandTotal || "")).toBeInTheDocument();
     expect(within(row1Element).getByText(mockAction1.action.value)).toBeInTheDocument();
     expect(within(row1Element).getByText(mockAction2.action.value)).toBeInTheDocument();
+  });
+
+  it("changes columns and rows when selecting a predefined filter", async () => {
+    renderComponent();
+    const user = userEvent.setup();
+
+    // Find predefined filter button
+    const columnButton = screen.getByText("Tutte le transazioni");
+    expect(columnButton).toBeInTheDocument();
+    await user.click(columnButton);
+
+    // Select filter MyBank Intesa
+    const myBankIntesaOption = screen.getByText("MyBank Intesa");
+    expect(myBankIntesaOption).toBeInTheDocument();
+    await user.click(myBankIntesaOption);
+
+    // Check column headers
+    expect(screen.queryByText("transactionId")).toBeInTheDocument();
+    expect(screen.queryByText("insertionDate (UTC)")).toBeInTheDocument();
+    expect(screen.queryByText(/PaymentToken/i)).toBeInTheDocument();
+    expect(screen.queryByText(/AuthorizationRequestId/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/MethodName/i)).not.toBeInTheDocument();
+    expect(screen.queryByText("pspId")).not.toBeInTheDocument();
+    expect(screen.queryByText("statoEcommerce")).not.toBeInTheDocument();
+    expect(screen.queryByText("nodoStatus")).not.toBeInTheDocument();
+    expect(screen.queryByText("gatewayStatus")).not.toBeInTheDocument();
+    expect(screen.queryByText("Azioni")).toBeInTheDocument();
+    expect(screen.queryByText("PaymentEndToEndId")).toBeInTheDocument();
+    expect(screen.queryByText("Amount")).not.toBeInTheDocument();
+
+    // Select filter BancomatPay
+    await user.click(columnButton);
+    const bancomatPayOption = screen.getByText("BancomatPay");
+    expect(bancomatPayOption).toBeInTheDocument();
+    await user.click(bancomatPayOption);
+
+    // Check some column headers changes
+    expect(screen.queryByText("PaymentEndToEndId")).not.toBeInTheDocument();
+    expect(screen.queryByText("gatewayStatus")).toBeInTheDocument();
+
+    // Select filter MyBank Unicredit
+    await user.click(columnButton);
+    const myBankUnicreditOption = screen.getByText("MyBank Unicredit");
+    expect(myBankUnicreditOption).toBeInTheDocument();
+    await user.click(myBankUnicreditOption);
+
+    // Check some column headers changes
+    expect(screen.queryByText("PaymentEndToEndId")).toBeInTheDocument();
+    expect(screen.queryByText("gatewayStatus")).not.toBeInTheDocument();
+
+    // Select no filter
+    await user.click(columnButton);
+    const defaultOption = screen.getByText("Tutte le transazioni");
+    expect(defaultOption).toBeInTheDocument();
+    await user.click(defaultOption);
+
+    // Check some column headers changes
+    expect(screen.queryByText("PaymentEndToEndId")).not.toBeInTheDocument();
+    expect(screen.queryByText("gatewayStatus")).toBeInTheDocument();
+    expect(screen.queryByText("nodoStatus")).toBeInTheDocument();
+  });
+
+
+  it('should trigger CSV download when export button is clicked', async () => {
+    renderComponent();
+    const user = userEvent.setup();
+
+    const downloadMocks = setupDownloadMocks();
+
+    const exportButton = screen.getByRole('button', { name: /Esporta intero range.*/i });
+    await user.click(exportButton);
+
+    await waitFor(() => {
+      expect(downloadMocks.mockLink.setAttribute).toHaveBeenCalledWith('download', 'Tutte_Transazioni_2025-07-01_2025-07-03.csv');
+      expect(downloadMocks.mockLink.setAttribute).toHaveBeenCalledWith('href', 'mock-url');
+      expect(downloadMocks.mockLink.click).toHaveBeenCalled();
+    });
   });
 
   describe("azioniSortingFn", () => {

@@ -2,7 +2,7 @@ import { Box, Grid } from "@mui/material";
 
 interface SectionHeaderProps {
   icon: string;
-  title: string;
+  title: string | JSX.Element;
   subtitle: string;
   color?: string;
 }
