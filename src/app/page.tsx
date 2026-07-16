@@ -57,7 +57,7 @@ export default function Home() {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [actions, setActions] = useState<ActionType[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 20 });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 100 });
   const [totalResults, setTotalResults] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
