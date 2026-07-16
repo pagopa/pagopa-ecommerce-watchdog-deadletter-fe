@@ -245,10 +245,10 @@ export default function Home() {
   const handleRangeChange = (start: string, end: string) => {
     setRangeStart(start);
     setRangeEnd(end);
-    setPaginationModel({ page: 0, pageSize: 20 });
+    setPaginationModel({ page: 0, pageSize: 100 });
 
     if (start && end) {
-      loadDataForRange(start, end, 0, 20);
+      loadDataForRange(start, end, 0, 100);
     }
   };
 
