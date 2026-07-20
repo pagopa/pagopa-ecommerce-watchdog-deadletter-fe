@@ -15,6 +15,10 @@ module.exports = function middleware (req, res, next) {
     return res.status(201).json(mockedResponse);
   }
 
+  if (req.method === 'POST' && req.path.match("/deadletter-transactions/actions/bulk")) {
+    return res.status(201);
+  }
+
   if (req.method === 'PUT' || req.method === 'DELETE') {
     return res.sendStatus(204);
   }
