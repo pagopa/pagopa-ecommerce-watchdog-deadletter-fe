@@ -92,6 +92,25 @@ export const fetchAddActionToDeadletterTransaction = async (token: string, actio
   }
 };
 
+export const fetchAddActionToDeadletterTransactions = async (token: string, action: { transactionIds: string[], value: string }): Promise<Response | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/actions/bulk`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(action),
+    });
+
+    if (!res.ok) throw new Error(`Failed to add action to deadletter transactions with ids: ${JSON.stringify(action.transactionIds)}`);
+    return res;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 export const fetchActions = async (token: string): Promise<ActionType[]> => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/actions`, {

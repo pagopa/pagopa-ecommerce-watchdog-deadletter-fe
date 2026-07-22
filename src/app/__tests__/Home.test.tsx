@@ -1,7 +1,18 @@
 import Home from "../page"
 import { render, screen, within, waitFor } from '@testing-library/react';
-import { fetchAuthentication, fetchActions, fetchActionsByTransactionId, fetchActionsByMultipleTransactionIds, fetchAddActionToDeadletterTransaction, fetchDeadletterTransactionsV2, fetchNotesByTransactionIds, addNoteToTransaction, updateTransactionNote, deleteTransactionNote } from '../utils/api/client';
-import React from "react";
+import {
+  fetchAuthentication,
+  fetchActions,
+  fetchActionsByTransactionId,
+  fetchActionsByMultipleTransactionIds,
+  fetchAddActionToDeadletterTransaction,
+  fetchAddActionToDeadletterTransactions,
+  fetchDeadletterTransactionsV2,
+  fetchNotesByTransactionIds, 
+  addNoteToTransaction,
+  updateTransactionNote,
+  deleteTransactionNote
+} from '../utils/api/client';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { decodeJwt } from 'jose';
@@ -17,6 +28,7 @@ jest.mock('../utils/api/client', () => ({
   fetchActionsByTransactionId: jest.fn(),
   fetchActionsByMultipleTransactionIds: jest.fn(),
   fetchAddActionToDeadletterTransaction: jest.fn(),
+  fetchAddActionToDeadletterTransactions: jest.fn(),
   fetchDeadletterTransactionsV2: jest.fn(),
   fetchNotesByTransactionIds: jest.fn(),
   addNoteToTransaction: jest.fn(),
@@ -64,6 +76,7 @@ const mockedFetchActions = fetchActions as jest.Mock;
 const mockedFetchActionsByTransactionId = fetchActionsByTransactionId as jest.Mock;
 const mockedFetchActionsByMultipleTransactionIds = fetchActionsByMultipleTransactionIds as jest.Mock;
 const mockedFetchAddActionToDeadletterTransaction = fetchAddActionToDeadletterTransaction as jest.Mock;
+const mockedFetchAddActionToDeadletterTransactions = fetchAddActionToDeadletterTransactions as jest.Mock;
 const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
 const mockedFetchNotesByTransactionIds = fetchNotesByTransactionIds as jest.Mock;
 const mockedAddNoteToTransaction = addNoteToTransaction as jest.Mock;
@@ -102,6 +115,7 @@ describe('Home', () => {
     mockedFetchActionsByTransactionId.mockReset();
     mockedFetchActionsByMultipleTransactionIds.mockReset();
     mockedFetchAddActionToDeadletterTransaction.mockReset();
+    mockedFetchAddActionToDeadletterTransactions.mockReset();
     mockedFetchDeadletterTransactionsV2.mockReset();
     mockedFetchNotesByTransactionIds.mockReset();
     mockGetTokenFromUrl.mockReset();
@@ -403,6 +417,70 @@ describe('Home', () => {
     await userEvent.click(option);
 
     expect(mockedFetchAddActionToDeadletterTransaction).toHaveBeenCalled();
+
+  });
+
+  it('check that an action can be added to multiple rows after confirming dialog', async () => {
+    // Mock the presence of a token in the sessionStorage would be logged without login needed
+    const tokenMock: string = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    const mockUser: JwtUser = {
+      name: 'Mario',
+      surname: 'Rossi',
+      email: 'mario.rossi@example.com',
+      id: 'testId'
+    };
+    mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
+
+    // Mock the api
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([{ value: "testAction", type: "FINAL" }]);
+    mockedFetchAddActionToDeadletterTransactions.mockResolvedValue({ response: "200" });
+
+    renderComponent();
+
+    // wait until the user is logged
+    expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
+
+    // check the presence of the date pickers
+    const startDatePicker = await screen.findByLabelText("Data inizio");
+    const endDatePicker = await screen.findByLabelText("Data fine");
+    expect(startDatePicker).toBeInTheDocument();
+    expect(endDatePicker).toBeInTheDocument();
+
+    // click on the date pickers and select a range
+    await userEvent.type(startDatePicker, "2025-11-07");
+    await userEvent.type(endDatePicker, "2025-11-08");
+
+    expect(startDatePicker).toHaveValue("2025-11-07");
+    expect(endDatePicker).toHaveValue("2025-11-08");
+
+    // wait until the graphs and the table are in the document
+    const table = await screen.findByRole("table");
+    expect(mockedFetchActions).toHaveBeenCalled();
+
+    // Add the action test to the transactions
+    const bulkActionSelection = screen.getByRole('combobox', { expanded: false, name: /.*Azione Massiva/i });
+    // Select rows
+    const selectAllButton = within(table).getByRole('checkbox', { name: 'Toggle select all' });
+    await userEvent.click(selectAllButton);
+
+    // Check select is enabled
+    expect(bulkActionSelection).toBeEnabled();
+    await userEvent.click(bulkActionSelection);
+    expect(screen.getByText('testAction')).toBeInTheDocument();
+
+    // Select action
+    const option = await screen.getByRole('option', { name: 'testAction' });
+    await userEvent.click(option);
+
+    // Confirm dialog
+    const dialogOk = await screen.getByRole('button', { name: 'Conferma' });
+    await userEvent.click(dialogOk);
+
+    expect(mockedFetchAddActionToDeadletterTransactions).toHaveBeenCalled();
 
   });
 

@@ -1,5 +1,6 @@
 {
   "/deadletter-transactions/:deadletterTransactionId/actions": "/deadletter-transactions-actions?deadletterTransactionId=:deadletterTransactionId",
+  "/deadletter-transactions/actions/bulk": "/deadletter-transactions-actions",
   "/v2/deadletter-transactions/actions": "/deadletter-transactions-actions-v2",
   "/v2/deadletter-transactions?fromDate=:fromDate&toDate=:toDate&pageNumber=:pageNumber&pageSize=:pageSize": "/deadletter-transactions-v2",
   "/deadletter-transactions/notes": "/notes-list"

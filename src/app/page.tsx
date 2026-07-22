@@ -18,6 +18,7 @@ import {
   addNoteToTransaction,
   updateTransactionNote,
   deleteTransactionNote,
+  fetchAddActionToDeadletterTransactions,
 } from "./utils/api/client";
 import { navigateTo } from "./utils/utils";
 import ChartsStatistics from "./components/ChartsStatistics";
@@ -126,6 +127,47 @@ export default function Home() {
             newMap.set(id, new Map());
           }
           newMap.get(id)?.set(actionType.value, newAction);
+          return newMap;
+        })
+      });
+    }
+  }
+
+  const handleAddActionToTransactions = (transactions: Transaction[], actionValue: string) => {
+    if (!jwtUser) return;
+
+    const actionType = actions.find(action => action.value === actionValue);
+    if (!actionType) return;
+
+    transactions = transactions.filter(t => !actionsMap.get(t.transactionId)?.has(actionValue))
+    if (transactions.length == 0) return;
+
+
+    const payload: { transactionIds: string[], value: string } = {
+      transactionIds: transactions.map(t => t.transactionId),
+      value: actionValue
+    }
+
+    if (token.current) {
+      fetchAddActionToDeadletterTransactions(token.current, payload).then((res) => {
+        if (!res) return;
+        setActionsMap((prev) => {
+          const newMap = new Map(prev);
+
+          transactions.forEach(t => {
+            const newAction: DeadletterAction = {
+              id: self.crypto.randomUUID(),
+              timestamp: new Date().toISOString(),
+              userId: jwtUser.id,
+              deadletterTransactionId: t.transactionId,
+              action: actionType
+            }
+
+            if (!newMap.get(t.transactionId)) {
+              newMap.set(t.transactionId, new Map());
+            }
+            newMap.get(t.transactionId)?.set(actionType.value, newAction);
+          })
           return newMap;
         })
       });
@@ -456,6 +498,7 @@ export default function Home() {
                   handleAddNote={handleAddNote}
                   handleEditNote={handleEditNote}
                   handleDeleteNote={handleDeleteNote}
+                  handleAddActionToTransactions={handleAddActionToTransactions}
                   rowCount={totalResults}
                 />
               </Paper>

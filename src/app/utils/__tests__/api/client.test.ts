@@ -7,6 +7,7 @@ import {
   fetchActionsByTransactionId,
   fetchActionsByMultipleTransactionIds,
   fetchAddActionToDeadletterTransaction,
+  fetchAddActionToDeadletterTransactions,
   fetchAuthentication,
   fetchDeadletterTransactionsV2,
   fetchNotesByTransactionIds,
@@ -306,6 +307,60 @@ describe("fetchAddActionToDeadletterTransaction", () => {
       mockToken,
       mockDeadletterAction
     );
+
+    expect(result).toEqual(null);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("fetchAddActionToDeadletterTransactions", () => {
+  it("should return Response on a successful fetch (200)", async () => {
+    const mockResponse = {
+      ok: true,
+      status: 201,
+      json: jest.fn().mockResolvedValue({}),
+    } as unknown as Response;
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse);
+
+    const mockBody = {
+      transactionIds: [mockTransactionId],
+      value: 'test'
+    }
+
+    const result = await fetchAddActionToDeadletterTransactions(mockToken, mockBody);
+
+    expect(result).toEqual(mockResponse);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/actions/bulk`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mockToken}`,
+        },
+        body: JSON.stringify(mockBody),
+      }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error(
+      `Failed to add action to deadletter transactions with ids: ${JSON.stringify([mockTransactionId])}`
+    );
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const mockBody = {
+      transactionIds: [mockTransactionId],
+      value: 'test'
+    }
+
+    const result = await fetchAddActionToDeadletterTransactions(mockToken, mockBody);
 
     expect(result).toEqual(null);
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);

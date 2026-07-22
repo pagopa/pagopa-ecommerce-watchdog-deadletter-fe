@@ -1,5 +1,5 @@
 import { Transaction } from "@/app/types/DeadletterResponse";
-import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip, Button, ButtonGroup, FormControl, InputLabel, TextField, CircularProgress } from "@mui/material";
+import { Box, Chip, Divider, MenuItem, Select, IconButton, Typography, Badge, Stack, Tooltip, Button, ButtonGroup, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import { getDeadletterActionAsString } from "@/app/utils/types/DeadletterActionUtils";
 import { DeadletterAction, ActionType } from "../types/DeadletterAction";
 import { dateTimeLocale, extendedMonthDateFormatOptions, utcDateTimeFormatOptions } from "../utils/datetimeFormatConfig";
@@ -26,6 +26,7 @@ export function TransactionsTable(
     isLoadingData: boolean;
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
+    handleAddActionToTransactions: (transactions: Transaction[], actionValue: string) => void;
     handleAddNote: (transactionId: string, text: string) => void;
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
     handleDeleteNote: (note: TransactionNote) => void;
@@ -35,6 +36,29 @@ export function TransactionsTable(
 
   const [filtroPredefinito, setFiltroPredefinito] = useState<ExportType>('all_range');
   const [loadingExport, setLoadingExport] = useState(false);
+  const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
+    open: false,
+    transactionId: null,
+  });
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [bulkActionValue, setBulkActionValue] = useState<string>("");
+
+
+  const handleOpenDrawer = (transactionId: string) => setDrawerConfig({ open: true, transactionId });
+  const handleCloseDrawer = () => setDrawerConfig((prev) => ({ ...prev, open: false }));
+
+  const handleDialogStatus = (value?: string) => {
+    if (!isDialogOpen) {
+      setDialogOpen(true);
+      setBulkActionValue(value ?? "")
+    } else if (isDialogOpen && value) {
+      setDialogOpen(false);
+      props.handleAddActionToTransactions(table.getSelectedRowModel().rows.map(r => r.original), value)
+    } else {
+      setDialogOpen(false)
+    }
+
+  }
 
   const setVisibleColumns = (columns: string[]) => {
     table.toggleAllColumnsVisible(false);
@@ -127,19 +151,6 @@ export function TransactionsTable(
     document.body.removeChild(link);
     setLoadingExport(false);
   }
-
-  const [drawerConfig, setDrawerConfig] = useState<{ open: boolean; transactionId: string | null }>({
-    open: false,
-    transactionId: null,
-  });
-
-  const handleOpenDrawer = (transactionId: string) => {
-    setDrawerConfig({ open: true, transactionId });
-  };
-
-  const handleCloseDrawer = () => {
-    setDrawerConfig((prev) => ({ ...prev, open: false }));
-  };
 
   type TransactionWithExtra = Transaction & { notes: TransactionNote[], actions: Map<string, DeadletterAction> }
 
@@ -570,6 +581,26 @@ export function TransactionsTable(
             Esporta righe selezionate
           </Button>
         </ButtonGroup>
+        <TextField 
+          select 
+          data-testid='action-button-bulk'
+          size='small' 
+          label='➕ Azione massiva'
+          value=''
+          disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
+          onChange={(e) => handleDialogStatus(e.target.value)}
+          sx={{
+            '& .MuiSelect-select': { paddingTop: 0.8 },
+            marginRight: '4px',
+            width: 200
+          }}
+        >
+          {props.actions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.value}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
     ),
     muiTableBodyProps: {
@@ -620,6 +651,24 @@ export function TransactionsTable(
         onEditNote={props.handleEditNote}
         onDeleteNote={props.handleDeleteNote}
       />
+      <Dialog
+        open={isDialogOpen}
+        onClose={() => handleDialogStatus()}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        role="alertdialog"
+      >
+        <DialogTitle id="alert-dialog-title">⚠️ Azione massiva ⚠️</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+          {`Questa azione coinvolgerà ${table.getSelectedRowModel().rows.length} righe. Continuare?`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDialogStatus()} autoFocus>Annulla</Button>
+          <Button onClick={() => handleDialogStatus(bulkActionValue)}>Conferma</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
