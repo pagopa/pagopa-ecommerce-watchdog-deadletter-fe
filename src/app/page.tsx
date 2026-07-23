@@ -19,6 +19,7 @@ import {
   updateTransactionNote,
   deleteTransactionNote,
   fetchAddActionToDeadletterTransactions,
+  addNoteToTransactions,
 } from "./utils/api/client";
 import { navigateTo } from "./utils/utils";
 import ChartsStatistics from "./components/ChartsStatistics";
@@ -326,6 +327,22 @@ export default function Home() {
     });
   };
 
+  const handleAddNotes = (transactions: Transaction[], text: string) => {
+    if (!token.current) return;
+
+    addNoteToTransactions(token.current, {transactionIds: transactions.map(t => t.transactionId), note: text}).then((newNotes) => {
+      if (!newNotes) return;
+      setNotesMap((prev) => {
+        const newMap = new Map(prev);
+        newNotes.forEach((note) => {
+          const transactionNotes = newMap.get(note.transactionId) || [];
+          newMap.set(note.transactionId, [...transactionNotes, note]);
+        })
+        return newMap;
+      });
+    });
+  };
+
   const handleEditNote = (currentNote: TransactionNote, newText: string) => {
     if (!token.current) return;
 
@@ -502,6 +519,7 @@ export default function Home() {
                   handleOpenDialog={handleOpenDialog}
                   handleAddActionToTransaction={handleAddActionToTransaction}
                   handleAddNote={handleAddNote}
+                  handleAddNotes={handleAddNotes}
                   handleEditNote={handleEditNote}
                   handleDeleteNote={handleDeleteNote}
                   handleAddActionToTransactions={handleAddActionToTransactions}

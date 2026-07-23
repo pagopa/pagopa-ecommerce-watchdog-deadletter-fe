@@ -10,6 +10,7 @@ import {
   fetchDeadletterTransactionsV2,
   fetchNotesByTransactionIds, 
   addNoteToTransaction,
+  addNoteToTransactions,
   updateTransactionNote,
   deleteTransactionNote
 } from '../utils/api/client';
@@ -32,6 +33,7 @@ jest.mock('../utils/api/client', () => ({
   fetchDeadletterTransactionsV2: jest.fn(),
   fetchNotesByTransactionIds: jest.fn(),
   addNoteToTransaction: jest.fn(),
+  addNoteToTransactions: jest.fn(),
   updateTransactionNote: jest.fn(),
   deleteTransactionNote: jest.fn(),
 }));
@@ -80,6 +82,7 @@ const mockedFetchAddActionToDeadletterTransactions = fetchAddActionToDeadletterT
 const mockedFetchDeadletterTransactionsV2 = fetchDeadletterTransactionsV2 as jest.Mock;
 const mockedFetchNotesByTransactionIds = fetchNotesByTransactionIds as jest.Mock;
 const mockedAddNoteToTransaction = addNoteToTransaction as jest.Mock;
+const mockedAddNoteToTransactions = addNoteToTransactions as jest.Mock;
 const mockedUpdateTransactionNote = updateTransactionNote as jest.Mock;
 const mockedDeleteTransactionNote = deleteTransactionNote as jest.Mock;
 const mockGetTokenFromUrl = getTokenFromUrl as jest.Mock;
@@ -481,6 +484,85 @@ describe('Home', () => {
     await userEvent.click(dialogOk);
 
     expect(mockedFetchAddActionToDeadletterTransactions).toHaveBeenCalled();
+
+  });
+
+  it('check that a note can be added to multiple rows after confirming dialogs', async () => {
+    // Mock the presence of a token in the sessionStorage would be logged without login needed
+    const tokenMock: string = "mockToken123";
+    mockSessionStorage.setItem("authToken", tokenMock);
+    const mockUser: JwtUser = {
+      name: 'Mario',
+      surname: 'Rossi',
+      email: 'mario.rossi@example.com',
+      id: 'testId'
+    };
+    mockSessionStorage.setItem("jwtUser", JSON.stringify(mockUser));
+
+    const noteText = "Test add";
+    const mockNewNote = {
+      noteId: "new-note-1",
+      transactionId: deadletterResponse.deadletterTransactions[0].transactionId,
+      note: noteText,
+      userId: "testId",
+      createdAt: new Date().toISOString()
+    };
+
+    // Mock the api
+    mockedFetchDeadletterTransactionsV2.mockResolvedValue(deadletterResponse);
+    mockedFetchNotesByTransactionIds.mockResolvedValue([]);
+    mockedFetchActionsByTransactionId.mockResolvedValue([]);
+    mockedFetchActions.mockResolvedValue([{ value: "testAction", type: "FINAL" }]);
+    mockedAddNoteToTransactions.mockResolvedValue([mockNewNote]);
+
+    renderComponent();
+
+    // wait until the user is logged
+    expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
+
+    // check the presence of the date pickers
+    const startDatePicker = await screen.findByLabelText("Data inizio");
+    const endDatePicker = await screen.findByLabelText("Data fine");
+    expect(startDatePicker).toBeInTheDocument();
+    expect(endDatePicker).toBeInTheDocument();
+
+    // click on the date pickers and select a range
+    await userEvent.type(startDatePicker, "2025-11-07");
+    await userEvent.type(endDatePicker, "2025-11-08");
+
+    expect(startDatePicker).toHaveValue("2025-11-07");
+    expect(endDatePicker).toHaveValue("2025-11-08");
+
+    // wait until the graphs and the table are in the document
+    const table = await screen.findByRole("table");
+    expect(mockedFetchActions).toHaveBeenCalled();
+
+    // Add the note test to the transactions
+    const bulkNoteSelection = screen.getByRole('button', { name: /Nota Massiva/i });
+    // Select rows
+    const selectAllButton = within(table).getByRole('checkbox', { name: 'Toggle select all' });
+    await userEvent.click(selectAllButton);
+
+    // Check massive note button is enabled
+    expect(bulkNoteSelection).toBeEnabled();
+    await userEvent.click(bulkNoteSelection);
+
+    // Get textarea
+    const noteTextArea = screen.getByRole('textbox', { name: 'Nota' });
+    await userEvent.type(noteTextArea, 'testNote')
+
+    // Confirm
+    const confirmButton = await screen.getByRole('button', { name: 'Continua' });
+    await userEvent.click(confirmButton);
+
+    // Confirm dialog
+    const dialogOk = await screen.getByRole('button', { name: 'Conferma' });
+    await userEvent.click(dialogOk);
+
+    expect(mockedAddNoteToTransactions).toHaveBeenCalled();
+    const addedNotes = await screen.findAllByText(noteText);
+    expect(addedNotes.length).toBeGreaterThan(0);
+    expect(addedNotes[0]).toBeInTheDocument();
 
   });
 

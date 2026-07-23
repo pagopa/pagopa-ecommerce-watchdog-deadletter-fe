@@ -12,6 +12,7 @@ import {
   fetchDeadletterTransactionsV2,
   fetchNotesByTransactionIds,
   addNoteToTransaction,
+  addNoteToTransactions,
   updateTransactionNote,
   deleteTransactionNote 
 } from "../../api/client";
@@ -469,6 +470,50 @@ describe("addNoteToTransaction", () => {
       }
     );
   });
+
+describe("addNoteToTransactions", () => {
+  it("should return TransactionNote on a successful fetch (200)", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: jest.fn().mockResolvedValue(mockTransactionNotesArray),
+    } as unknown as Response);
+
+    const body = { transactionIds: mockTransactionNotesArray.map(t => t.transactionId), note: mockActionTypeArray[0].value };
+    const result = await addNoteToTransactions(mockToken, body);
+
+    expect(result).toEqual(mockTransactionNotesArray);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/notes/bulk`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${mockToken}`,
+        },
+        body: JSON.stringify(body),
+      }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const body = { transactionIds: mockTransactionNotesArray.map(t => t.transactionId), note: mockActionTypeArray[0].value };
+    const error = new Error(`Failed to add note to deadletter transactions with ids: ${JSON.stringify(body)}`);
+
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const result = await addNoteToTransactions(mockToken, body);
+
+    expect(result).toBeNull();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
 
   it("should return null on a non-ok status", async () => {
     const mockNote = mockTransactionNotesArray[0];

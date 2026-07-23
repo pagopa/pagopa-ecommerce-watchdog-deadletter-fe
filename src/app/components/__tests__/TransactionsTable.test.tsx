@@ -69,7 +69,9 @@ global.URL.createObjectURL = jest.fn(() => 'mock-url');
 global.URL.revokeObjectURL = jest.fn();
 const mockHandleOpenDialog = jest.fn();
 const mockHandleAddActionToTransaction = jest.fn();
+const mockHandleAddActionToTransactions= jest.fn();
 const mockHandleAddNote = jest.fn();
+const mockHandleAddNotes = jest.fn();
 const mockHandleEditNote = jest.fn();
 const mockHandleDeleteNote = jest.fn();
 
@@ -334,9 +336,12 @@ const defaultProps = {
   actions: mockActionTypes,
   startDate: "2025-07-01",
   endDate: "2025-07-03",
+  isLoadingData: false,
   handleOpenDialog: mockHandleOpenDialog,
   handleAddActionToTransaction: mockHandleAddActionToTransaction,
+  handleAddActionToTransactions: mockHandleAddActionToTransactions,
   handleAddNote: mockHandleAddNote,
+  handleAddNotes: mockHandleAddNotes,
   handleEditNote: mockHandleEditNote,
   handleDeleteNote: mockHandleDeleteNote,
   userId: "test.user",
@@ -677,19 +682,20 @@ describe("TransactionsTable", () => {
   });
 
   describe("azioniSortingFn", () => {
-    it("should return the difference in the number of actions between two rows", () => {
+    it("should return the row with the most recent action between two rows", () => {
       const rowA = { original: { transactionId: "tx-1", actions: new Map([
-        ["action1", {} as DeadletterAction],
-        ["action2", {} as DeadletterAction],
+        ["action1", {timestamp: new Date(2026, 1, 5).toISOString()} as DeadletterAction],
+        ["action2", {timestamp: new Date(2026, 1, 1).toISOString()} as DeadletterAction],
       ])}};
       const rowB = { original: { transactionId: "tx-2", actions: new Map([
-        ["action1", {} as DeadletterAction],
+        ["action1", {timestamp: new Date(2026, 1, 7).toISOString()} as DeadletterAction],
       ])}};
       const rowC = { original: { transactionId: "tx-3", actions: new Map() } };
 
       expect(azioniSortingFn(rowA, rowB)).toBe(1);
       expect(azioniSortingFn(rowB, rowA)).toBe(-1);
-      expect(azioniSortingFn(rowB, rowC)).toBe(1);
+      expect(azioniSortingFn(rowB, rowC)).toBe(-1);
+      expect(azioniSortingFn(rowC, rowB)).toBe(1);
       expect(azioniSortingFn(rowC, rowC)).toBe(0);
     });
   });
@@ -702,6 +708,7 @@ describe("TransactionsTable", () => {
             {
               action: { value: "Stornata" },
               userId: "mario.rossi",
+              timestamp: new Date(2026, 1, 1).toISOString()
             } as DeadletterAction,
           ],
           [

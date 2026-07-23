@@ -15,6 +15,21 @@ module.exports = function middleware (req, res, next) {
     return res.status(201).json(mockedResponse);
   }
 
+  if (req.method === 'POST' && req.path.match("/deadletter-transactions/notes/bulk")) {
+    const now = new Date().toISOString();
+    const mockedResponse = req.body.transactionIds.map(id => {
+      return {
+        transactionId: id,
+        userId: "mario.rossi",
+        noteId: crypto.randomUUID(),
+        note: req.body.note,
+        createdAt: now,
+        updatedAt: now
+      }
+    });
+    return res.status(201).json(mockedResponse);
+  }
+
   if (req.method === 'POST' && req.path.match("/deadletter-transactions/actions/bulk")) {
     return res.status(201);
   }

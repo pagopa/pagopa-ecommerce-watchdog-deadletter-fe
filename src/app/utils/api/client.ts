@@ -164,6 +164,25 @@ export const addNoteToTransaction = async (token: string, transactionId: string,
   }
 };
 
+export const addNoteToTransactions = async (token: string, input: { transactionIds: string[], note: string }): Promise<TransactionNote[] | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/notes/bulk`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(input),
+    });
+
+    if (!res.ok) throw new Error(`Failed to add note to deadletter transactions with ids: ${JSON.stringify(input)}`);
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 export const updateTransactionNote = async (token: string, transactionId: string, noteId: string, note: string): Promise<Response | null> => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/${transactionId}/notes/${noteId}`, {
