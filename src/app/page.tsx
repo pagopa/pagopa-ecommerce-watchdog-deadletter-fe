@@ -115,6 +115,7 @@ export default function Home() {
       timestamp: new Date().toISOString(),
       userId: jwtUser.id,
       deadletterTransactionId: id,
+      transactionId: id,
       action: actionType
     }
 
@@ -160,6 +161,7 @@ export default function Home() {
               timestamp: new Date().toISOString(),
               userId: jwtUser.id,
               deadletterTransactionId: t.transactionId,
+              transactionId: t.transactionId,
               action: actionType
             }
 
@@ -204,8 +206,8 @@ export default function Home() {
     try {
       const data = await fetchDeadletterTransactionsV2(token.current!, start, end, page, pageSize);
       const transactionsList = data?.deadletterTransactions
-            .sort((a, b) => new Date(a.insertionDate).valueOf() - new Date(b.insertionDate).valueOf())
-            || [];
+        .sort((a, b) => new Date(a.insertionDate).valueOf() - new Date(b.insertionDate).valueOf())
+        || [];
 
       if (page === 0) {
         setTransactions(transactionsList);
@@ -240,11 +242,15 @@ export default function Home() {
       if (token.current && transactionIds?.size > 0) {
         const nestedActionsList = await fetchActionsByMultipleTransactionIds(token.current, transactionIds)
         for (const actions of nestedActionsList ?? []) {
+          if (!actions || actions.length === 0) continue;
           const singleActionMap: Map<string, DeadletterAction> = actions.reduce(
-            (acc, item) => {acc.set(item.action.value, item); return acc},
+            (acc, item) => { acc.set(item.action.value, item); return acc },
             new Map()
           );
-          newActionsMap.set(actions[0]?.deadletterTransactionId, singleActionMap);
+          const tId = actions[0]?.transactionId || actions[0]?.deadletterTransactionId;
+          if (tId) {
+            newActionsMap.set(tId, singleActionMap);
+          }
         }
       }
 
@@ -431,8 +437,8 @@ export default function Home() {
               icon="⚡"
               title={
                 <>
-                Azioni Rapide
-                <Chip label="⚠️ Discontinued" variant="outlined" color="error" sx={{ marginLeft: 12 }}/>
+                  Azioni Rapide
+                  <Chip label="⚠️ Discontinued" variant="outlined" color="error" sx={{ marginLeft: 12 }} />
                 </>
               }
               subtitle="Export CSV per gestione storni e tanto altro"
