@@ -137,7 +137,7 @@ export const multipleTransactionIdsActions: DeadletterAction[][] = [
   [
     {
       id: "mockId",
-      deadletterTransactionId: "mockTransactionId",
+      transactionId: "mockTransactionId",
       userId: "mockUserId",
       action: {
         value: "mockAction",
