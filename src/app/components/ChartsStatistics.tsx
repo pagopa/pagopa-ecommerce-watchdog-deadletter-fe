@@ -58,19 +58,19 @@ export default function ChartsStatistics(
     const grouped = new Map<string, number>();
     grouped.set(FINAL_STATUS, 0);
     grouped.set(NON_FINAL_STATUS, 0);
-    grouped.set(NON_ANALYZED_STATUS, 0);
+    grouped.set(NON_ANALYZED_STATUS, props.transactions.length);
 
     for (const transactionActionMap of actionsMap.values()) {
-      if (transactionActionMap.size === 0) {
-        grouped.set(NON_ANALYZED_STATUS, grouped.get(NON_ANALYZED_STATUS)! + 1);
-        continue;
-      }
       for (const actionItem of transactionActionMap.values()) {
-        if (actionItem.action.type === "FINAL") {
-          grouped.set(FINAL_STATUS, grouped.get(FINAL_STATUS)! + 1);
-        } else {
-          grouped.set(NON_FINAL_STATUS, grouped.get(NON_FINAL_STATUS)! + 1);
+        switch (actionItem.action.type) {
+          case "FINAL":
+            grouped.set(FINAL_STATUS, grouped.get(FINAL_STATUS)! + 1);
+            break;
+          case "NOT_FINAL":
+            grouped.set(NON_FINAL_STATUS, grouped.get(NON_FINAL_STATUS)! + 1);
+            break;
         }
+        grouped.set(NON_ANALYZED_STATUS, Math.max(grouped.get(NON_ANALYZED_STATUS)! - 1, 0))
       }
     }
     return Array.from(grouped.entries()).map(([name, value]) => ({
@@ -93,7 +93,19 @@ export default function ChartsStatistics(
   );
 
   const actionTypes = useMemo(
-    () => groupActionsByType(props.actionsMap),
+    () => {
+      const latestActions: Map<string, Map<string, DeadletterAction>> = new Map();
+
+      for (const [tId, actions] of props.actionsMap) {
+        if (actions.size == 0) continue;
+        const latest = actions.entries().reduce(
+          (acc, value) => new Date(acc[1].timestamp).valueOf() > new Date(value[1].timestamp).valueOf() ?
+          acc : value
+        );
+        latestActions.set(tId, new Map([latest]))
+      }
+      return groupActionsByType(latestActions)
+    },
     [props.actionsMap]
   );
 
@@ -125,7 +137,7 @@ export default function ChartsStatistics(
             >
               {chart.title}
             </Typography>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
                   data={chart.data}

@@ -50,6 +50,10 @@ const mockTransactions: Transaction[] = [
   } as Transaction,
 ];
 
+const date1 = new Date();
+const date2 = new Date();
+date2.setTime(date2.getTime() - 60);
+
 const mockActionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
   ["t1", new Map([["a1", { action: { type: "FINAL" } } as DeadletterAction]])],
   [
@@ -59,8 +63,8 @@ const mockActionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
   [
     "t3",
     new Map([
-      ["a3", { action: { type: "FINAL" } } as DeadletterAction],
-      ["a4", { action: { type: "NOT_FINAL" } } as DeadletterAction],
+      ["a3", { action: { type: "FINAL" }, timestamp: date1.toISOString() } as DeadletterAction],
+      ["a4", { action: { type: "NOT_FINAL" }, timestamp: date2.toISOString() } as DeadletterAction],
     ]),
   ],
   ["t4", new Map()],
@@ -152,7 +156,7 @@ describe("ChartsStatistics", () => {
     expect(data).toEqual(
       expect.arrayContaining([
         { name: "FINALE", value: 2 },
-        { name: "NON FINALE", value: 2 },
+        { name: "NON FINALE", value: 1 },
         { name: "NON ANALIZZATO", value: 1 },
       ])
     );

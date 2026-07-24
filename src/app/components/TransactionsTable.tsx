@@ -380,7 +380,7 @@ export function TransactionsTable(
         filterFn: (row, _id, filterValue) => azioniFilterFn(row, filterValue),
         Cell: ({ row }) => {
           const transactionActions = row.original.actions
-            ? Array.from(row.original.actions!.values())
+            ? Array.from(row.original.actions!.values()).sort((a,b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
             : [];
 
           return (
