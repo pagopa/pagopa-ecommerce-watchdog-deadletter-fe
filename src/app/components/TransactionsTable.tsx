@@ -28,6 +28,7 @@ export function TransactionsTable(
     handleAddActionToTransaction: (actionType: string, id: string) => void;
     handleAddActionToTransactions: (transactions: Transaction[], actionValue: string) => void;
     handleAddNote: (transactionId: string, text: string) => void;
+    handleAddNotes: (transactions: Transaction[], text: string) => void;
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
     handleDeleteNote: (note: TransactionNote) => void;
     rowCount?: number;
@@ -41,23 +42,34 @@ export function TransactionsTable(
     transactionId: null,
   });
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const [bulkActionValue, setBulkActionValue] = useState<string>("");
+  const [isDialogFormOpen, setDialogFormOpen] = useState(false);
+  const [bulkAction, setBulkAction] = useState<() => void>(() => {});
 
 
   const handleOpenDrawer = (transactionId: string) => setDrawerConfig({ open: true, transactionId });
   const handleCloseDrawer = () => setDrawerConfig((prev) => ({ ...prev, open: false }));
 
-  const handleDialogStatus = (value?: string) => {
-    if (!isDialogOpen) {
-      setDialogOpen(true);
-      setBulkActionValue(value ?? "")
-    } else if (isDialogOpen && value) {
-      setDialogOpen(false);
-      props.handleAddActionToTransactions(table.getSelectedRowModel().rows.map(r => r.original), value)
-    } else {
-      setDialogOpen(false)
-    }
+  const handleOpenDialog = (op?: () => void) => {
+    if (op) setBulkAction((_) => op);
+    setDialogOpen(true);
+  }
 
+  const handleCloseDialog = (confirm: boolean = false) => {
+    if (confirm) bulkAction();
+    setDialogOpen(false);
+  }
+
+  const handleOpenFormDialog = () => {
+    setDialogFormOpen(true);
+  }
+  const handleCloseFormDialog = (event?: React.FormEvent<HTMLFormElement>) => {
+    if (event) {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
+      const formJson = Object.fromEntries((formData as any).entries());
+      handleOpenDialog(() => props.handleAddNotes(table.getSelectedRowModel().rows.map(r => r.original), formJson.note))
+    }
+    setDialogFormOpen(false);
   }
 
   const setVisibleColumns = (columns: string[]) => {
@@ -158,11 +170,11 @@ export function TransactionsTable(
     props.transactions.map((v) => {
       return {
         ...v,
-          notes: props.notesMap.get(v.transactionId) ?? [],
-          actions: props.actionsMap.get(v.transactionId) ?? new Map() 
+        notes: props.notesMap.get(v.transactionId) ?? [],
+        actions: props.actionsMap.get(v.transactionId) ?? new Map() 
       }
     }),
-    [props.notesMap, props.actionsMap]
+    [props.transactions, props.notesMap, props.actionsMap]
   );
 
 
@@ -588,11 +600,13 @@ export function TransactionsTable(
           label='➕ Azione massiva'
           value=''
           disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
-          onChange={(e) => handleDialogStatus(e.target.value)}
+          onChange={(e) => handleOpenDialog(
+            () => props.handleAddActionToTransactions(table.getSelectedRowModel().rows.map(r => r.original), e.target.value)
+          )}
           sx={{
             '& .MuiSelect-select': { paddingTop: 0.8 },
             marginRight: '4px',
-            width: 200
+            width: 190
           }}
         >
           {props.actions.map((option) => (
@@ -601,6 +615,15 @@ export function TransactionsTable(
             </MenuItem>
           ))}
         </TextField>
+        <Button
+          size="small"
+          variant="contained"
+          disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
+          onClick={(_) => handleOpenFormDialog()}
+          startIcon={<AddCommentIcon/>}
+        >
+          Nota massiva
+        </Button>
       </Box>
     ),
     muiTableBodyProps: {
@@ -653,20 +676,44 @@ export function TransactionsTable(
       />
       <Dialog
         open={isDialogOpen}
-        onClose={() => handleDialogStatus()}
+        onClose={() => handleCloseDialog()}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         role="alertdialog"
       >
-        <DialogTitle id="alert-dialog-title">⚠️ Azione massiva ⚠️</DialogTitle>
+        <DialogTitle id="alert-dialog-title">⚠️ Operazione massiva ⚠️</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-          {`Questa azione coinvolgerà ${table.getSelectedRowModel().rows.length} righe. Continuare?`}
+          {`Questa operazione coinvolgerà ${table.getSelectedRowModel().rows.length} righe. Continuare?`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleDialogStatus()} autoFocus>Annulla</Button>
-          <Button onClick={() => handleDialogStatus(bulkActionValue)}>Conferma</Button>
+          <Button onClick={() => handleCloseDialog()} autoFocus>Annulla</Button>
+          <Button onClick={() => handleCloseDialog(true)}
+          >
+            Conferma
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={isDialogFormOpen} onClose={() => handleCloseFormDialog()}>
+        <DialogTitle>Inserisci una nota</DialogTitle>
+        <DialogContent>
+          <form onSubmit={(e) => handleCloseFormDialog(e)} id="subscription-form">
+            <TextField
+              autoFocus
+              required
+              multiline
+              id="multinote"
+              name="note"
+              label="Nota"
+              rows={2}
+              sx={{ marginTop: 1 }}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleCloseFormDialog()}>Annulla</Button>
+          <Button type="submit" form="subscription-form">Continua</Button>
         </DialogActions>
       </Dialog>
     </Box>
@@ -676,7 +723,24 @@ export function TransactionsTable(
 export const azioniSortingFn = (
   rowA: { original: { transactionId: string, actions: Map<string, DeadletterAction> } },
   rowB: { original: { transactionId: string, actions: Map<string, DeadletterAction> } }
-): number => rowA.original.actions.size - rowB.original.actions.size;
+): number => {
+  switch (true) {
+    case rowA.original.actions.size == 0 && rowB.original.actions.size == 0: return 0;
+    case rowB.original.actions.size == 0: return -1;
+    case rowA.original.actions.size == 0: return 1;
+  }
+
+  const getNewestAction = (acc: DeadletterAction, value: DeadletterAction): DeadletterAction =>
+    acc.timestamp < value.timestamp ? value : acc
+
+  const maxA = rowA.original.actions.values().reduce(getNewestAction);
+  const maxB = rowB.original.actions.values().reduce(getNewestAction);
+  switch (true) {
+    case maxA.timestamp >  maxB.timestamp: return -1;
+    case maxA.timestamp <  maxB.timestamp: return 1;
+    default: return 0;
+  } 
+}
 
 export const azioniFilterFn = (
   row: { original: { transactionId: string, actions: Map<string, DeadletterAction> } },
