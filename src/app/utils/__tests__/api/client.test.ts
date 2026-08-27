@@ -31,8 +31,10 @@ const mockAuthenticationCredential = {
 
 const mockToken = "abc123";
 const mockTransactionId = "test-id";
-const mockFromDate = "2023-10-01";
-const mockToDate = "2023-10-07";
+const strFromDate = "2023-10-01";
+const strToDate = "2023-10-07";
+const mockFromDate = new Date(strFromDate);
+const mockToDate = new Date(strToDate);
 
 const mockActionType: ActionType = {
   value: "test",
@@ -250,7 +252,7 @@ describe("fetchDeadletterTransactionsV2", () => {
 
     expect(result).toEqual(mockDeadletterResponse);
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      `https://api.mock.com/v2/deadletter-transactions?fromDate=${mockFromDate}&toDate=${mockToDate}&pageNumber=0&pageSize=2`,
+      `https://api.mock.com/v2/deadletter-transactions?fromDate=${strFromDate}&toDate=${strToDate}&pageNumber=0&pageSize=2`,
       {
         headers: { Authorization: `Bearer ${mockToken}` },
       }

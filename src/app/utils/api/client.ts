@@ -58,9 +58,11 @@ export const fetchActionsByMultipleTransactionIds = async (token: string, transa
   }
 };
 
-export const fetchDeadletterTransactionsV2 = async (token: string, fromDate: string, toDate: string, pageNumber: number = 0, pageSize: number = 2): Promise<DeadletterResponse | null> => {
+export const fetchDeadletterTransactionsV2 = async (token: string, fromDate: Date, toDate: Date, pageNumber: number = 0, pageSize: number = 2): Promise<DeadletterResponse | null> => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/v2/deadletter-transactions?fromDate=${fromDate}&toDate=${toDate}&pageNumber=${pageNumber}&pageSize=${pageSize}`, {
+    const from = `${fromDate.getFullYear()}-${(fromDate.getMonth()+1).toString().padStart(2, "0")}-${(fromDate.getDate()).toString().padStart(2, "0")}`
+    const to = `${toDate.getFullYear()}-${(toDate.getMonth()+1).toString().padStart(2, "0")}-${(toDate.getDate()).toString().padStart(2, "0")}`
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/v2/deadletter-transactions?fromDate=${from}&toDate=${to}&pageNumber=${pageNumber}&pageSize=${pageSize}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

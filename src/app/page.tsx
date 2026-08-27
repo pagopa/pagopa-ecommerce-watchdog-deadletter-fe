@@ -222,7 +222,7 @@ export default function Home() {
     }
 
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current!, range?.from?.toISOString(), range?.to?.toISOString(), page, pageSize);
+      const data = await fetchDeadletterTransactionsV2(token.current!, range.from, range.to, page, pageSize);
       const transactionsList = data?.deadletterTransactions
         .sort((a, b) => new Date(a.insertionDate).valueOf() - new Date(b.insertionDate).valueOf())
         || [];
@@ -320,7 +320,7 @@ export default function Home() {
   const handleFetchAllForExport = async (): Promise<Transaction[]> => {
     if (!range?.from || !range?.to || !token.current) return [];
     try {
-      const data = await fetchDeadletterTransactionsV2(token.current, range.from.toISOString(), range.to.toISOString(), 0, 1000);
+      const data = await fetchDeadletterTransactionsV2(token.current, range.from, range.to, 0, 1000);
       return data ? data.deadletterTransactions : [];
     } catch (e) {
       console.error("Error fetching all for export", e);
