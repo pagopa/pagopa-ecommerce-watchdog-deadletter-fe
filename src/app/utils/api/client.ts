@@ -2,6 +2,7 @@ import { ActionType, DeadletterAction } from "@/app/types/DeadletterAction";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authentication";
 import { TransactionNote, TransactionNotes } from "@/app/types/TransactionNotes";
+import { CalendarStats } from "@/app/types/CalendarStatsResponse";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST}/authenticate`, {
@@ -216,5 +217,21 @@ export const deleteTransactionNote = async (token: string, transactionId: string
   } catch (e) {
     console.error(e);
     return null;
+  }
+};
+
+export const fetchCalendarStats = async (token: string, year: number, month: number): Promise<CalendarStats[]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/stats?year=${year}&month=${month}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch actions`);
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 };

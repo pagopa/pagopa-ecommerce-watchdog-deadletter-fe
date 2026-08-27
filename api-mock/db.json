@@ -2527,5 +2527,36 @@
         }
       ]
     }
+  ],
+  "stats": [
+    { "date": "2026/07/01", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
+    { "date": "2026/07/02", "finalized": 4, "notFinalized": 1, "notAnalyzed": 0 },
+    { "date": "2026/07/03", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
+    { "date": "2026/07/04", "finalized": 0, "notFinalized": 1, "notAnalyzed": 1 },
+    { "date": "2026/07/05", "finalized": 0, "notFinalized": 0, "notAnalyzed": 5 },
+    { "date": "2026/07/06", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
+    { "date": "2026/07/07", "finalized": 1, "notFinalized": 0, "notAnalyzed": 0 },
+    { "date": "2026/07/08", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
+    { "date": "2026/07/09", "finalized": 5, "notFinalized": 1, "notAnalyzed": 1 },
+    { "date": "2026/07/10", "finalized": 2, "notFinalized": 0, "notAnalyzed": 2 },
+    { "date": "2026/07/11", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
+    { "date": "2026/07/12", "finalized": 0, "notFinalized": 1, "notAnalyzed": 0 },
+    { "date": "2026/07/13", "finalized": 0, "notFinalized": 9, "notAnalyzed": 1 },
+    { "date": "2026/07/14", "finalized": 5, "notFinalized": 5, "notAnalyzed": 5 },
+    { "date": "2026/08/01", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
+    { "date": "2026/08/02", "finalized": 4, "notFinalized": 1, "notAnalyzed": 0 },
+    { "date": "2026/08/03", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
+    { "date": "2026/08/04", "finalized": 0, "notFinalized": 1, "notAnalyzed": 1 },
+    { "date": "2026/08/05", "finalized": 0, "notFinalized": 0, "notAnalyzed": 5 },
+    { "date": "2026/08/06", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
+    { "date": "2026/08/07", "finalized": 1, "notFinalized": 0, "notAnalyzed": 0 },
+    { "date": "2026/08/08", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
+    { "date": "2026/08/09", "finalized": 5, "notFinalized": 1, "notAnalyzed": 1 },
+    { "date": "2026/08/10", "finalized": 2, "notFinalized": 0, "notAnalyzed": 2 },
+    { "date": "2026/08/11", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
+    { "date": "2026/08/12", "finalized": 0, "notFinalized": 1, "notAnalyzed": 0 },
+    { "date": "2026/08/13", "finalized": 0, "notFinalized": 9, "notAnalyzed": 1 },
+    { "date": "2026/08/14", "finalized": 5, "notFinalized": 5, "notAnalyzed": 5 },
+    { "date": "2026/08/15", "finalized": 0, "notFinalized": 0, "notAnalyzed": 0 }
   ]
 }

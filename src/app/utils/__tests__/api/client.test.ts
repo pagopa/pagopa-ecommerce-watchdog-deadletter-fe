@@ -14,9 +14,11 @@ import {
   addNoteToTransaction,
   addNoteToTransactions,
   updateTransactionNote,
-  deleteTransactionNote 
+  deleteTransactionNote,
+  fetchCalendarStats
 } from "../../api/client";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
+import { CalendarStats } from "@/app/types/CalendarStatsResponse";
 
 const mockAuthOkResponse = {
   urlRedirect: "https://mock.com/token=abc123",
@@ -55,6 +57,14 @@ const mockDeadletterResponse: DeadletterResponse = {
 } as DeadletterResponse;
 
 const mockActionTypeArray: ActionType[] = [mockActionType];
+
+const mockDayStats: CalendarStats = {
+  date: "2026/08/01",
+  finalized: 0,
+  notFinalized: 0,
+  notAnalyzed: 0
+};
+const mockDayStatsArray: CalendarStats[] = [mockDayStats]
 
 const mockTransactionNotesArray = [
   {
@@ -615,6 +625,43 @@ describe("deleteTransactionNote", () => {
     const result = await deleteTransactionNote(mockToken, mockNote.transactionId, mockNote.noteId);
 
     expect(result).toBeNull();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+describe("fetchCalendarStats", () => {
+  it("should return DayStats array on a successful fetch (200)", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockResolvedValue(mockDayStats),
+    } as unknown as Response);
+
+    const result = await fetchCalendarStats(mockToken, 2026, 8);
+
+    expect(result).toEqual(mockDayStats);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `https://api.mock.com/deadletter-transactions/stats?year=2026&month=8`,
+      {
+        headers: { Authorization: `Bearer ${mockToken}` },
+        method: "GET"
+      }
+    );
+  });
+
+  it("should return an empty array on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: false,
+      status: 500,
+    } as unknown as Response);
+    const error = new Error("Failed to fetch actions");
+    const consoleErrorSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => { });
+
+    const result = await fetchCalendarStats(mockToken, 2026, 8);
+
+    expect(result).toEqual([]);
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);
   });
 });

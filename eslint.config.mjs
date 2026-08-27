@@ -26,6 +26,7 @@ const eslintConfig = defineConfig([
       '@typescript-eslint/no-unused-vars': ['warn', { caughtErrors: 'none' }],
       '@typescript-eslint/no-explicit-any': ['warn'],
       'react-hooks/set-state-in-effect': ['warn', { caughtErrors: 'none' }],
+      'react-hooks/refs': ['warn'],
       'react-hooks/purity': ['warn', { caughtErrors: 'none' }],
     }
   }
