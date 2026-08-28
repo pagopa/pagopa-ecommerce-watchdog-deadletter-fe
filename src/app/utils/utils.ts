@@ -19,3 +19,13 @@ export function debounce(fn: () => void, delay: number): () => void {
     timer = setTimeout( () => { fn(); }, delay);
   }
 }
+
+export function formatDate(date: Date, sep: string = "-"): string {
+  const components = [
+    date.getFullYear(),
+    (date.getMonth()+1).toString().padStart(2, "0"),
+    date.getDate().toString().padStart(2, "0")
+  ]
+
+  return components.join(sep);
+}

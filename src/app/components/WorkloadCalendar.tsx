@@ -4,6 +4,7 @@ import { it } from "@daypicker/react/locale"
 import { Box, Button } from "@mui/material";
 import { theme } from "@pagopa/mui-italia";
 import { CalendarStats } from "../types/CalendarStatsResponse";
+import { formatDate } from "../utils/utils";
 
 export default function WorkloadCalendar(props: {
     range: DateRange | undefined,
@@ -26,8 +27,17 @@ export default function WorkloadCalendar(props: {
         TODO: props.stats.filter(conditions.TODO).map(v => new Date(v.date))
     }
 
+    let footer = 'Seleziona un range di date (max 7 giorni)'
+    if (props.range?.from) {
+        if (!props.range.to) {
+            footer = `Da ${formatDate(props.range.from)}`;
+        } else if (props.range.to) {
+            footer = `Da ${formatDate(props.range.from)} a ${formatDate(props.range.to)}`;
+        }
+    }
+
     return (
-        <Box>
+        <Box marginLeft='auto' marginRight='auto'>
             <DayPicker
                 mode="range"
                 locale={it}
@@ -38,10 +48,8 @@ export default function WorkloadCalendar(props: {
                 startMonth={new Date(2023, 11)}
                 endMonth={new Date(new Date(today).setMonth(today.getMonth() + 1))}
                 showOutsideDays={true}
-                onMonthChange={(e) => {
-                    // Probably should be delegated to parent component to then make API calls..
-                    return props.setDate(e);
-                }}
+                footer={footer}
+                onMonthChange={(e) => props.setDate(e)}
                 resetOnSelect={true}
                 timeZone="Europe/Rome"
                 max={6}
@@ -59,25 +67,28 @@ export default function WorkloadCalendar(props: {
                     todo:    { backgroundImage: `radial-gradient(circle 20px at center center, ${theme.palette.error.extraLight} 0% 90%, ${theme.palette.error.main} 90% 99%, transparent 99% 100%)` }
                 }}
                 styles={{
-                    root: {width: '100%'},
+                    root: {width: '40dvw'},
                     month_grid: {width: '100%'},
                     months: {width: '100%', maxWidth: '100%'},
                     month: {width: '100%', maxWidth: '100%'},
+                    footer: {marginTop: '5px', marginBottom: '5px'},
                     month_caption: {
-                        fontSize: "2.5dvw",
-                        marginBottom: "5dvh"
+                        fontSize: "2dvw",
+                        marginBottom: "1.5dvh"
                     },
                     weekdays: {
-                        fontSize: "2dvw"
+                        fontSize: "1.5dvw"
                     },
                     day_button: {
-                        fontSize: "1.5dvw",
-                        marginTop: "1dvh",
-                        marginBottom: "1dvh",
+                        fontSize: "1dvw",
+                        marginTop: "4px",
+                        marginBottom: "4px",
                         marginLeft: "auto",
                         marginRight: "auto",
                     },
                     day: {
+                        height: "20px",
+                        width: "20px",
                         border: "solid",
                         borderTopWidth: "1px",
                         borderTopColor: "lightgray",
