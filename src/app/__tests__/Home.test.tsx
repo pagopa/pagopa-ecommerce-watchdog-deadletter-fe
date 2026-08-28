@@ -53,6 +53,7 @@ jest.mock('jose', () => ({
 }));
 
 jest.mock('../utils/utils', () => ({
+  ...jest.requireActual('../utils/utils'),
   getTokenFromUrl: jest.fn(),
   navigateTo: jest.fn(),
   debounce: jest.fn((f, _) => () => f())

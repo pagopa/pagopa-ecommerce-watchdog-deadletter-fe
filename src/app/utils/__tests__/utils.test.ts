@@ -1,4 +1,4 @@
-import { getTokenFromUrl, debounce } from "../utils";
+import { getTokenFromUrl, debounce, formatDate } from "../utils";
 
 describe('getTokenFromUrl', () => {
   it('should return the token when a valid #token= fragment exists', () => {
@@ -42,5 +42,18 @@ describe('delayed', () => {
     debouncedTestFn();
     await sleep(1500);
     expect(testFn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('formatDate', () => {
+  it('should return the formatted date with - separator', () => {
+    const date = new Date(2026, 7, 10);
+    expect(formatDate(date)).toBe('2026-08-10');
+  });
+
+  it('should return the formatted date with custom separator', () => {
+    const date = new Date(2026, 0, 1);
+    const sep = '@';
+    expect(formatDate(date, sep)).toBe('2026@01@01');
   });
 });
