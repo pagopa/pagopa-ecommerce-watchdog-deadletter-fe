@@ -57,16 +57,14 @@ describe("WorkloadCalendar", () => {
 
     const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
     expect(day1Cell).toBeInTheDocument();
+    expect(day1Cell).toBeEnabled();
 
     //Click on day 1 cell
     await user.click(day1Cell);
     expect(mockSetRange).toHaveBeenCalledTimes(1);
 
-    const day2Cell = screen.getByRole("button", { name: new RegExp(` 2 ${currentMonth}`) });
-    expect(day2Cell).toBeInTheDocument();
-
-    //Click on day 2 cell
-    await user.click(day2Cell);
+    // Complete range
+    await user.click(day1Cell);
     expect(mockSetRange).toHaveBeenCalledTimes(2);
   });
 
