@@ -98,8 +98,8 @@ export default function Home() {
 
     if (token.current && jwtUser && !fetchedYearMonths.includes(key)) {
       fetchCalendarStats(token.current, year, month)
-        .then((stats) => {
-          setCalendarStats(calendarStats.concat(stats))
+        .then((res) => {
+          setCalendarStats(calendarStats.concat(res.stats))
           setFetchedYearMonths(fetchedYearMonths.concat(key));
         })
     }

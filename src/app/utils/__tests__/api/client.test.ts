@@ -60,13 +60,13 @@ const mockDeadletterResponse: DeadletterResponse = {
 
 const mockActionTypeArray: ActionType[] = [mockActionType];
 
-const mockDayStats: CalendarStats = {
+const mockCalendarStats: CalendarStats = {
   date: "2026/08/01",
   finalized: 0,
   notFinalized: 0,
   notAnalyzed: 0
 };
-const mockDayStatsArray: CalendarStats[] = [mockDayStats]
+const mockCalendarStatsResponse = { stats: [mockCalendarStats] }
 
 const mockTransactionNotesArray = [
   {
@@ -636,12 +636,12 @@ describe("fetchCalendarStats", () => {
     jest.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       status: 200,
-      json: jest.fn().mockResolvedValue(mockDayStats),
+      json: jest.fn().mockResolvedValue(mockCalendarStatsResponse),
     } as unknown as Response);
 
     const result = await fetchCalendarStats(mockToken, 2026, 8);
 
-    expect(result).toEqual(mockDayStats);
+    expect(result).toEqual(mockCalendarStatsResponse);
     expect(globalThis.fetch).toHaveBeenCalledWith(
       `https://api.mock.com/deadletter-transactions/stats?year=2026&month=8`,
       {
@@ -663,7 +663,7 @@ describe("fetchCalendarStats", () => {
 
     const result = await fetchCalendarStats(mockToken, 2026, 8);
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({ stats: [] });
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);
   });
 });
