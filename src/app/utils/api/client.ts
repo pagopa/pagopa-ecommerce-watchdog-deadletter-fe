@@ -223,7 +223,7 @@ export const deleteTransactionNote = async (token: string, transactionId: string
   }
 };
 
-export const fetchCalendarStats = async (token: string, year: number, month: number): Promise<CalendarStats[]> => {
+export const fetchCalendarStats = async (token: string, year: number, month: number): Promise<{ stats: CalendarStats[] }> => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/deadletter-transactions/stats?year=${year}&month=${month}`, {
       method: "GET",
@@ -235,6 +235,6 @@ export const fetchCalendarStats = async (token: string, year: number, month: num
     return await res.json();
   } catch (e) {
     console.error(e);
-    return [];
+    return { stats: [] };
   }
 };

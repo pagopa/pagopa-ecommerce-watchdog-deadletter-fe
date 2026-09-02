@@ -134,7 +134,7 @@ describe('Home', () => {
   });
 
   const renderComponent = () => {
-    mockedFetchCalendarStats.mockResolvedValue([])
+    mockedFetchCalendarStats.mockResolvedValue({ stats: [] })
     return render(<Home />)
   }
 
