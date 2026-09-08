@@ -3,6 +3,7 @@ import { DateRange, DayPicker } from "@daypicker/react";
 import { it } from "@daypicker/react/locale"
 import { Box, Button } from "@mui/material";
 import { theme } from "@pagopa/mui-italia";
+import { useEffect, useState } from "react";
 import { CalendarStats } from "../types/CalendarStatsResponse";
 import { formatDate } from "../utils/utils";
 
@@ -13,7 +14,11 @@ export default function WorkloadCalendar(props: {
     setDate: (param: Date) => void,
     stats: CalendarStats[]
 }) {
-    const today = new Date();
+    const [today, setToday] = useState(() => new Date());
+
+    useEffect(() => {
+        setToday(new Date());
+    }, []);
 
     const conditions = {
         DONE: (v: CalendarStats) => v.finalized >= 0 && v.notFinalized == 0 && v.notAnalyzed == 0,
