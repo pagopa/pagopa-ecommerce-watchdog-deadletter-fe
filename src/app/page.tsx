@@ -28,7 +28,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
-import CsvExportSection from "./components/CsvExportSection";
 import SectionDivider from "./components/SectionDivider";
 import SectionHeader from "./components/SectionHeader";
 import LoginDialog from "./components/LoginDialog";
@@ -38,7 +37,7 @@ import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
 import { DateRange } from "@daypicker/react";
 import WorkloadCalendar from "./components/WorkloadCalendar";
-import { Chip, Grid, Paper } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import { TransactionsTable } from "./components/TransactionsTable";
 import { CalendarStats } from "./types/CalendarStatsResponse";
 
@@ -317,18 +316,6 @@ export default function Home() {
     }
   };
 
-  const handleFetchAllForExport = async (): Promise<Transaction[]> => {
-    if (!range?.from || !range?.to || !token.current) return [];
-    try {
-      const data = await fetchDeadletterTransactionsV2(token.current, range.from, range.to, 0, 1000);
-      return data ? data.deadletterTransactions : [];
-    } catch (e) {
-      console.error("Error fetching all for export", e);
-      return [];
-    }
-  };
-
-
   const handleAddNote = (transactionId: string, text: string) => {
     if (!token.current) return;
 
@@ -457,26 +444,6 @@ export default function Home() {
 
         {transactions.length > 0 && !loadingData && (
           <>
-            <SectionDivider />
-
-            <SectionHeader
-              icon="⚡"
-              title={
-                <>
-                  Azioni Rapide
-                  <Chip label="⚠️ Discontinued" variant="outlined" color="error" sx={{ marginLeft: 12 }} />
-                </>
-              }
-              subtitle="Export CSV per gestione storni e tanto altro"
-            />
-
-            <CsvExportSection
-              transactions={transactions}
-              startDate={range?.from?.toISOString()}
-              endDate={range?.to?.toISOString()}
-              onFetchAllForExport={handleFetchAllForExport}
-            />
-
             <SectionDivider />
 
             <SectionHeader
