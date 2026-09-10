@@ -3,8 +3,15 @@ import { DateRange, DayPicker } from "@daypicker/react";
 import { it } from "@daypicker/react/locale"
 import { Box, Button } from "@mui/material";
 import { theme } from "@pagopa/mui-italia";
+import { useEffect, useState } from "react";
 import { CalendarStats } from "../types/CalendarStatsResponse";
 import { formatDate } from "../utils/utils";
+
+const getToday = () => {
+    const today = new Date();
+    today.setHours(12, 0, 0, 0);
+    return today;
+};
 
 export default function WorkloadCalendar(props: {
     range: DateRange | undefined,
@@ -13,7 +20,11 @@ export default function WorkloadCalendar(props: {
     setDate: (param: Date) => void,
     stats: CalendarStats[]
 }) {
-    const today = new Date();
+    const [today, setToday] = useState(getToday);
+
+    useEffect(() => {
+        setToday(getToday());
+    }, []);
 
     const conditions = {
         DONE: (v: CalendarStats) => v.finalized >= 0 && v.notFinalized == 0 && v.notAnalyzed == 0,
