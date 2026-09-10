@@ -68,6 +68,16 @@ describe("WorkloadCalendar", () => {
     expect(mockSetRange).toHaveBeenCalledTimes(2);
   });
 
+  it('current day remains selectable', () => {
+    renderComponent();
+
+    const currentDay = screen.getByRole("button", {
+      name: new RegExp(` ${new Date().getDate()} ${currentMonth}`),
+    });
+
+    expect(currentDay).toBeEnabled();
+  });
+
   it('month can be changed', async () => {
     const user = userEvent.setup();
     renderComponent();

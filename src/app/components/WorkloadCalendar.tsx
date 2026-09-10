@@ -7,6 +7,12 @@ import { useEffect, useState } from "react";
 import { CalendarStats } from "../types/CalendarStatsResponse";
 import { formatDate } from "../utils/utils";
 
+const getToday = () => {
+    const today = new Date();
+    today.setHours(12, 0, 0, 0);
+    return today;
+};
+
 export default function WorkloadCalendar(props: {
     range: DateRange | undefined,
     setRange: (param: DateRange | undefined) => void,
@@ -14,10 +20,10 @@ export default function WorkloadCalendar(props: {
     setDate: (param: Date) => void,
     stats: CalendarStats[]
 }) {
-    const [today, setToday] = useState(() => new Date());
+    const [today, setToday] = useState(getToday);
 
     useEffect(() => {
-        setToday(new Date());
+        setToday(getToday());
     }, []);
 
     const conditions = {
