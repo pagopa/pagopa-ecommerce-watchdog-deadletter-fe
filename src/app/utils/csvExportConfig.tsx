@@ -43,6 +43,34 @@ const getExtraColumnValue = (transaction: ExportableTransaction, column: string)
   return undefined;
 };
 
+const getColumnValue = (
+  transaction: ExportableTransaction,
+  column: string,
+  formatDate: (date: Date) => string
+): string => {
+  const extraValue = getExtraColumnValue(transaction, column);
+  if (extraValue !== undefined) return extraValue;
+
+  if (column === 'insertionDate') {
+    const date = transaction.insertionDate;
+    if (!date) return '';
+    return formatDate(new Date(date));
+  }
+
+  if (column === 'authorizationRequestId') {
+    return transaction.eCommerceDetails?.transactionInfo?.authorizationRequestId || '';
+  }
+
+  if (column === 'amount') {
+    return transaction.eCommerceDetails?.transactionInfo?.grandTotal.toString() || '';
+  }
+
+  return transaction[column as keyof Transaction] as string || '';
+};
+
+const formatShortDate = (date: Date): string => date.toISOString().split('T')[0];
+const formatDateTime = (date: Date): string => date.toISOString().split('.')[0];
+
 export const exportConfigs: Record<ExportType, ExportConfig> = {
   mybank_intesa: {
     label: "MyBank Intesa",
@@ -53,17 +81,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
         t.pspId === 'BCITITMM';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId', 'actions', 'notes'],
-    getColumnValue: (transaction: Transaction, column: string) => {
-      const extraValue = getExtraColumnValue(transaction, column);
-      if (extraValue !== undefined) return extraValue;
-      if (column === 'insertionDate') {
-        const date = transaction.insertionDate;
-        if (!date) return '';
-        const dateObj = new Date(date);
-        return dateObj.toISOString().split('T')[0];
-      }
-      return transaction[column as keyof Transaction] as string || '';
-    },
+    getColumnValue: (transaction, column) => getColumnValue(transaction, column, formatShortDate),
     fileNamePrefix: 'StorniMyBank_Intesa'
   },
   mybank_unicredit: {
@@ -75,17 +93,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
         t.pspId === 'UNCRITMM';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId', 'actions', 'notes'],
-    getColumnValue: (transaction, column) => {
-      const extraValue = getExtraColumnValue(transaction, column);
-      if (extraValue !== undefined) return extraValue;
-      if (column === 'insertionDate') {
-        const date = transaction.insertionDate;
-        if (!date) return '';
-        const dateObj = new Date(date);
-        return dateObj.toISOString().split('T')[0];
-      }
-      return transaction[column as keyof Transaction] as string || '';
-    },
+    getColumnValue: (transaction, column) => getColumnValue(transaction, column, formatShortDate),
     fileNamePrefix: 'StorniMyBank_Unicredit'
   },
   bancomat_pay: {
@@ -96,17 +104,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
         t.paymentMethodName === 'BANCOMATPAY';
     },
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'gatewayAuthorizationStatus', 'actions', 'notes'],
-    getColumnValue: (transaction, column) => {
-      const extraValue = getExtraColumnValue(transaction, column);
-      if (extraValue !== undefined) return extraValue;
-      if (column === 'insertionDate') {
-        const date = transaction.insertionDate;
-        if (!date) return '';
-        const dateObj = new Date(date);
-        return dateObj.toISOString().split('T')[0];
-      }
-      return transaction[column as keyof Transaction] as string || '';
-    },
+    getColumnValue: (transaction, column) => getColumnValue(transaction, column, formatShortDate),
     fileNamePrefix: 'BancomatPay_Pending'
   },
   all_range: {
@@ -114,21 +112,7 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     description: "Tutte le transazioni nel range selezionato",
     filter: () => true,
     columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'nodoStatus', 'paymentEndToEndId', 'authorizationRequestId', "amount", 'actions', 'notes'],
-    getColumnValue: (transaction, column) => {
-      const extraValue = getExtraColumnValue(transaction, column);
-      if (extraValue !== undefined) return extraValue;
-      if (column === 'insertionDate') {
-        const date = transaction.insertionDate;
-        if (!date) return '';
-        const dateObj = new Date(date);
-        return dateObj.toISOString().split('.')[0];
-      } else if (column === 'authorizationRequestId') {
-        return transaction.eCommerceDetails?.transactionInfo?.authorizationRequestId || '';
-      } else if (column === 'amount') {
-        return transaction.eCommerceDetails?.transactionInfo?.grandTotal.toString() || '';
-      }
-      return transaction[column as keyof Transaction] as string || '';
-    },
+    getColumnValue: (transaction, column) => getColumnValue(transaction, column, formatDateTime),
     fileNamePrefix: 'Tutte_Transazioni'
   }
 };
