@@ -314,15 +314,17 @@ describe('csvExportConfig', () => {
           }]
         ]),
         notes: [
-          { noteId: '1', transactionId: 'tx-123', userId: 'mario.rossi', note: 'Prima nota', createdAt: '', updatedAt: '' },
-          { noteId: '2', transactionId: 'tx-123', userId: 'luigi.verdi', note: 'Seconda nota', createdAt: '', updatedAt: '' }
+          { noteId: '1', transactionId: 'tx-123', userId: 'mario.rossi', note: 'Prima nota', createdAt: '2026-03-02T10:00:00Z', updatedAt: '' },
+          { noteId: '2', transactionId: 'tx-123', userId: 'luigi.verdi', note: 'Seconda nota', createdAt: '2026-03-01T10:00:00Z', updatedAt: '' }
         ]
       };
 
       expect(exportConfigs.all_range.getColumnValue(transaction, 'actions')).toContain('Stornata');
       expect(exportConfigs.all_range.getColumnValue(transaction, 'actions')).toContain('Da stornare');
       expect(exportConfigs.all_range.getColumnValue(transaction, 'actions')).toContain(' | ');
-      expect(exportConfigs.all_range.getColumnValue(transaction, 'notes')).toBe('Prima nota | Seconda nota');
+      expect(exportConfigs.all_range.getColumnValue(transaction, 'notes')).toBe(
+        '[mario.rossi - 2026-03-02T10:00:00.000Z] Prima nota | [luigi.verdi - 2026-03-01T10:00:00.000Z] Seconda nota'
+      );
     });
   });
 

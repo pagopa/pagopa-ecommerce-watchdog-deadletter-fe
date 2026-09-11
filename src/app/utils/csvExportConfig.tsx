@@ -28,7 +28,16 @@ const getExtraColumnValue = (transaction: ExportableTransaction, column: string)
   }
 
   if (column === 'notes') {
-    return (transaction.notes ?? []).map((note) => note.note).join(' | ');
+    return (transaction.notes ?? [])
+      .map((note) => {
+        const createdAt = new Date(note.createdAt);
+        const formattedDate = Number.isNaN(createdAt.getTime())
+          ? note.createdAt
+          : createdAt.toISOString();
+
+        return `[${note.userId} - ${formattedDate}] ${note.note}`;
+      })
+      .join(' | ');
   }
 
   return undefined;
