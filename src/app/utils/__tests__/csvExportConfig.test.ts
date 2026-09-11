@@ -33,9 +33,9 @@ describe('csvExportConfig', () => {
     });
 
     it('should have columns defined for each export type', () => {
-      expect(exportConfigs.mybank_intesa.columns).toHaveLength(4);
-      expect(exportConfigs.mybank_unicredit.columns).toHaveLength(4);
-      expect(exportConfigs.bancomat_pay.columns).toHaveLength(4);
+      expect(exportConfigs.mybank_intesa.columns).toHaveLength(6);
+      expect(exportConfigs.mybank_unicredit.columns).toHaveLength(6);
+      expect(exportConfigs.bancomat_pay.columns).toHaveLength(6);
     });
   });
 
@@ -250,7 +250,9 @@ describe('csvExportConfig', () => {
         'insertionDate',
         'transactionId',
         'paymentToken',
-        'paymentEndToEndId'
+        'paymentEndToEndId',
+        'actions',
+        'notes'
       ]);
     });
 
@@ -259,7 +261,9 @@ describe('csvExportConfig', () => {
         'insertionDate',
         'transactionId',
         'paymentToken',
-        'paymentEndToEndId'
+        'paymentEndToEndId',
+        'actions',
+        'notes'
       ]);
     });
 
@@ -268,7 +272,9 @@ describe('csvExportConfig', () => {
         'insertionDate',
         'transactionId',
         'paymentToken',
-        'gatewayAuthorizationStatus'
+        'gatewayAuthorizationStatus',
+        'actions',
+        'notes'
       ]);
     });
 
@@ -284,8 +290,39 @@ describe('csvExportConfig', () => {
         'nodoStatus',
         'paymentEndToEndId',
         'authorizationRequestId',
-        'amount'
+        'amount',
+        'actions',
+        'notes'
       ]);
+    });
+
+    it('should serialize actions and notes as readable lists', () => {
+      const transaction = {
+        ...({} as Transaction),
+        actions: new Map([
+          ['first', {
+            id: 'first',
+            userId: 'mario.rossi',
+            action: { value: 'Stornata', type: 'FINAL' as const },
+            timestamp: '2026-03-02T10:00:00Z'
+          }],
+          ['second', {
+            id: 'second',
+            userId: 'luigi.verdi',
+            action: { value: 'Da stornare', type: 'NOT_FINAL' as const },
+            timestamp: '2026-03-01T10:00:00Z'
+          }]
+        ]),
+        notes: [
+          { noteId: '1', transactionId: 'tx-123', userId: 'mario.rossi', note: 'Prima nota', createdAt: '', updatedAt: '' },
+          { noteId: '2', transactionId: 'tx-123', userId: 'luigi.verdi', note: 'Seconda nota', createdAt: '', updatedAt: '' }
+        ]
+      };
+
+      expect(exportConfigs.all_range.getColumnValue(transaction, 'actions')).toContain('Stornata');
+      expect(exportConfigs.all_range.getColumnValue(transaction, 'actions')).toContain('Da stornare');
+      expect(exportConfigs.all_range.getColumnValue(transaction, 'actions')).toContain(' | ');
+      expect(exportConfigs.all_range.getColumnValue(transaction, 'notes')).toBe('Prima nota | Seconda nota');
     });
   });
 

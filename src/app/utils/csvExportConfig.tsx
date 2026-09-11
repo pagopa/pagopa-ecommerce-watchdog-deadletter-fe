@@ -1,4 +1,7 @@
 import { Transaction } from "../types/DeadletterResponse";
+import { TransactionNote } from "../types/TransactionNotes";
+import { DeadletterAction } from "../types/DeadletterAction";
+import { getDeadletterActionAsString } from "./types/DeadletterActionUtils";
 
 export type ExportType = 'mybank_intesa' | 'mybank_unicredit' | 'bancomat_pay' | 'all_range';
 
@@ -7,9 +10,29 @@ export interface ExportConfig {
   description: string;
   filter: (transaction: Transaction) => boolean;
   columns: string[];
-  getColumnValue: (transaction: Transaction, column: string) => string;
+  getColumnValue: (transaction: ExportableTransaction, column: string) => string;
   fileNamePrefix: string;
 }
+
+export type ExportableTransaction = Transaction & {
+  actions?: Map<string, DeadletterAction>;
+  notes?: TransactionNote[];
+};
+
+const getExtraColumnValue = (transaction: ExportableTransaction, column: string): string | undefined => {
+  if (column === 'actions') {
+    return Array.from(transaction.actions?.values() ?? [])
+      .sort((a, b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
+      .map(getDeadletterActionAsString)
+      .join(' | ');
+  }
+
+  if (column === 'notes') {
+    return (transaction.notes ?? []).map((note) => note.note).join(' | ');
+  }
+
+  return undefined;
+};
 
 export const exportConfigs: Record<ExportType, ExportConfig> = {
   mybank_intesa: {
@@ -20,8 +43,10 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
         t.eCommerceStatus === 'REFUND_ERROR' &&
         t.pspId === 'BCITITMM';
     },
-    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId'],
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId', 'actions', 'notes'],
     getColumnValue: (transaction: Transaction, column: string) => {
+      const extraValue = getExtraColumnValue(transaction, column);
+      if (extraValue !== undefined) return extraValue;
       if (column === 'insertionDate') {
         const date = transaction.insertionDate;
         if (!date) return '';
@@ -40,8 +65,10 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
         t.eCommerceStatus === 'REFUND_ERROR' &&
         t.pspId === 'UNCRITMM';
     },
-    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId'],
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentEndToEndId', 'actions', 'notes'],
     getColumnValue: (transaction, column) => {
+      const extraValue = getExtraColumnValue(transaction, column);
+      if (extraValue !== undefined) return extraValue;
       if (column === 'insertionDate') {
         const date = transaction.insertionDate;
         if (!date) return '';
@@ -59,8 +86,10 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
       return (t.gatewayAuthorizationStatus === 'PENDING' || t.gatewayAuthorizationStatus == null || t.gatewayAuthorizationStatus == 'null') &&
         t.paymentMethodName === 'BANCOMATPAY';
     },
-    columns: ['insertionDate', 'transactionId', 'paymentToken', 'gatewayAuthorizationStatus'],
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'gatewayAuthorizationStatus', 'actions', 'notes'],
     getColumnValue: (transaction, column) => {
+      const extraValue = getExtraColumnValue(transaction, column);
+      if (extraValue !== undefined) return extraValue;
       if (column === 'insertionDate') {
         const date = transaction.insertionDate;
         if (!date) return '';
@@ -75,8 +104,10 @@ export const exportConfigs: Record<ExportType, ExportConfig> = {
     label: "Tutte le transazioni",
     description: "Tutte le transazioni nel range selezionato",
     filter: () => true,
-    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'nodoStatus', 'paymentEndToEndId', 'authorizationRequestId', "amount"],
+    columns: ['insertionDate', 'transactionId', 'paymentToken', 'paymentMethodName', 'pspId', 'eCommerceStatus', 'gatewayAuthorizationStatus', 'nodoStatus', 'paymentEndToEndId', 'authorizationRequestId', "amount", 'actions', 'notes'],
     getColumnValue: (transaction, column) => {
+      const extraValue = getExtraColumnValue(transaction, column);
+      if (extraValue !== undefined) return extraValue;
       if (column === 'insertionDate') {
         const date = transaction.insertionDate;
         if (!date) return '';
