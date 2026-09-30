@@ -10,8 +10,10 @@ ENV NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST=$NEXT_PUBLIC_ECOMMERCE_WATCH
 ENV NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST=$NEXT_PUBLIC_ECOMMERCE_WATCHDOG_AUTH_API_HOST
 ENV NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH=$NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH
 
-COPY package*.json ./
-RUN yarn install --frozen-lockfile
+# Copy the lockfile before installation so the Docker build uses the same
+# dependency versions as local development and CI, without updating the lockfile.
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --non-interactive
 COPY . .
 RUN yarn build
 
