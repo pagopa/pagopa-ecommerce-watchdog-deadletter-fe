@@ -11,7 +11,7 @@ import { useMemo, useState } from "react";
 import TransactionNotesDrawer from "./TransactionNotesDrawer";
 import { getSuggestedAction } from "../utils/SuggestedActionsRules";
 import { FileDownload } from "@mui/icons-material";
-import { exportConfigs, ExportType } from "../utils/csvExportConfig";
+import { exportConfigs, ExportType, ExportableTransaction } from "../utils/csvExportConfig";
 import { stringify } from "csv-stringify/sync";
 
 export function TransactionsTable(
@@ -128,14 +128,15 @@ export function TransactionsTable(
     type = type ?? 'all_range';
 
     const transformed_rows = (onlySelected ? table.getSelectedRowModel() : table.getRowModel())
-      .rows.map(
-        (row) => {
-          const r: Record<string, any> = {};
-          row.getAllCells()
-            .forEach(c => r[c.column.columnDef.accessorKey!] = c.getValue() ?? "")
-          return r;
-        }
-      )
+      .rows.map((row) => {
+        const transaction = row.original as ExportableTransaction;
+        return Object.fromEntries(
+          exportConfigs[type].columns.map((column) => [
+            column,
+            exportConfigs[type].getColumnValue(transaction, column),
+          ])
+        );
+      });
 
     const csvContent = stringify(
       transformed_rows,
@@ -733,8 +734,8 @@ export const azioniSortingFn = (
   const getNewestAction = (acc: DeadletterAction, value: DeadletterAction): DeadletterAction =>
     acc.timestamp < value.timestamp ? value : acc
 
-  const maxA = rowA.original.actions.values().reduce(getNewestAction);
-  const maxB = rowB.original.actions.values().reduce(getNewestAction);
+  const maxA = Array.from(rowA.original.actions.values()).reduce(getNewestAction);
+  const maxB = Array.from(rowB.original.actions.values()).reduce(getNewestAction);
   switch (true) {
     case maxA.timestamp >  maxB.timestamp: return -1;
     case maxA.timestamp <  maxB.timestamp: return 1;

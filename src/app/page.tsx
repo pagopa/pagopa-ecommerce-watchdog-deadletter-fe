@@ -36,10 +36,14 @@ import { dateTimeLocale, extendedMonthDateFormatOptions } from "./utils/datetime
 import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
 import { DateRange } from "@daypicker/react";
-import WorkloadCalendar from "./components/WorkloadCalendar";
+import dynamic from "next/dynamic";
 import { Grid, Paper } from "@mui/material";
 import { TransactionsTable } from "./components/TransactionsTable";
 import { CalendarStats } from "./types/CalendarStatsResponse";
+
+const WorkloadCalendar = dynamic(() => import("./components/WorkloadCalendar"), {
+  ssr: false,
+});
 
 
 
