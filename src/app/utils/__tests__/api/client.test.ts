@@ -15,7 +15,11 @@ import {
   addNoteToTransactions,
   updateTransactionNote,
   deleteTransactionNote,
-  fetchCalendarStats
+  fetchCalendarStats,
+  fetchRefundCandidates,
+  fetchRefundTransaction,
+  startRefund,
+  fetchRefundStatus
 } from "../../api/client";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { CalendarStats } from "@/app/types/CalendarStatsResponse";
@@ -665,5 +669,124 @@ describe("fetchCalendarStats", () => {
 
     expect(result).toEqual({ stats: [] });
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+const mockOkResponse = (body: unknown, status = 200) => ({
+  ok: true,
+  status,
+  json: jest.fn().mockResolvedValue(body),
+} as unknown as Response);
+
+describe("fetchRefundCandidates", () => {
+  it("should return the candidates list on success", async () => {
+    const candidates = [{ transactionId: "t1", refundReason: "reason", status: "REQUESTED" }];
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockOkResponse({ transactions: candidates }));
+
+    const result = await fetchRefundCandidates(mockToken, ["REQUESTED", "ERROR"]);
+
+    expect(result).toEqual(candidates);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/refunds/transactions?limit=20&status=REQUESTED%2CERROR",
+      { headers: { Authorization: `Bearer ${mockToken}` } }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({ ok: false, status: 500 } as Response);
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await fetchRefundCandidates(mockToken, ["REQUESTED"])).toBeNull();
+  });
+});
+
+describe("fetchRefundTransaction", () => {
+  it("should return the detail on success", async () => {
+    const detail = { transactionId: "t1", eCommerceDetails: null, npgDetails: null, nodoDetails: null };
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockOkResponse(detail));
+
+    const result = await fetchRefundTransaction(mockToken, "t1");
+
+    expect(result).toEqual(detail);
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/refunds/transactions/t1",
+      { headers: { Authorization: `Bearer ${mockToken}` } }
+    );
+  });
+
+  it("should encode the transaction id in the path", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockOkResponse({}));
+
+    await fetchRefundTransaction(mockToken, "a/../b");
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/refunds/transactions/a%2F..%2Fb",
+      expect.anything()
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({ ok: false, status: 404 } as Response);
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await fetchRefundTransaction(mockToken, "t1")).toBeNull();
+  });
+});
+
+describe("startRefund", () => {
+  it("should POST the otp code", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({ ok: true, status: 202 } as Response);
+
+    await startRefund(mockToken, "t1", "123456");
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/refunds/transactions/t1",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${mockToken}` },
+        body: JSON.stringify({ otpCode: "123456" }),
+      }
+    );
+  });
+
+  it.each([
+    [202, "started"],
+    [422, "invalidOtp"],
+    [409, "conflict"],
+    [401, "unauthorized"],
+    [500, "error"],
+  ])("should map status %i to %s", async (status, expected) => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({ ok: status < 300, status } as Response);
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await startRefund(mockToken, "t1", "123456")).toBe(expected);
+  });
+
+  it("should return error on network failure", async () => {
+    jest.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network"));
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await startRefund(mockToken, "t1", "123456")).toBe("error");
+  });
+});
+
+describe("fetchRefundStatus", () => {
+  it("should return the request status on success", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockOkResponse({ status: "DONE" }));
+
+    const result = await fetchRefundStatus(mockToken, "t1");
+
+    expect(result).toBe("DONE");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/refunds/transactions/t1/status",
+      { headers: { Authorization: `Bearer ${mockToken}` } }
+    );
+  });
+
+  it("should return null on a non-ok status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue({ ok: false, status: 500 } as Response);
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await fetchRefundStatus(mockToken, "t1")).toBeNull();
   });
 });

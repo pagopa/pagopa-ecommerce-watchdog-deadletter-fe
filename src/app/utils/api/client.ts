@@ -3,6 +3,14 @@ import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authentication";
 import { TransactionNote, TransactionNotes } from "@/app/types/TransactionNotes";
 import { CalendarStats } from "@/app/types/CalendarStatsResponse";
+import {
+  RefundCandidate,
+  RefundCandidatesResponse,
+  RefundRequestStatus,
+  RefundStartResult,
+  RefundStatusResponse,
+  RefundTransactionDetail
+} from "@/app/types/Refund";
 import { formatDate } from "../utils";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
@@ -236,5 +244,78 @@ export const fetchCalendarStats = async (token: string, year: number, month: num
   } catch (e) {
     console.error(e);
     return { stats: [] };
+  }
+};
+
+export const fetchRefundCandidates = async (token: string, statuses: RefundRequestStatus[]): Promise<RefundCandidate[] | null> => {
+  try {
+    const params = new URLSearchParams({ limit: "20", status: statuses.join(",") });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/refunds/transactions?${params}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (!res.ok) throw new Error("Failed to fetch refund candidates");
+    const data: RefundCandidatesResponse = await res.json();
+    return data.transactions;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const fetchRefundTransaction = async (token: string, transactionId: string): Promise<RefundTransactionDetail | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/refunds/transactions/${encodeURIComponent(transactionId)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch refund transaction with id: ${transactionId}`);
+    return await res.json();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const startRefund = async (token: string, transactionId: string, otpCode: string): Promise<RefundStartResult> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/refunds/transactions/${encodeURIComponent(transactionId)}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ otpCode }),
+    });
+    switch (res.status) {
+      case 202: return 'started';
+      case 422: return 'invalidOtp';
+      case 409: return 'conflict';
+      case 401: return 'unauthorized';
+      default:
+        console.error(`Failed to start refund for transaction with id: ${transactionId}, status: ${res.status}`);
+        return 'error';
+    }
+  } catch (e) {
+    console.error(e);
+    return 'error';
+  }
+};
+
+export const fetchRefundStatus = async (token: string, transactionId: string): Promise<RefundRequestStatus | null> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/refunds/transactions/${encodeURIComponent(transactionId)}/status`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch refund status for transaction with id: ${transactionId}`);
+    const data: RefundStatusResponse = await res.json();
+    return data.status;
+  } catch (e) {
+    console.error(e);
+    return null;
   }
 };
