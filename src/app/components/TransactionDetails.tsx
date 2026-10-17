@@ -188,7 +188,7 @@ const FlatList = ({ data }: { data: any }) => {
     );
 };
 
-export function TransactionDetails({ content }: { content: any }) {
+export function TransactionDetails({ content, defaultExpanded = false }: { content: any; defaultExpanded?: boolean }) {
     const handleCopy = () => {
         navigator.clipboard.writeText(JSON.stringify(content, null, 2));
     };
@@ -208,6 +208,7 @@ export function TransactionDetails({ content }: { content: any }) {
             {/* Dettagli generali */}
             {Object.keys(otherDetails).length > 0 && (
                 <Accordion
+                    defaultExpanded={defaultExpanded}
                     sx={{
                         mb: 2,
                         border: '1px solid #e0e0e0',
@@ -229,6 +230,7 @@ export function TransactionDetails({ content }: { content: any }) {
             {/* eCommerce Details */}
             {eCommerceDetails && (
                 <Accordion
+                    defaultExpanded={defaultExpanded}
                     sx={{
                         mb: 2,
                         border: '1px solid #e0e0e0',
@@ -250,6 +252,7 @@ export function TransactionDetails({ content }: { content: any }) {
             {/* NPG Details */}
             {npgDetails && (
                 <Accordion
+                    defaultExpanded={defaultExpanded}
                     sx={{
                         mb: 2,
                         border: '1px solid #e0e0e0',
@@ -271,6 +274,7 @@ export function TransactionDetails({ content }: { content: any }) {
             {/* Nodo Details */}
             {nodoDetails && (
                 <Accordion
+                    defaultExpanded={defaultExpanded}
                     sx={{
                         mb: 2,
                         border: '1px solid #e0e0e0',

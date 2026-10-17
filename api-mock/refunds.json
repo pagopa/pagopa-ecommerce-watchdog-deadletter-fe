@@ -1,0 +1,107 @@
+{
+  "candidates": [
+    { "transactionId": "a3f1c9e27b4d4e1f8c6a2b9d0e7f1a01", "refundReason": "Pagamento autorizzato da NPG ma la notifica al Nodo è fallita dopo tutti i tentativi.\nL'utente risulta addebitato senza ricevuta di pagamento." },
+    { "transactionId": "b7e2d4f19c3a4b2e9d8f1c0a6e5b2a02", "refundReason": "Doppio addebito: la stessa posizione debitoria è stata pagata due volte a pochi secondi di distanza." },
+    { "transactionId": "c9a8b7d6e5f4434281f0e9d8c7b6aerror", "refundReason": "Timeout di chiusura sul Nodo (sendPaymentOutcome) con esito KO definitivo.\nPrecedente tentativo di storno automatico non riuscito." },
+    { "transactionId": "d1e2f3a4b5c64d7e8f9a0b1c2d3e4a04", "refundReason": "Avviso già pagato su altro canale: il Nodo ha rifiutato la chiusura con PPT_PAGAMENTO_DUPLICATO." },
+    { "transactionId": "e5f6a7b8c9d04e1f2a3b4c5d6e7f8a05", "refundReason": "Autorizzazione concessa dal PSP oltre la scadenza del token di pagamento." },
+    { "transactionId": "f0a1b2c3d4e54f6a7b8c9d0e1f2a3a06", "status": "ERROR", "refundReason": "Storno automatico in REFUND_ERROR dopo 3 tentativi: richiesta verifica e nuovo invio manuale." },
+    { "transactionId": "0a1b2c3d4e5f4a6b7c8d9e0f1a2b3a07", "refundReason": "Esito di autorizzazione non ricevuto dal gateway; NPG riporta l'operazione come EXECUTED." },
+    { "transactionId": "1b2c3d4e5f6a4b7c8d9e0f1a2b3c4a08", "refundReason": "Segnalazione dell'Ente Creditore: importo errato sull'avviso, il cittadino ha richiesto la restituzione." },
+    { "transactionId": "2c3d4e5f6a7b4c8d9e0f1a2b3c4d5a09", "refundReason": "Transazione rimasta in CLOSURE_ERROR oltre la finestra di retry.\nNessun riscontro di ricevuta sul Nodo." },
+    { "transactionId": "3d4e5f6a7b8c4d9e0f1a2b3c4d5e6a10", "refundReason": "Pagamento MyBank confermato dalla banca dopo l'annullamento lato eCommerce." },
+    { "transactionId": "4e5f6a7b8c9d4e0f1a2b3c4d5e6f7a11", "status": "DONE", "refundReason": "Doppio addebito: la stessa posizione debitoria è stata pagata due volte a pochi secondi di distanza." },
+    { "transactionId": "5f6a7b8c9d0e4f1a2b3c4d5e6f7a8a12", "refundReason": "Pagamento autorizzato da NPG ma la notifica al Nodo è fallita dopo tutti i tentativi." },
+    { "transactionId": "6a7b8c9d0e1f4a2b3c4d5e6f7a8b9a13", "refundReason": "Utente ha abbandonato il flusso dopo l'autorizzazione; sessione scaduta prima della chiusura." },
+    { "transactionId": "7b8c9d0e1f2a4b3c4d5e6f7a8b9c0a14", "refundReason": "Avviso già pagato su altro canale: il Nodo ha rifiutato la chiusura con PPT_PAGAMENTO_DUPLICATO." },
+    { "transactionId": "8c9d0e1f2a3b4c4d5e6f7a8b9c0d1a15", "refundReason": "Autorizzazione BANCOMAT Pay rimasta PENDING e confermata dal PSP dopo 24 ore." },
+    { "transactionId": "9d0e1f2a3b4c4d5e6f7a8b9c0d1e2a16", "status": "ERROR", "refundReason": "Storno automatico in REFUND_ERROR dopo 3 tentativi: richiesta verifica e nuovo invio manuale." },
+    { "transactionId": "ae1f2a3b4c5d4e6f7a8b9c0d1e2f3a17", "refundReason": "Timeout di chiusura sul Nodo (sendPaymentOutcome) con esito KO definitivo." },
+    { "transactionId": "bf2a3b4c5d6e4f7a8b9c0d1e2f3a4a18", "refundReason": "Segnalazione del PSP: addebito presente sull'estratto conto senza corrispondente pagamento registrato." },
+    { "transactionId": "c03b4c5d6e7f4a8b9c0d1e2f3a4b5a19", "refundReason": "Transazione rimasta in CLOSURE_ERROR oltre la finestra di retry." },
+    { "transactionId": "d14c5d6e7f8a4b9c0d1e2f3a4b5c6a20", "refundReason": "Pagamento autorizzato da NPG ma la notifica al Nodo è fallita dopo tutti i tentativi." },
+    { "transactionId": "e25d6e7f8a9b4c0d1e2f3a4b5c6d7a21", "status": "DONE", "refundReason": "Doppio addebito segnalato dal cittadino tramite assistenza." },
+    { "transactionId": "f36e7f8a9b0c4d1e2f3a4b5c6d7e8a22", "refundReason": "Esito di autorizzazione non ricevuto dal gateway; NPG riporta l'operazione come EXECUTED." },
+    { "transactionId": "047f8a9b0c1d4e2f3a4b5c6d7e8f9a23", "refundReason": "Avviso annullato dall'Ente Creditore dopo l'autorizzazione del pagamento." },
+    { "transactionId": "158a9b0c1d2e4f3a4b5c6d7e8f9a0a24", "refundReason": "Timeout di chiusura sul Nodo (sendPaymentOutcome) con esito KO definitivo." },
+    { "transactionId": "269b0c1d2e3f4a4b5c6d7e8f9a0b1a25", "refundReason": "Storno automatico in REFUND_ERROR dopo 3 tentativi: richiesta verifica e nuovo invio manuale." }
+  ],
+  "detailTemplate": {
+    "eCommerceDetails": {
+      "userInfo": {
+        "userFiscalCode": null,
+        "notificationEmail": "test@test.it",
+        "surname": null,
+        "name": null,
+        "username": null,
+        "authenticationType": "GUEST"
+      },
+      "transactionInfo": {
+        "creationDate": "2026-10-01T16:07:24.467271641Z",
+        "status": "Cancellato",
+        "statusDetails": null,
+        "eventStatus": "REFUND_ERROR",
+        "amount": 12000,
+        "fee": 100,
+        "grandTotal": 12100,
+        "rrn": null,
+        "authorizationCode": "123456",
+        "authorizationOperationId": "321055056922651839",
+        "refundOperationId": null,
+        "paymentMethodName": "CARDS",
+        "brand": "VISA",
+        "authorizationRequestId": "E1751472447254teSA",
+        "paymentGateway": "NPG",
+        "correlationId": "292eeba9-1c39-4bb4-a6fe-2c2d351dfd14",
+        "gatewayAuthorizationStatus": "EXECUTED",
+        "gatewayErrorCode": null
+      },
+      "paymentInfo": {
+        "origin": "CHECKOUT",
+        "idTransaction": "",
+        "details": [
+          {
+            "subject": "TARI/TEFA 2026",
+            "iuv": null,
+            "rptId": "77777777777302018888888888887",
+            "amount": 12000,
+            "paymentToken": "6535d0c28c67448f9936bad26aeb9743",
+            "creditorInstitution": "company PA",
+            "paFiscalCode": "77777777777"
+          }
+        ]
+      },
+      "pspInfo": {
+        "pspId": "CIPBITMM",
+        "businessName": "NX PAYMENTS S.P.A.",
+        "idChannel": "13212880150_17"
+      },
+      "product": "ECOMMERCE"
+    },
+    "nodoDetails": {
+      "dateFrom": "2026-10-01",
+      "dateTo": "2026-10-01",
+      "data": []
+    },
+    "npgDetails": {
+      "operations": [
+        {
+          "additionalData": {
+            "authorizationCode": "123456",
+            "rrn": null
+          },
+          "operationAmount": "12100",
+          "operationCurrency": "EUR",
+          "operationId": "321055056922651839",
+          "operationResult": "EXECUTED",
+          "operationTime": "2026-10-01 18:07:27.611",
+          "operationType": "AUTHORIZATION",
+          "orderId": "E1751472447254teSA",
+          "paymentCircuit": "VISA",
+          "paymentEndToEndId": null,
+          "paymentMethod": "CARD"
+        }
+      ]
+    }
+  }
+}
