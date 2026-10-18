@@ -3,6 +3,7 @@ import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { AuthenticationCredential, AuthenticationOk } from "@/app/types/Authentication";
 import { TransactionNote, TransactionNotes } from "@/app/types/TransactionNotes";
 import { CalendarStats } from "@/app/types/CalendarStatsResponse";
+import { RefundRequestResult, TransactionCheckResult } from "@/app/types/TransactionCheck";
 import { formatDate } from "../utils";
 
 export const fetchAuthentication = async (user: AuthenticationCredential): Promise<AuthenticationOk | null> => {
@@ -236,5 +237,74 @@ export const fetchCalendarStats = async (token: string, year: number, month: num
   } catch (e) {
     console.error(e);
     return { stats: [] };
+  }
+};
+
+const transactionUrl = (transactionId: string) =>
+  `${process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_SERVICE_API_HOST}/v1/transactions/${encodeURIComponent(transactionId)}`;
+
+export const fetchTransactionCheck = async (token: string, transactionId: string): Promise<TransactionCheckResult> => {
+  try {
+    const res = await fetch(transactionUrl(transactionId), {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (res.status === 404) return { outcome: 'notFound' };
+    if (res.status === 401) return { outcome: 'unauthorized' };
+    if (!res.ok) throw new Error(`Failed to fetch transaction with id: ${transactionId}, status: ${res.status}`);
+    return { outcome: 'found', transaction: await res.json() };
+  } catch (e) {
+    console.error(e);
+    return { outcome: 'error' };
+  }
+};
+
+export const requestTransactionRefund = async (token: string, transactionId: string, otpCode: string, force: boolean): Promise<RefundRequestResult> => {
+  try {
+    const res = await fetch(`${transactionUrl(transactionId)}/refund`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ otpCode, force }),
+    });
+
+    if (!force && res.status === 201) return { outcome: 'accepted' };
+    if (force && res.status === 200) return { outcome: 'completed' };
+    if (force && res.status === 502) {
+      const body = await res.json().catch(() => null);
+      return { outcome: 'gatewayError', message: body?.detail ?? body?.title ?? "Errore restituito dal gateway" };
+    }
+    if (res.status === 409) {
+      const body = await res.json().catch(() => null);
+      return { outcome: 'notRefundable', message: body?.detail ?? "La transazione non è in uno stato stornabile" };
+    }
+    if (res.status === 422) return { outcome: 'invalidOtp' };
+    if (res.status === 401) return { outcome: 'unauthorized' };
+    if (res.status === 404) return { outcome: 'notFound' };
+
+    console.error(`Failed to request refund for transaction with id: ${transactionId}, status: ${res.status}`);
+    return { outcome: 'error' };
+  } catch (e) {
+    console.error(e);
+    return { outcome: 'error' };
+  }
+};
+
+export const fetchTransactionEcommerceStatus = async (token: string, transactionId: string): Promise<string | null> => {
+  try {
+    const res = await fetch(`${transactionUrl(transactionId)}/status`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch eCommerce status for transaction with id: ${transactionId}`);
+    const data: { eCommerceStatus: string } = await res.json();
+    return data.eCommerceStatus;
+  } catch (e) {
+    console.error(e);
+    return null;
   }
 };
