@@ -127,7 +127,7 @@ function RefundAction(props: Readonly<{
         <Box flex={1} minWidth={0}>
           <Typography component="h3" fontWeight={700}>Storno</Typography>
           <Typography variant="body2" color="text.secondary" mb={1.5}>
-            Richiede un codice dell&apos;app Authenticator.
+            Richiede abilitazione e configurazione dell&apos;app Authenticator.
           </Typography>
           {transaction.eCommerceStatus === "REFUNDED" && phase.name === "idle" && (
             <Typography variant="body2" color="warning.dark" mb={1.5}>
