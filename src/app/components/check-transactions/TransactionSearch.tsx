@@ -47,6 +47,7 @@ export default function TransactionSearch(
             }}
             placeholder="es. 6460dc3e61ba4ed6bfea2c4468b2862c"
             error={!!error}
+            helperText={error}
             autoComplete="off"
             spellCheck={false}
             autoFocus={!props.initialValue}
