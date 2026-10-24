@@ -54,20 +54,20 @@ const date1 = new Date();
 const date2 = new Date();
 date2.setTime(date2.getTime() - 60);
 
-const mockActionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
-  ["t1", new Map([["a1", { action: { type: "FINAL" } } as DeadletterAction]])],
+const mockActionsMap: Map<string, DeadletterAction[]> = new Map([
+  ["t1", [{ action: { type: "FINAL" }, timestamp: date2.toISOString() } as DeadletterAction]],
   [
     "t2",
-    new Map([["a2", { action: { type: "NOT_FINAL" } } as DeadletterAction]]),
+    [{ action: { type: "NOT_FINAL" }, timestamp: date2.toISOString() } as DeadletterAction],
   ],
   [
     "t3",
-    new Map([
-      ["a3", { action: { type: "FINAL" }, timestamp: date1.toISOString() } as DeadletterAction],
-      ["a4", { action: { type: "NOT_FINAL" }, timestamp: date2.toISOString() } as DeadletterAction],
-    ]),
+    [
+      { action: { type: "FINAL" }, timestamp: date1.toISOString() } as DeadletterAction,
+      { action: { type: "NOT_FINAL" }, timestamp: date2.toISOString() } as DeadletterAction,
+    ],
   ],
-  ["t4", new Map()],
+  ["t4", []],
 ]);
 
 // Helper to find a chart by its title and return its mock <Pie>

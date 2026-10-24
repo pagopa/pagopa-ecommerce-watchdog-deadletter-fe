@@ -52,7 +52,7 @@ export default function Home() {
   const [range, setRange] = useState<DateRange | undefined>();
 
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
-  const [actionsMap, setActionsMap] = useState<Map<string, Map<string, DeadletterAction>>>(new Map());
+  const [actionsMap, setActionsMap] = useState<Map<string, DeadletterAction[]>>(new Map());
   const [notesMap, setNotesMap] = useState<Map<string, TransactionNote[]>>(new Map());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
@@ -126,7 +126,7 @@ export default function Home() {
   };
 
   const handleAddActionToTransaction = (actionValue: string, id: string) => {
-    if (!jwtUser || actionsMap.get(id)?.has(actionValue)) return;
+    if (!jwtUser) return;
 
     const actionType = actions.find(action => action.value === actionValue);
     if (!actionType) return;
@@ -145,12 +145,10 @@ export default function Home() {
         if (!res) return;
         setActionsMap((prev) => {
           const newMap = new Map(prev);
-          if (!newMap.get(id)) {
-            newMap.set(id, new Map());
-          }
-          newMap.get(id)?.set(actionType.value, newAction);
+          const existing = newMap.get(id) ?? [];
+          newMap.set(id, [...existing, newAction]);
           return newMap;
-        })
+        });
       });
     }
   }
@@ -161,9 +159,7 @@ export default function Home() {
     const actionType = actions.find(action => action.value === actionValue);
     if (!actionType) return;
 
-    transactions = transactions.filter(t => !actionsMap.get(t.transactionId)?.has(actionValue))
-    if (transactions.length == 0) return;
-
+    if (transactions.length === 0) return;
 
     const payload: { transactionIds: string[], value: string } = {
       transactionIds: transactions.map(t => t.transactionId),
@@ -186,13 +182,11 @@ export default function Home() {
               action: actionType
             }
 
-            if (!newMap.get(t.transactionId)) {
-              newMap.set(t.transactionId, new Map());
-            }
-            newMap.get(t.transactionId)?.set(actionType.value, newAction);
+            const existing = newMap.get(t.transactionId) ?? [];
+            newMap.set(t.transactionId, [...existing, newAction]);
           })
           return newMap;
-        })
+        });
       });
     }
   }
@@ -259,18 +253,17 @@ export default function Home() {
         setNotesMap(new Map());
       }
 
-      const newActionsMap: Map<string, Map<string, DeadletterAction>> = new Map();
+      const newActionsMap: Map<string, DeadletterAction[]> = new Map();
       if (token.current && transactionIds?.size > 0) {
         const nestedActionsList = await fetchActionsByMultipleTransactionIds(token.current, transactionIds)
         for (const actions of nestedActionsList ?? []) {
           if (!actions || actions.length === 0) continue;
-          const singleActionMap: Map<string, DeadletterAction> = actions.reduce(
-            (acc, item) => { acc.set(item.action.value, item); return acc },
-            new Map()
-          );
           const tId = actions[0]?.transactionId || actions[0]?.deadletterTransactionId;
           if (tId) {
-            newActionsMap.set(tId, singleActionMap);
+            const sorted = [...actions].sort(
+              (a, b) => new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf()
+            );
+            newActionsMap.set(tId, sorted);
           }
         }
       }

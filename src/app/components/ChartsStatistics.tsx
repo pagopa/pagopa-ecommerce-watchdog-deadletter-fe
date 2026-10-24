@@ -15,7 +15,7 @@ import { DeadletterAction } from "../types/DeadletterAction";
 export default function ChartsStatistics(
   props: Readonly<{
     transactions: Transaction[];
-    actionsMap: Map<string, Map<string, DeadletterAction>>;
+    actionsMap: Map<string, DeadletterAction[]>;
   }>
 ) {
   const COLORS = [
@@ -53,25 +53,28 @@ export default function ChartsStatistics(
   );
 
   function groupActionsByType(
-    actionsMap: Map<string, Map<string, DeadletterAction>>
+    actionsMap: Map<string, DeadletterAction[]>
   ) {
     const grouped = new Map<string, number>();
     grouped.set(FINAL_STATUS, 0);
     grouped.set(NON_FINAL_STATUS, 0);
     grouped.set(NON_ANALYZED_STATUS, props.transactions.length);
 
-    for (const transactionActionMap of actionsMap.values()) {
-      for (const actionItem of transactionActionMap.values()) {
-        switch (actionItem.action.type) {
-          case "FINAL":
-            grouped.set(FINAL_STATUS, grouped.get(FINAL_STATUS)! + 1);
-            break;
-          case "NOT_FINAL":
-            grouped.set(NON_FINAL_STATUS, grouped.get(NON_FINAL_STATUS)! + 1);
-            break;
-        }
-        grouped.set(NON_ANALYZED_STATUS, Math.max(grouped.get(NON_ANALYZED_STATUS)! - 1, 0))
+    for (const transactionActions of actionsMap.values()) {
+      if (transactionActions.length === 0) continue;
+      // Pick the most recent action for this transaction to determine its analysis status
+      const latestAction = transactionActions.reduce(
+        (acc, curr) => new Date(acc.timestamp).valueOf() > new Date(curr.timestamp).valueOf() ? acc : curr
+      );
+      switch (latestAction.action.type) {
+        case "FINAL":
+          grouped.set(FINAL_STATUS, grouped.get(FINAL_STATUS)! + 1);
+          break;
+        case "NOT_FINAL":
+          grouped.set(NON_FINAL_STATUS, grouped.get(NON_FINAL_STATUS)! + 1);
+          break;
       }
+      grouped.set(NON_ANALYZED_STATUS, Math.max(grouped.get(NON_ANALYZED_STATUS)! - 1, 0));
     }
     return Array.from(grouped.entries()).map(([name, value]) => ({
       name,
@@ -94,17 +97,19 @@ export default function ChartsStatistics(
 
   const actionTypes = useMemo(
     () => {
-      const latestActions: Map<string, Map<string, DeadletterAction>> = new Map();
+      // Build a map keeping only the most recent action per transaction,
+      // so the chart reflects the "current" analysis state of each transaction.
+      const latestPerTransaction: Map<string, DeadletterAction[]> = new Map();
 
       for (const [tId, actions] of props.actionsMap) {
-        if (actions.size == 0) continue;
-        const latest = actions.entries().reduce(
-          (acc, value) => new Date(acc[1].timestamp).valueOf() > new Date(value[1].timestamp).valueOf() ?
-          acc : value
+        if (actions.length === 0) continue;
+        const latest = actions.reduce(
+          (acc, curr) =>
+            new Date(acc.timestamp).valueOf() > new Date(curr.timestamp).valueOf() ? acc : curr
         );
-        latestActions.set(tId, new Map([latest]))
+        latestPerTransaction.set(tId, [latest]);
       }
-      return groupActionsByType(latestActions)
+      return groupActionsByType(latestPerTransaction);
     },
     [props.actionsMap]
   );
