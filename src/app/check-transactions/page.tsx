@@ -154,7 +154,7 @@ function CheckTransactionsContent() {
         );
       case "unauthorized":
         return (
-          <Alert severity="error" action={<Button color="inherit" size="small" onClick={goHome}>Vai alla home</Button>}>
+          <Alert severity="error" action={<Button color="inherit" size="small" onClick={handleLogout}>Vai alla home</Button>}>
             Sessione scaduta, effettua di nuovo il login.
           </Alert>
         );
