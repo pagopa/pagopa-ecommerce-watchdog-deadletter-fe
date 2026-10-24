@@ -61,6 +61,18 @@ To run the application locally, you need to start both the frontend and a mock A
     You need to include a mock user token in the URL to bypass the initial authentication (which is a basic auth placeholder for the PoC):
     `http://localhost:3000/#token=123`
 
+5.  **Check Transactions page (mock):**
+    After logging in, open `http://localhost:3000/check-transactions` and search one of the transaction IDs below.
+    The valid Authenticator (OTP) code in the mock is `123456`.
+
+    | Transaction ID | Refund scenario |
+    |---|---|
+    | `6460dc3e61ba4ed6bfea2c4468b2862c` | eCommerce status becomes `REFUNDED` during polling |
+    | `aabe94d6f8b34482a323045704ce522b` | eCommerce status becomes `REFUND_ERROR`, then the forced refund succeeds (`200`) |
+    | `505db4c0c7be4f4582868fd0780359f4` | eCommerce status stays `REFUND_REQUESTED` until the polling timeout (2 minutes), then the forced refund fails (`502`) |
+
+    Any other transaction ID in `api-mock/db.json` follows the first scenario. Refund state is kept in memory: restart `yarn mock-server` to reset it.
+
 ---
 
 ### Architecture & Technology Stack
