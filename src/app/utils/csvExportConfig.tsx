@@ -15,13 +15,13 @@ export interface ExportConfig {
 }
 
 export type ExportableTransaction = Transaction & {
-  actions?: Map<string, DeadletterAction>;
+  actions?: DeadletterAction[];
   notes?: TransactionNote[];
 };
 
 const getExtraColumnValue = (transaction: ExportableTransaction, column: string): string | undefined => {
   if (column === 'actions') {
-    return Array.from(transaction.actions?.values() ?? [])
+    return (transaction.actions ?? [])
       .sort((a, b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
       .map(getDeadletterActionAsString)
       .join(' | ');
