@@ -103,15 +103,12 @@ const mockAction2: DeadletterAction = {
   timestamp: "2025-08-10T08:20:00Z",
 };
 
-const mockActionsMap: Map<string, Map<string, DeadletterAction>> = new Map([
+const mockActionsMap: Map<string, DeadletterAction[]> = new Map([
   [
     "505db4c0c7be4f4582868fd0780359f4",
-    new Map([
-      ["Stornata", mockAction1],
-      ["Da stornare", mockAction2],
-    ]),
+    [mockAction1, mockAction2],
   ],
-  ["429a7b69689c4e6197f4d4fd412ae355", new Map()],
+  ["429a7b69689c4e6197f4d4fd412ae355", []],
 ]);
 
 const mockTransactions: Transaction[] = [
@@ -683,14 +680,14 @@ describe("TransactionsTable", () => {
 
   describe("azioniSortingFn", () => {
     it("should return the row with the most recent action between two rows", () => {
-      const rowA = { original: { transactionId: "tx-1", actions: new Map([
-        ["action1", {timestamp: new Date(2026, 1, 5).toISOString()} as DeadletterAction],
-        ["action2", {timestamp: new Date(2026, 1, 1).toISOString()} as DeadletterAction],
-      ])}};
-      const rowB = { original: { transactionId: "tx-2", actions: new Map([
-        ["action1", {timestamp: new Date(2026, 1, 7).toISOString()} as DeadletterAction],
-      ])}};
-      const rowC = { original: { transactionId: "tx-3", actions: new Map() } };
+      const rowA = { original: { transactionId: "tx-1", actions: [
+        {timestamp: new Date(2026, 1, 5).toISOString()} as DeadletterAction,
+        {timestamp: new Date(2026, 1, 1).toISOString()} as DeadletterAction,
+      ]}};
+      const rowB = { original: { transactionId: "tx-2", actions: [
+        {timestamp: new Date(2026, 1, 7).toISOString()} as DeadletterAction,
+      ]}};
+      const rowC = { original: { transactionId: "tx-3", actions: [] } };
 
       expect(azioniSortingFn(rowA, rowB)).toBe(1);
       expect(azioniSortingFn(rowB, rowA)).toBe(-1);
@@ -701,27 +698,19 @@ describe("TransactionsTable", () => {
   });
 
   describe("azioniFilterFn", () => {
-    const row1 = { original: { transactionId: "tx-1", actions: 
-        new Map([
-          [
-            "Stornata",
-            {
-              action: { value: "Stornata" },
-              userId: "mario.rossi",
-              timestamp: new Date(2026, 1, 1).toISOString()
-            } as DeadletterAction,
-          ],
-          [
-            "Refund",
-            {
-              action: { value: "Refund" },
-              userId: "giuseppe.verdi",
-            } as DeadletterAction,
-          ],
-        ]),
-      }
-    };
-    const row2 = { original: { transactionId: "tx-2", actions: new Map() } };
+    const row1 = { original: { transactionId: "tx-1", actions: [
+        {
+          action: { value: "Stornata" },
+          userId: "mario.rossi",
+          timestamp: new Date(2026, 1, 1).toISOString()
+        } as DeadletterAction,
+        {
+          action: { value: "Refund" },
+          userId: "giuseppe.verdi",
+        } as DeadletterAction,
+      ],
+    }};
+    const row2 = { original: { transactionId: "tx-2", actions: [] } };
 
     it("should return true when filter value matches action value case-insensitively", () => {
       expect(azioniFilterFn(row1, "stornata")).toBe(true);

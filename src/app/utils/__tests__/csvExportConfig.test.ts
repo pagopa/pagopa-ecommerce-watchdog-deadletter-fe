@@ -299,20 +299,20 @@ describe('csvExportConfig', () => {
     it('should serialize actions and notes as readable lists', () => {
       const transaction = {
         ...({} as Transaction),
-        actions: new Map([
-          ['first', {
+        actions: [
+          {
             id: 'first',
             userId: 'mario.rossi',
             action: { value: 'Stornata', type: 'FINAL' as const },
             timestamp: '2026-03-02T10:00:00Z'
-          }],
-          ['second', {
+          },
+          {
             id: 'second',
             userId: 'luigi.verdi',
             action: { value: 'Da stornare', type: 'NOT_FINAL' as const },
             timestamp: '2026-03-01T10:00:00Z'
-          }]
-        ]),
+          }
+        ],
         notes: [
           { noteId: '1', transactionId: 'tx-123', userId: 'mario.rossi', note: 'Prima nota', createdAt: '2026-03-02T10:00:00Z', updatedAt: '' },
           { noteId: '2', transactionId: 'tx-123', userId: 'luigi.verdi', note: 'Seconda nota', createdAt: '2026-03-01T10:00:00Z', updatedAt: '' }

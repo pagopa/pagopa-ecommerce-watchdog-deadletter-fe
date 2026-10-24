@@ -18,7 +18,7 @@ export function TransactionsTable(
   props: Readonly<{
     transactions: Transaction[];
     notesMap: Map<string, TransactionNote[]>;
-    actionsMap: Map<string, Map<string, DeadletterAction>>;
+    actionsMap: Map<string, DeadletterAction[]>;
     actions: ActionType[];
     userId: string;
     startDate?: string;
@@ -165,14 +165,14 @@ export function TransactionsTable(
     setLoadingExport(false);
   }
 
-  type TransactionWithExtra = Transaction & { notes: TransactionNote[], actions: Map<string, DeadletterAction> }
+  type TransactionWithExtra = Transaction & { notes: TransactionNote[], actions: DeadletterAction[] }
 
   const transactionsWithExtra: TransactionWithExtra[] = useMemo(() => 
     props.transactions.map((v) => {
       return {
         ...v,
         notes: props.notesMap.get(v.transactionId) ?? [],
-        actions: props.actionsMap.get(v.transactionId) ?? new Map() 
+        actions: props.actionsMap.get(v.transactionId) ?? []
       }
     }),
     [props.transactions, props.notesMap, props.actionsMap]
@@ -380,9 +380,8 @@ export function TransactionsTable(
         sortingFn: (rowA, rowB) => azioniSortingFn(rowA, rowB),
         filterFn: (row, _id, filterValue) => azioniFilterFn(row, filterValue),
         Cell: ({ row }) => {
-          const transactionActions = row.original.actions
-            ? Array.from(row.original.actions!.values()).sort((a,b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
-            : [];
+          const transactionActions = [...row.original.actions]
+            .sort((a, b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf());
 
           return (
             <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -722,20 +721,20 @@ export function TransactionsTable(
 }
 
 export const azioniSortingFn = (
-  rowA: { original: { transactionId: string, actions: Map<string, DeadletterAction> } },
-  rowB: { original: { transactionId: string, actions: Map<string, DeadletterAction> } }
+  rowA: { original: { transactionId: string, actions: DeadletterAction[] } },
+  rowB: { original: { transactionId: string, actions: DeadletterAction[] } }
 ): number => {
   switch (true) {
-    case rowA.original.actions.size == 0 && rowB.original.actions.size == 0: return 0;
-    case rowB.original.actions.size == 0: return -1;
-    case rowA.original.actions.size == 0: return 1;
+    case rowA.original.actions.length == 0 && rowB.original.actions.length == 0: return 0;
+    case rowB.original.actions.length == 0: return -1;
+    case rowA.original.actions.length == 0: return 1;
   }
 
   const getNewestAction = (acc: DeadletterAction, value: DeadletterAction): DeadletterAction =>
     acc.timestamp < value.timestamp ? value : acc
 
-  const maxA = Array.from(rowA.original.actions.values()).reduce(getNewestAction);
-  const maxB = Array.from(rowB.original.actions.values()).reduce(getNewestAction);
+  const maxA = rowA.original.actions.reduce(getNewestAction);
+  const maxB = rowB.original.actions.reduce(getNewestAction);
   switch (true) {
     case maxA.timestamp >  maxB.timestamp: return -1;
     case maxA.timestamp <  maxB.timestamp: return 1;
@@ -744,12 +743,10 @@ export const azioniSortingFn = (
 }
 
 export const azioniFilterFn = (
-  row: { original: { transactionId: string, actions: Map<string, DeadletterAction> } },
+  row: { original: { transactionId: string, actions: DeadletterAction[] } },
   filterValue: string
 ): boolean => {
-  const transactionActions = row.original.actions
-    ? Array.from(row.original.actions!.values())
-    : [];
+  const transactionActions = row.original.actions ?? [];
 
   return transactionActions.some((a) =>
     a.action.value.toLowerCase().includes(filterValue.toLowerCase()) ||
