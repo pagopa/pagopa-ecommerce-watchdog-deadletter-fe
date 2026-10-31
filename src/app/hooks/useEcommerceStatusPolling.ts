@@ -3,6 +3,7 @@ import { fetchTransactionEcommerceStatus } from "../utils/api/client";
 
 export const REFUND_POLLING_INITIAL_INTERVAL_MS = 2_000;
 export const REFUND_POLLING_TIMEOUT_MS = 30_000;
+export const REFUND_POLLING_MAX_CHECKS = 24;
 
 export type RefundPollingResult = 'refunded' | 'refundError' | 'timeout';
 
