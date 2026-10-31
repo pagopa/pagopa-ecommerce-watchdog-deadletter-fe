@@ -3,7 +3,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CompensatingActions from "../CompensatingActions";
 import { fetchTransactionEcommerceStatus, requestTransactionRefund } from "@/app/utils/api/client";
-import { REFUND_POLLING_INTERVAL_MS, REFUND_POLLING_MAX_CHECKS } from "@/app/hooks/useEcommerceStatusPolling";
+import { REFUND_POLLING_INITIAL_INTERVAL_MS, REFUND_POLLING_TIMEOUT_MS } from "@/app/hooks/useEcommerceStatusPolling";
 import { transactionCheckMock } from "./mock/transactionCheckMock";
 
 jest.mock("@/app/utils/api/client", () => ({
@@ -99,7 +99,7 @@ describe("CompensatingActions - refund", () => {
     expect(screen.getByText("Verifica dello stato eCommerce in corso.")).toBeInTheDocument();
     expect(screen.getByText("REFUND_REQUESTED")).toBeInTheDocument();
 
-    await advance(REFUND_POLLING_INTERVAL_MS);
+    await advance(REFUND_POLLING_INITIAL_INTERVAL_MS);
 
     expect(await screen.findByText("Storno completato")).toBeInTheDocument();
     expect(onActionCompleted).toHaveBeenCalledTimes(1);
@@ -133,9 +133,9 @@ describe("CompensatingActions - refund", () => {
 
     await user.click(screen.getByRole("button", { name: "Avvia storno" }));
     await submitOtp(user, "Avvia storno");
-    await advance(REFUND_POLLING_INTERVAL_MS * (REFUND_POLLING_MAX_CHECKS - 1));
+    // Advance past the independent wall-clock deadline to trigger the timeout.
+    await advance(REFUND_POLLING_TIMEOUT_MS);
 
-    expect(mockedFetchStatus).toHaveBeenCalledTimes(REFUND_POLLING_MAX_CHECKS);
     await screen.findByRole("dialog", { name: "Forza storno" });
     await submitOtp(user, "Forza storno");
 

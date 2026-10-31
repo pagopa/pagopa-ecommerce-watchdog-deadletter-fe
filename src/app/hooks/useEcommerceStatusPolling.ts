@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchTransactionEcommerceStatus } from "../utils/api/client";
 
-export const REFUND_POLLING_INTERVAL_MS = 10_000;
-export const REFUND_POLLING_TIMEOUT_MS = 2 * 60_000;
-// First check is immediate, then one every interval until the timeout.
-export const REFUND_POLLING_MAX_CHECKS = REFUND_POLLING_TIMEOUT_MS / REFUND_POLLING_INTERVAL_MS + 1;
+export const REFUND_POLLING_INITIAL_INTERVAL_MS = 2_000;
+export const REFUND_POLLING_TIMEOUT_MS = 30_000;
 
 export type RefundPollingResult = 'refunded' | 'refundError' | 'timeout';
 
@@ -30,26 +28,38 @@ export function useEcommerceStatusPolling(
     if (!enabled) return;
 
     let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
+    let pollTimer: ReturnType<typeof setTimeout> | undefined;
+    let settled = false;
     let checks = 0;
     let lastStatus: string | null = null;
+    let nextInterval = REFUND_POLLING_INITIAL_INTERVAL_MS;
+
+    const settle = (result: RefundPollingResult) => {
+      if (settled || cancelled) return;
+      settled = true;
+      clearTimeout(pollTimer);
+      onSettledRef.current(result, lastStatus);
+    };
+
+    // Independent wall-clock deadline — fires regardless of in-flight requests.
+    const deadlineTimer = setTimeout(() => settle('timeout'), REFUND_POLLING_TIMEOUT_MS);
 
     const poll = async () => {
       const status = await fetchTransactionEcommerceStatus(token, transactionId);
-      if (cancelled) return;
+      if (cancelled || settled) return;
 
       checks += 1;
       lastStatus = status ?? lastStatus;
       setProgress({ checks, lastStatus });
 
       if (status === "REFUNDED") {
-        onSettledRef.current('refunded', lastStatus);
+        settle('refunded');
       } else if (status === "REFUND_ERROR") {
-        onSettledRef.current('refundError', lastStatus);
-      } else if (checks >= REFUND_POLLING_MAX_CHECKS) {
-        onSettledRef.current('timeout', lastStatus);
+        settle('refundError');
       } else {
-        timer = setTimeout(poll, REFUND_POLLING_INTERVAL_MS);
+        // Exponential backoff: 2s → 4s → 8s → 16s → ...
+        pollTimer = setTimeout(poll, nextInterval);
+        nextInterval *= 2;
       }
     };
 
@@ -57,7 +67,8 @@ export function useEcommerceStatusPolling(
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      clearTimeout(pollTimer);
+      clearTimeout(deadlineTimer);
       setProgress({ checks: 0, lastStatus: null });
     };
   }, [token, transactionId, enabled]);
