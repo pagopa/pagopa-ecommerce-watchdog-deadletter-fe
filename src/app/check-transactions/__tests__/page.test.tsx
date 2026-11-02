@@ -6,12 +6,9 @@ import { fetchTransactionCheck } from "../../utils/api/client";
 import { navigateTo } from "../../utils/utils";
 import { transactionCheckMock } from "../../components/check-transactions/__tests__/mock/transactionCheckMock";
 
-const mockPush = jest.fn();
 let mockSearch = "";
 
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
-  usePathname: () => "/check-transactions",
   useSearchParams: () => new URLSearchParams(mockSearch),
 }));
 
@@ -41,6 +38,7 @@ describe("CheckTransactionsPage", () => {
 
   afterEach(() => {
     sessionStorage.clear();
+    window.history.replaceState(null, "", "/");
   });
 
   it("asks to login when there is no token", async () => {
@@ -51,21 +49,26 @@ describe("CheckTransactionsPage", () => {
     expect(navigateTo).toHaveBeenCalled();
   });
 
-  it("shows the empty state and pushes the searched id to the url", async () => {
-    login();
-    render(<CheckTransactionsPage />);
+  it.each(["/check-transactions", "/pagopa-ecommerce-watchdog-deadletter-fe/check-transactions"])(
+    "shows the empty state and preserves %s when searching",
+    async (pathname) => {
+      window.history.replaceState(null, "", pathname);
+      login();
+      render(<CheckTransactionsPage />);
 
-    expect(screen.getByRole("heading", { level: 1, name: "Verifica transazione" })).toBeInTheDocument();
-    expect(screen.getByText("Nessuna transazione selezionata")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Verifica transazione" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByText("eCommerce Watchdog")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Analisi Deadletter" })).toHaveAttribute("href", "/");
+      expect(screen.getByRole("heading", { level: 1, name: "Verifica transazione" })).toBeInTheDocument();
+      expect(screen.getByText("Nessuna transazione selezionata")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Verifica transazione" })).toHaveAttribute("aria-current", "page");
+      expect(screen.getByText("eCommerce Watchdog")).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Analisi Deadletter" })).toHaveAttribute("href", "/");
 
-    await userEvent.type(screen.getByLabelText("Transaction ID"), `${VALID_ID}{Enter}`);
+      await userEvent.type(screen.getByLabelText("Transaction ID"), `${VALID_ID}{Enter}`);
 
-    expect(mockPush).toHaveBeenCalledWith(`/check-transactions?transactionId=${VALID_ID}`);
-    expect(mockedFetchTransactionCheck).not.toHaveBeenCalled();
-  });
+      expect(window.location.pathname).toBe(pathname);
+      expect(window.location.search).toBe(`?transactionId=${VALID_ID}`);
+      expect(mockedFetchTransactionCheck).not.toHaveBeenCalled();
+    }
+  );
 
   it("loads the transaction from the url and renders all sections", async () => {
     login();
@@ -92,7 +95,6 @@ describe("CheckTransactionsPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Cerca" }));
 
     await waitFor(() => expect(mockedFetchTransactionCheck).toHaveBeenCalledTimes(2));
-    expect(mockPush).not.toHaveBeenCalled();
   });
 
   it.each([

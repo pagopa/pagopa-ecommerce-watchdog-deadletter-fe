@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Button, Stack } from "@mui/material";
-import Link from "next/link";
+import { getAppPath } from "../utils/utils";
 
 const pages = [
   { href: "/", label: "Analisi Deadletter" },
@@ -17,8 +17,8 @@ export default function AppNavigation({ activePage }: Readonly<{ activePage: typ
           return (
             <Button
               key={href}
-              component={Link}
-              href={href}
+              component="a"
+              href={getAppPath(href)}
               aria-current={active ? "page" : undefined}
               sx={{
                 px: { xs: 1, sm: 2 },

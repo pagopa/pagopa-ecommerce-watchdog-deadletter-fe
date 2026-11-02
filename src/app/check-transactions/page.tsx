@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Logout } from "@mui/icons-material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import { Alert, Box, Button, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
@@ -85,8 +85,6 @@ function TransactionResult(props: Readonly<{ token: string; transaction: Transac
 }
 
 function CheckTransactionsContent() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const transactionId = searchParams.get("transactionId") ?? "";
   const validId = isValidTransactionId(transactionId) ? transactionId : "";
@@ -120,7 +118,7 @@ function CheckTransactionsContent() {
       reload();
       return;
     }
-    router.push(`${pathname}?transactionId=${encodeURIComponent(id)}`);
+    window.history.pushState(null, "", `?transactionId=${encodeURIComponent(id)}`);
   };
 
   const handleLogout = () => {

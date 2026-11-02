@@ -74,6 +74,19 @@ To run the application locally, you need to start both the frontend and a mock A
 
     Any other transaction ID in `api-mock/db.json` follows the first scenario. Refund state is kept in memory: restart `yarn mock-server` to reset it.
 
+### Deployment under a URL prefix
+
+Set `NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH=/pagopa-ecommerce-watchdog-deadletter-fe/`
+at build time through the Docker build argument for deployments exposed under
+that prefix. This matches the ingress configuration in **dev, UAT, and production**;
+provide the same value in all three environments. No default is set in Docker.
+Leave it empty or set it
+to `/` for local development at the domain root. Menu links use this prefix;
+transaction searches update only the query string, preserving the public path.
+Navigation between pages uses standard links so it remains compatible with the
+ingress routing. The login session is retained in `sessionStorage`.
+The Next.js `assetPrefix` setting only controls static assets, not page links.
+
 ---
 
 ### Architecture & Technology Stack
