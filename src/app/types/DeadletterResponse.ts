@@ -107,7 +107,7 @@ interface PspInfo {
   idChannel: string;
 }
 
-interface ECommerceDetails {
+export interface ECommerceDetails {
   userInfo: UserInfo;
   transactionInfo: ECommerceTransactionInfo;
   paymentInfo: PaymentInfo;
@@ -115,7 +115,7 @@ interface ECommerceDetails {
   product: string;
 }
 
-interface NodoDetails {
+export interface NodoDetails {
   dateFrom: string;
   dateTo: string;
   data: unknown[]; //TODO: use a specific type; mock DB only has empty array as "data" value
@@ -140,6 +140,6 @@ interface NpgOperationAdditionalData {
   rrn: string | null;
 }
 
-interface NpgDetails {
+export interface NpgDetails {
   operations: NpgOperation[];
 }

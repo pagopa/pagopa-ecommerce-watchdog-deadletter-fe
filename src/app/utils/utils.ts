@@ -11,6 +11,11 @@ export const navigateTo = (url: string) => {
   window.location.assign(url);
 };
 
+export const getAppPath = (path: string): string => {
+  const basePath = (process.env.NEXT_PUBLIC_ECOMMERCE_WATCHDOG_BASE_PATH ?? "").replace(/\/+$/, "");
+  return `${basePath}${path}`;
+};
+
 export function debounce(fn: () => void, delay: number): () => void {
   let timer: ReturnType<typeof setTimeout>;
 

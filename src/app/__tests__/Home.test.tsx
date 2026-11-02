@@ -168,6 +168,10 @@ describe('Home', () => {
     expect(mockedFetchActions).toHaveBeenCalledWith(tokenMock);
     expect(mockedFetchActions).toHaveBeenCalledTimes(1);
 
+    expect(screen.getByText("eCommerce Watchdog")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Analisi Deadletter" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Verifica transazione" })).toHaveAttribute("href", "/check-transactions");
+
     // The dialog should not be visible
     expect(screen.queryByRole('dialog', { name: "Login" })).not.toBeInTheDocument();
 

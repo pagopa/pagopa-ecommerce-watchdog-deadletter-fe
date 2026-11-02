@@ -1,4 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { handleCheckTransactions } = require('./checkTransactions');
+
 module.exports = function middleware (req, res, next) {
+
+  if (req.path.startsWith('/v1/transactions/')) {
+    return handleCheckTransactions(req, res);
+  }
 
   // POST /deadletter-transactions/{transactionId}/notes
   const match = req.path.match("(/deadletter-transactions/(.+)/notes)");

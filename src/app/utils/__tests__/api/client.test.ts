@@ -15,7 +15,10 @@ import {
   addNoteToTransactions,
   updateTransactionNote,
   deleteTransactionNote,
-  fetchCalendarStats
+  fetchCalendarStats,
+  fetchTransactionCheck,
+  requestTransactionRefund,
+  fetchTransactionEcommerceStatus
 } from "../../api/client";
 import { DeadletterResponse } from "@/app/types/DeadletterResponse";
 import { CalendarStats } from "@/app/types/CalendarStatsResponse";
@@ -665,5 +668,137 @@ describe("fetchCalendarStats", () => {
 
     expect(result).toEqual({ stats: [] });
     expect(consoleErrorSpy).toHaveBeenCalledWith(error);
+  });
+});
+
+const mockResponse = (status: number, body?: unknown) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  json: body === undefined ? jest.fn().mockRejectedValue(new Error("no body")) : jest.fn().mockResolvedValue(body),
+} as unknown as Response);
+
+describe("fetchTransactionCheck", () => {
+  it("returns the transaction when found", async () => {
+    const transaction = { transactionId: "t1", events: [] };
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(200, transaction));
+
+    const result = await fetchTransactionCheck(mockToken, "t1");
+
+    expect(result).toEqual({ outcome: "found", transaction });
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/v1/transactions/t1",
+      { headers: { Authorization: `Bearer ${mockToken}` } }
+    );
+  });
+
+  it.each([
+    [404, "notFound"],
+    [401, "unauthorized"],
+    [500, "error"],
+  ])("maps status %i to %s", async (status, outcome) => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(status));
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await fetchTransactionCheck(mockToken, "t1")).toEqual({ outcome });
+  });
+
+  it("encodes the transaction id", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(200, {}));
+
+    await fetchTransactionCheck(mockToken, "a/../b");
+
+    expect(globalThis.fetch).toHaveBeenCalledWith("https://api.mock.com/v1/transactions/a%2F..%2Fb", expect.anything());
+  });
+});
+
+describe("requestTransactionRefund", () => {
+  it("posts the otp code without force", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(201));
+
+    const result = await requestTransactionRefund(mockToken, "t1", "123456", false);
+
+    expect(result).toEqual({ outcome: "accepted" });
+    expect(globalThis.fetch).toHaveBeenCalledWith("https://api.mock.com/v1/transactions/t1/refund", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${mockToken}` },
+      body: JSON.stringify({ otpCode: "123456", force: false }),
+    });
+  });
+
+  it("sends force=true in the body and maps 200 to completed", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(200));
+
+    const result = await requestTransactionRefund(mockToken, "t1", "123456", true);
+
+    expect(result).toEqual({ outcome: "completed" });
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/v1/transactions/t1/refund",
+      expect.objectContaining({ body: JSON.stringify({ otpCode: "123456", force: true }) })
+    );
+  });
+
+  it("maps a forced 502 to gatewayError with the backend message", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(502, { title: "Bad Gateway", detail: "PSP refused" }));
+
+    expect(await requestTransactionRefund(mockToken, "t1", "123456", true))
+      .toEqual({ outcome: "gatewayError", message: "PSP refused" });
+  });
+
+  it("uses a fallback message when the 502 has no body", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(502));
+
+    expect(await requestTransactionRefund(mockToken, "t1", "123456", true))
+      .toEqual({ outcome: "gatewayError", message: "Errore restituito dal gateway" });
+  });
+
+  it("maps 409 to notRefundable with the backend detail or a fallback", async () => {
+    jest.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(mockResponse(409, { detail: "Forced refund is supported only for NPG transactions" }))
+      .mockResolvedValueOnce(mockResponse(409));
+
+    expect(await requestTransactionRefund(mockToken, "t1", "123456", true))
+      .toEqual({ outcome: "notRefundable", message: "Forced refund is supported only for NPG transactions" });
+    expect(await requestTransactionRefund(mockToken, "t1", "123456", false))
+      .toEqual({ outcome: "notRefundable", message: "La transazione non è in uno stato stornabile" });
+  });
+
+  it.each([
+    [422, false, "invalidOtp"],
+    [401, false, "unauthorized"],
+    [404, true, "notFound"],
+    [500, false, "error"],
+    [200, false, "error"],
+    [201, true, "error"],
+  ])("maps status %i (force=%s) to %s", async (status, force, outcome) => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(status));
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await requestTransactionRefund(mockToken, "t1", "123456", force)).toEqual({ outcome });
+  });
+
+  it("returns error on network failure", async () => {
+    jest.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network"));
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await requestTransactionRefund(mockToken, "t1", "123456", false)).toEqual({ outcome: "error" });
+  });
+});
+
+describe("fetchTransactionEcommerceStatus", () => {
+  it("returns the eCommerce status", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(200, { eCommerceStatus: "REFUNDED" }));
+
+    expect(await fetchTransactionEcommerceStatus(mockToken, "t1")).toBe("REFUNDED");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      "https://api.mock.com/v1/transactions/t1/status",
+      { headers: { Authorization: `Bearer ${mockToken}` } }
+    );
+  });
+
+  it("returns null on error", async () => {
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(500));
+    jest.spyOn(console, "error").mockImplementation(() => { });
+
+    expect(await fetchTransactionEcommerceStatus(mockToken, "t1")).toBeNull();
   });
 });
