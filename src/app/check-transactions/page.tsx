@@ -15,6 +15,7 @@ import { fetchTransactionCheck } from "../utils/api/client";
 import { navigateTo } from "../utils/utils";
 import { isValidTransactionId } from "../utils/transactionCheckUtils";
 import { TransactionCheck, TransactionCheckResult } from "../types/TransactionCheck";
+import AppNavigation from "../components/AppNavigation";
 
 const pagoPALink: RootLinkType = {
   label: "PagoPA S.p.A.",
@@ -186,13 +187,14 @@ function CheckTransactionsContent() {
         chipLabel="Beta"
         productsList={[
           {
-            title: "eCommerce Watchdog - Verifica transazioni",
+            title: "eCommerce Watchdog",
             id: "",
             productUrl: "",
             linkType: "internal"
           }
         ]}
       />
+      <AppNavigation activePage="/check-transactions" />
       <main className={styles.main}>
         <Box sx={{ width: "100%", maxWidth: 1280, mx: "auto" }}>
           <Typography component="h1" variant="h4" fontWeight={700}>Verifica transazione</Typography>

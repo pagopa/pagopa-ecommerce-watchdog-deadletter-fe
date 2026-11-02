@@ -57,6 +57,9 @@ describe("CheckTransactionsPage", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Verifica transazione" })).toBeInTheDocument();
     expect(screen.getByText("Nessuna transazione selezionata")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Verifica transazione" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("eCommerce Watchdog")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Analisi Deadletter" })).toHaveAttribute("href", "/");
 
     await userEvent.type(screen.getByLabelText("Transaction ID"), `${VALID_ID}{Enter}`);
 

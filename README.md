@@ -3,7 +3,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pagopa_pagopa-ecommerce-watchdog-deadletter-fe&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pagopa_pagopa-ecommerce-watchdog-deadletter-fe)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pagopa_pagopa-ecommerce-watchdog-deadletter-fe&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pagopa_pagopa-ecommerce-watchdog-deadletter-fe)
 
-This is the repository for the **pagoPA eCommerce Watchdog Deadletter** frontend component.
+This is the repository for the **pagoPA eCommerce Watchdog** frontend component.
 
 The project is a Next.js/react application designed to optimize the process of analyzing eCommerce transactions that end up in a "deadletter" state. 
 
@@ -62,7 +62,8 @@ To run the application locally, you need to start both the frontend and a mock A
     `http://localhost:3000/#token=123`
 
 5.  **Check Transactions page (mock):**
-    After logging in, open `http://localhost:3000/check-transactions` and search one of the transaction IDs below.
+    After logging in, select **Verifica transazione** in the navigation menu below the header (or open `http://localhost:3000/check-transactions`) and search one of the transaction IDs below.
+    Use **Analisi Deadletter** in the same menu to return to the deadletter dashboard. The menu highlights the current page and preserves the login session when switching pages.
     The valid Authenticator (OTP) code in the mock is `123456`.
 
     | Transaction ID | Refund scenario |

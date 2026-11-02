@@ -40,6 +40,7 @@ import dynamic from "next/dynamic";
 import { Grid, Paper } from "@mui/material";
 import { TransactionsTable } from "./components/TransactionsTable";
 import { CalendarStats } from "./types/CalendarStatsResponse";
+import AppNavigation from "./components/AppNavigation";
 
 const WorkloadCalendar = dynamic(() => import("./components/WorkloadCalendar"), {
   ssr: false,
@@ -423,13 +424,14 @@ export default function Home() {
         chipLabel="Beta"
         productsList={[
           {
-            title: "eCommerce Watchdog Deadletter",
+            title: "eCommerce Watchdog",
             id: "",
             productUrl: "",
             linkType: "internal"
           }
         ]}
       />
+      <AppNavigation activePage="/" />
       <main className={styles.main}>
         <WorkloadCalendar range={range} setRange={handleRangeChange} date={date} setDate={setDate} stats={calendarStats} />
 
