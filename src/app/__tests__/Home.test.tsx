@@ -457,6 +457,63 @@ describe('Home', () => {
 
   });
 
+  describe('bulk action batching', () => {
+    const manyTransactionsResponse = {
+      ...deadletterResponse,
+      deadletterTransactions: Array.from({ length: 150 }, (_, i) => ({
+        ...deadletterResponse.deadletterTransactions[0],
+        transactionId: `tx-${i}`,
+      })),
+    };
+
+    const selectAllAndApplyBulkAction = async () => {
+      mockSessionStorage.setItem("authToken", "mockToken123");
+      mockSessionStorage.setItem("jwtUser", JSON.stringify({ name: 'Mario', surname: 'Rossi', email: 'mario.rossi@example.com', id: 'testId' }));
+
+      mockedFetchDeadletterTransactionsV2.mockResolvedValue(manyTransactionsResponse);
+      mockedFetchNotesByTransactionIds.mockResolvedValue([]);
+      mockedFetchActionsByMultipleTransactionIds.mockResolvedValue([]);
+      mockedFetchActions.mockResolvedValue([{ value: "testAction", type: "FINAL" }]);
+
+      renderComponent();
+      expect(await screen.findByText("Mario Rossi")).toBeInTheDocument();
+
+      const day1Cell = screen.getByRole("button", { name: new RegExp(` 1 ${currentMonth}`) });
+      await userEvent.click(day1Cell);
+      await userEvent.click(day1Cell);
+
+      const table = await screen.findByRole("table");
+      await userEvent.click(within(table).getByRole('checkbox', { name: 'Toggle select all' }));
+      await userEvent.click(screen.getByRole('combobox', { expanded: false, name: /.*Azione Massiva/i }));
+      await userEvent.click(await screen.findByRole('option', { name: 'testAction' }));
+
+      await userEvent.click(screen.getByRole('button', { name: 'Conferma' }));
+    };
+
+    it('sends selected transactions in sequential batches of 100 and notifies success', async () => {
+      mockedFetchAddActionToDeadletterTransactions.mockResolvedValue({ ok: true });
+
+      await selectAllAndApplyBulkAction();
+
+      expect(await screen.findByText(/assegnata a 150 transazioni/i)).toBeInTheDocument();
+      expect(mockedFetchAddActionToDeadletterTransactions).toHaveBeenCalledTimes(2);
+      expect(mockedFetchAddActionToDeadletterTransactions.mock.calls[0][1].transactionIds).toHaveLength(100);
+      expect(mockedFetchAddActionToDeadletterTransactions.mock.calls[1][1].transactionIds).toHaveLength(50);
+      expect(screen.queryByTestId('bulk-action-progress')).not.toBeInTheDocument();
+    }, 30000);
+
+    it('stops at the first failed batch and reports how many transactions were processed', async () => {
+      mockedFetchAddActionToDeadletterTransactions
+        .mockResolvedValueOnce({ ok: true })
+        .mockResolvedValueOnce(null);
+
+      await selectAllAndApplyBulkAction();
+
+      expect(await screen.findByText(/100 di 150 transazioni aggiornate/i)).toBeInTheDocument();
+      expect(mockedFetchAddActionToDeadletterTransactions).toHaveBeenCalledTimes(2);
+    }, 30000);
+  });
+
   it('check that a note can be added to multiple rows after confirming dialogs', async () => {
     // Mock the presence of a token in the sessionStorage would be logged without login needed
     const tokenMock: string = "mockToken123";

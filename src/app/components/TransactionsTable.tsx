@@ -26,7 +26,8 @@ export function TransactionsTable(
     isLoadingData: boolean;
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
-    handleAddActionToTransactions: (transactions: Transaction[], actionValue: string) => void;
+    handleAddActionToTransactions: (transactions: Transaction[], actionValue: string) => void | Promise<void>;
+    isBulkActionRunning?: boolean;
     handleAddNote: (transactionId: string, text: string) => void;
     handleAddNotes: (transactions: Transaction[], text: string) => void;
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
@@ -597,9 +598,9 @@ export function TransactionsTable(
           select 
           data-testid='action-button-bulk'
           size='small' 
-          label='➕ Azione massiva'
+          label={props.isBulkActionRunning ? '⏳ Azione in corso...' : '➕ Azione massiva'}
           value=''
-          disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
+          disabled={props.isBulkActionRunning || (!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected())}
           onChange={(e) => handleOpenDialog(
             () => props.handleAddActionToTransactions(table.getSelectedRowModel().rows.map(r => r.original), e.target.value)
           )}

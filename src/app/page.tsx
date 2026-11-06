@@ -37,7 +37,7 @@ import { TransactionNote } from "./types/TransactionNotes";
 import LinearProgress from '@mui/material/LinearProgress';
 import { DateRange } from "@daypicker/react";
 import dynamic from "next/dynamic";
-import { Grid, Paper } from "@mui/material";
+import { Alert, Grid, Paper, Snackbar } from "@mui/material";
 import { TransactionsTable } from "./components/TransactionsTable";
 import { CalendarStats } from "./types/CalendarStatsResponse";
 import AppNavigation from "./components/AppNavigation";
@@ -45,6 +45,8 @@ import AppNavigation from "./components/AppNavigation";
 const WorkloadCalendar = dynamic(() => import("./components/WorkloadCalendar"), {
   ssr: false,
 });
+
+const BULK_ACTION_BATCH_SIZE = 100;
 
 
 
@@ -55,6 +57,8 @@ export default function Home() {
   const [jwtUser, setJwtUser] = useState<JwtUser | null>(null);
   const [actionsMap, setActionsMap] = useState<Map<string, DeadletterAction[]>>(new Map());
   const [notesMap, setNotesMap] = useState<Map<string, TransactionNote[]>>(new Map());
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
+  const [bulkResult, setBulkResult] = useState<{ severity: "success" | "error"; message: string } | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState({});
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(true);
@@ -154,42 +158,56 @@ export default function Home() {
     }
   }
 
-  const handleAddActionToTransactions = (transactions: Transaction[], actionValue: string) => {
-    if (!jwtUser) return;
+  const handleAddActionToTransactions = async (transactions: Transaction[], actionValue: string) => {
+    if (!jwtUser || !token.current || bulkProgress) return;
 
     const actionType = actions.find(action => action.value === actionValue);
-    if (!actionType) return;
+    if (!actionType || transactions.length === 0) return;
 
-    if (transactions.length === 0) return;
+    const total = transactions.length;
+    let done = 0;
+    setBulkProgress({ done, total });
 
-    const payload: { transactionIds: string[], value: string } = {
-      transactionIds: transactions.map(t => t.transactionId),
-      value: actionValue
-    }
-
-    if (token.current) {
-      fetchAddActionToDeadletterTransactions(token.current, payload).then((res) => {
-        if (!res) return;
-        setActionsMap((prev) => {
-          const newMap = new Map(prev);
-
-          transactions.forEach(t => {
-            const newAction: DeadletterAction = {
-              id: self.crypto.randomUUID(),
-              timestamp: new Date().toISOString(),
-              userId: jwtUser.id,
-              deadletterTransactionId: t.transactionId,
-              transactionId: t.transactionId,
-              action: actionType
-            }
-
-            const existing = newMap.get(t.transactionId) ?? [];
-            newMap.set(t.transactionId, [...existing, newAction]);
-          })
-          return newMap;
-        });
+    // Sequential batches: the backend caps requests at 100 ids and concurrent calls contend on calendar stats
+    for (let i = 0; i < total; i += BULK_ACTION_BATCH_SIZE) {
+      const batch = transactions.slice(i, i + BULK_ACTION_BATCH_SIZE);
+      const res = await fetchAddActionToDeadletterTransactions(token.current, {
+        transactionIds: batch.map(t => t.transactionId),
+        value: actionValue,
       });
+
+      if (!res) {
+        setBulkProgress(null);
+        setBulkResult({
+          severity: "error",
+          message: `Assegnazione interrotta: ${done} di ${total} transazioni aggiornate. Le restanti ${total - done} non sono state elaborate, riprova.`,
+        });
+        return;
+      }
+
+      const timestamp = new Date().toISOString();
+      setActionsMap((prev) => {
+        const newMap = new Map(prev);
+        batch.forEach(t => {
+          const newAction: DeadletterAction = {
+            id: self.crypto.randomUUID(),
+            timestamp,
+            userId: jwtUser.id,
+            deadletterTransactionId: t.transactionId,
+            transactionId: t.transactionId,
+            action: actionType
+          };
+          newMap.set(t.transactionId, [...(newMap.get(t.transactionId) ?? []), newAction]);
+        });
+        return newMap;
+      });
+
+      done += batch.length;
+      setBulkProgress({ done, total });
     }
+
+    setBulkProgress(null);
+    setBulkResult({ severity: "success", message: `Azione "${actionValue}" assegnata a ${total} transazioni.` });
   }
 
   const loadDataForRange = async (range: DateRange, page: number = 0, pageSize: number = 20) => {
@@ -480,6 +498,15 @@ export default function Home() {
             )}
 
 
+            {bulkProgress && (
+              <Alert severity="info" icon={<CircularProgress size={20} />} sx={{ mb: 2 }} data-testid="bulk-action-progress">
+                <Typography variant="body2" mb={1}>
+                  {`Assegnazione azione in corso (${bulkProgress.done} / ${bulkProgress.total})... Attendi il completamento dell'operazione.`}
+                </Typography>
+                <LinearProgress variant="determinate" value={(bulkProgress.done / bulkProgress.total) * 100} />
+              </Alert>
+            )}
+
             <Grid item xs={12}>
               <Paper sx={{ height: "100%", width: "100%", minHeight: "600px" }}>
                 <TransactionsTable
@@ -498,6 +525,7 @@ export default function Home() {
                   handleEditNote={handleEditNote}
                   handleDeleteNote={handleDeleteNote}
                   handleAddActionToTransactions={handleAddActionToTransactions}
+                  isBulkActionRunning={bulkProgress !== null}
                   rowCount={totalResults}
                 />
               </Paper>
@@ -563,6 +591,19 @@ export default function Home() {
             setJwtUser={setJwtUser}
           />
         )}
+
+        <Snackbar
+          open={bulkResult !== null}
+          autoHideDuration={6000}
+          onClose={() => setBulkResult(null)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          {bulkResult ? (
+            <Alert severity={bulkResult.severity} variant="filled" onClose={() => setBulkResult(null)}>
+              {bulkResult.message}
+            </Alert>
+          ) : undefined}
+        </Snackbar>
       </main>
     </div>
   );
