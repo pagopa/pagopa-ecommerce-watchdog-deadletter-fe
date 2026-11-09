@@ -26,7 +26,12 @@ export function TransactionsTable(
     isLoadingData: boolean;
     handleOpenDialog: (content: object) => void;
     handleAddActionToTransaction: (actionType: string, id: string) => void;
-    handleAddActionToTransactions: (transactions: Transaction[], actionValue: string) => void;
+    handleAddActionToTransactions: (
+      transactions: Transaction[],
+      actionValue: string,
+      onBatchApplied?: (transactionIds: string[]) => void
+    ) => void | Promise<void>;
+    isBulkActionRunning?: boolean;
     handleAddNote: (transactionId: string, text: string) => void;
     handleAddNotes: (transactions: Transaction[], text: string) => void;
     handleEditNote: (currentNote: TransactionNote, newText: string) => void;
@@ -597,11 +602,25 @@ export function TransactionsTable(
           select 
           data-testid='action-button-bulk'
           size='small' 
-          label='➕ Azione massiva'
+          label={props.isBulkActionRunning ? '⏳ Azione in corso...' : '➕ Azione massiva'}
           value=''
-          disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
+          disabled={props.isBulkActionRunning || (!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected())}
           onChange={(e) => handleOpenDialog(
-            () => props.handleAddActionToTransactions(table.getSelectedRowModel().rows.map(r => r.original), e.target.value)
+            () => props.handleAddActionToTransactions(
+              table.getSelectedRowModel().rows.map(r => r.original),
+              e.target.value,
+              // Deselect confirmed rows so a retry only resubmits the unconfirmed ones
+              (transactionIds) => {
+                const applied = new Set(transactionIds);
+                table.setRowSelection(prev => {
+                  const next = { ...prev };
+                  table.getCoreRowModel().rows
+                    .filter(r => applied.has(r.original.transactionId))
+                    .forEach(r => delete next[r.id]);
+                  return next;
+                });
+              }
+            )
           )}
           sx={{
             '& .MuiSelect-select': { paddingTop: 0.8 },
