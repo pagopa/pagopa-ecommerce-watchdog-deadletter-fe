@@ -180,7 +180,7 @@ export default function Home() {
         setBulkProgress(null);
         setBulkResult({
           severity: "error",
-          message: `Assegnazione interrotta: ${done} di ${total} transazioni aggiornate. Le restanti ${total - done} non sono state elaborate, riprova.`,
+          message: `Assegnazione interrotta: ${done} di ${total} transazioni aggiornate con conferma. Esito non confermato per il lotto di ${batch.length} transazioni; le successive ${total - done - batch.length} non sono state inviate. Verifica lo stato prima di riprovare.`,
         });
         return;
       }
