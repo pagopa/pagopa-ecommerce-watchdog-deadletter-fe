@@ -512,6 +512,24 @@ describe('Home', () => {
       expect(await screen.findByText(/100 di 150 transazioni aggiornate/i)).toBeInTheDocument();
       expect(mockedFetchAddActionToDeadletterTransactions).toHaveBeenCalledTimes(2);
     }, 30000);
+
+    it('keeps only unconfirmed transactions selected so a retry does not resubmit confirmed ones', async () => {
+      mockedFetchAddActionToDeadletterTransactions
+        .mockResolvedValueOnce({ ok: true })
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ ok: true });
+
+      await selectAllAndApplyBulkAction();
+      expect(await screen.findByText(/100 di 150 transazioni aggiornate/i)).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('combobox', { expanded: false, name: /.*Azione Massiva/i }));
+      await userEvent.click(await screen.findByRole('option', { name: 'testAction' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Conferma' }));
+
+      expect(await screen.findByText(/assegnata a 50 transazioni/i)).toBeInTheDocument();
+      const retryIds: string[] = mockedFetchAddActionToDeadletterTransactions.mock.calls[2][1].transactionIds;
+      expect(retryIds).toEqual(mockedFetchAddActionToDeadletterTransactions.mock.calls[1][1].transactionIds);
+    }, 30000);
   });
 
   it('check that a note can be added to multiple rows after confirming dialogs', async () => {

@@ -158,7 +158,11 @@ export default function Home() {
     }
   }
 
-  const handleAddActionToTransactions = async (transactions: Transaction[], actionValue: string) => {
+  const handleAddActionToTransactions = async (
+    transactions: Transaction[],
+    actionValue: string,
+    onBatchApplied?: (transactionIds: string[]) => void
+  ) => {
     if (!jwtUser || !token.current || bulkProgress) return;
 
     const actionType = actions.find(action => action.value === actionValue);
@@ -201,6 +205,7 @@ export default function Home() {
         });
         return newMap;
       });
+      onBatchApplied?.(batch.map(t => t.transactionId));
 
       done += batch.length;
       setBulkProgress({ done, total });
