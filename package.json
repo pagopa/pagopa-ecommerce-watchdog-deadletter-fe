@@ -8,6 +8,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
+    "lint-autofix": "eslint . --fix",
     "mock-server": "json-server --watch api-mock/db.json --middlewares api-mock/middleware.js --routes api-mock/routes.json --port 4000",
     "test": "jest",
     "test:watch": "jest --watch",
