@@ -78,7 +78,7 @@ const ArrayOfObjectsSection = ({ label, items }: { label: string; items: Record<
                 >
                     #{i + 1}
                 </Typography>
-                {Object.entries(item)
+                {Object.entries(flattenObject(item))
                     .filter(([, v]) => v !== null && v !== undefined && v !== '')
                     .map(([k, v]) => (
                         <Box

@@ -1204,7 +1204,50 @@
             "paymentGateway": "NPG",
             "correlationId": "292eeba9-1c39-4bb4-a6fe-2c2d351dfd14",
             "gatewayAuthorizationStatus": null,
-            "gatewayErrorCode": null
+            "gatewayErrorCode": null,
+            "events": [
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_ACTIVATED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_AUTHORIZATION_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_AUTHORIZATION_COMPLETED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_CLOSURE_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_CLOSED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_USER_RECEIPT_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_USER_RECEIPT_ADDED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_REFUND_REQUESTED_EVENT"
+              },
+              {
+                "creationDate": "2025-07-02T16:07:24.467271641Z",
+                "eventCode": "TRANSACTION_REFUND_ERROR_EVENT",
+                "errorDetails": {
+                  "httpErrorCode": 500,
+                  "description": "Ops, something went wrong",
+                  "errorType": "KO_RESPONSE_RECEIVED"
+                }
+              }
+            ]
           },
           "paymentInfo": {
             "origin": "CHECKOUT",
@@ -2530,35 +2573,180 @@
   ],
   "stats": {
     "stats": [
-      { "date": "2026/07/01", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
-      { "date": "2026/07/02", "finalized": 4, "notFinalized": 1, "notAnalyzed": 0 },
-      { "date": "2026/07/03", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
-      { "date": "2026/07/04", "finalized": 0, "notFinalized": 1, "notAnalyzed": 1 },
-      { "date": "2026/07/05", "finalized": 0, "notFinalized": 0, "notAnalyzed": 5 },
-      { "date": "2026/07/06", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
-      { "date": "2026/07/07", "finalized": 1, "notFinalized": 0, "notAnalyzed": 0 },
-      { "date": "2026/07/08", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
-      { "date": "2026/07/09", "finalized": 5, "notFinalized": 1, "notAnalyzed": 1 },
-      { "date": "2026/07/10", "finalized": 2, "notFinalized": 0, "notAnalyzed": 2 },
-      { "date": "2026/07/11", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
-      { "date": "2026/07/12", "finalized": 0, "notFinalized": 1, "notAnalyzed": 0 },
-      { "date": "2026/07/13", "finalized": 0, "notFinalized": 9, "notAnalyzed": 1 },
-      { "date": "2026/07/14", "finalized": 5, "notFinalized": 5, "notAnalyzed": 5 },
-      { "date": "2026/08/01", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
-      { "date": "2026/08/02", "finalized": 4, "notFinalized": 1, "notAnalyzed": 0 },
-      { "date": "2026/08/03", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
-      { "date": "2026/08/04", "finalized": 0, "notFinalized": 1, "notAnalyzed": 1 },
-      { "date": "2026/08/05", "finalized": 0, "notFinalized": 0, "notAnalyzed": 5 },
-      { "date": "2026/08/06", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
-      { "date": "2026/08/07", "finalized": 1, "notFinalized": 0, "notAnalyzed": 0 },
-      { "date": "2026/08/08", "finalized": 3, "notFinalized": 0, "notAnalyzed": 0 },
-      { "date": "2026/08/09", "finalized": 5, "notFinalized": 1, "notAnalyzed": 1 },
-      { "date": "2026/08/10", "finalized": 2, "notFinalized": 0, "notAnalyzed": 2 },
-      { "date": "2026/08/11", "finalized": 0, "notFinalized": 2, "notAnalyzed": 0 },
-      { "date": "2026/08/12", "finalized": 0, "notFinalized": 1, "notAnalyzed": 0 },
-      { "date": "2026/08/13", "finalized": 0, "notFinalized": 9, "notAnalyzed": 1 },
-      { "date": "2026/08/14", "finalized": 5, "notFinalized": 5, "notAnalyzed": 5 },
-      { "date": "2026/08/15", "finalized": 0, "notFinalized": 0, "notAnalyzed": 0 }
+      {
+        "date": "2026/07/01",
+        "finalized": 3,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/02",
+        "finalized": 4,
+        "notFinalized": 1,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/03",
+        "finalized": 0,
+        "notFinalized": 2,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/04",
+        "finalized": 0,
+        "notFinalized": 1,
+        "notAnalyzed": 1
+      },
+      {
+        "date": "2026/07/05",
+        "finalized": 0,
+        "notFinalized": 0,
+        "notAnalyzed": 5
+      },
+      {
+        "date": "2026/07/06",
+        "finalized": 0,
+        "notFinalized": 2,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/07",
+        "finalized": 1,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/08",
+        "finalized": 3,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/09",
+        "finalized": 5,
+        "notFinalized": 1,
+        "notAnalyzed": 1
+      },
+      {
+        "date": "2026/07/10",
+        "finalized": 2,
+        "notFinalized": 0,
+        "notAnalyzed": 2
+      },
+      {
+        "date": "2026/07/11",
+        "finalized": 0,
+        "notFinalized": 2,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/12",
+        "finalized": 0,
+        "notFinalized": 1,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/07/13",
+        "finalized": 0,
+        "notFinalized": 9,
+        "notAnalyzed": 1
+      },
+      {
+        "date": "2026/07/14",
+        "finalized": 5,
+        "notFinalized": 5,
+        "notAnalyzed": 5
+      },
+      {
+        "date": "2026/08/01",
+        "finalized": 3,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/02",
+        "finalized": 4,
+        "notFinalized": 1,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/03",
+        "finalized": 0,
+        "notFinalized": 2,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/04",
+        "finalized": 0,
+        "notFinalized": 1,
+        "notAnalyzed": 1
+      },
+      {
+        "date": "2026/08/05",
+        "finalized": 0,
+        "notFinalized": 0,
+        "notAnalyzed": 5
+      },
+      {
+        "date": "2026/08/06",
+        "finalized": 0,
+        "notFinalized": 2,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/07",
+        "finalized": 1,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/08",
+        "finalized": 3,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/09",
+        "finalized": 5,
+        "notFinalized": 1,
+        "notAnalyzed": 1
+      },
+      {
+        "date": "2026/08/10",
+        "finalized": 2,
+        "notFinalized": 0,
+        "notAnalyzed": 2
+      },
+      {
+        "date": "2026/08/11",
+        "finalized": 0,
+        "notFinalized": 2,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/12",
+        "finalized": 0,
+        "notFinalized": 1,
+        "notAnalyzed": 0
+      },
+      {
+        "date": "2026/08/13",
+        "finalized": 0,
+        "notFinalized": 9,
+        "notAnalyzed": 1
+      },
+      {
+        "date": "2026/08/14",
+        "finalized": 5,
+        "notFinalized": 5,
+        "notAnalyzed": 5
+      },
+      {
+        "date": "2026/08/15",
+        "finalized": 0,
+        "notFinalized": 0,
+        "notAnalyzed": 0
+      }
     ]
   }
 }
